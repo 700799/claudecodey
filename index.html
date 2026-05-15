@@ -785,6 +785,305 @@ h1 {
   background-size: 40px 10px;
   background-repeat: repeat-x;
 }
+
+/* ===== CHAIN CARDS ===== */
+.chain-resources {
+  background: rgba(254,217,15,0.07);
+  border: 1px solid rgba(254,217,15,0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 0.78rem;
+}
+.chain-resources-label {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--yellow);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.chain-resources ul { list-style: none; padding: 0; margin: 0; }
+.chain-resources li { color: var(--text); padding: 2px 0; line-height: 1.5; }
+.chain-resources li::before { content: '📎 '; }
+.chain-steps { display: flex; flex-direction: column; gap: 0; margin-bottom: 14px; }
+.chain-connector { width: 2px; height: 10px; background: var(--card-border); margin-left: 23px; }
+.chain-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  position: relative;
+}
+.step-num {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--springfield-blue);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Mono', monospace;
+}
+.step-body { flex: 1; min-width: 0; }
+.step-cat-badge {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(112,200,240,0.15);
+  color: var(--sky);
+  border: 1px solid rgba(112,200,240,0.3);
+  margin-bottom: 5px;
+}
+.step-prompt-text {
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding-right: 64px;
+}
+.copy-step-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.62rem;
+  padding: 2px 8px;
+  border: 1.5px solid var(--sky);
+  background: transparent;
+  color: var(--sky);
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.copy-step-btn:hover { background: var(--sky); color: #111; }
+.copy-all-btn {
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, var(--springfield-blue), var(--sky-dark));
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.copy-all-btn:hover { opacity: 0.88; }
+.chain-run-btn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1.5px solid var(--green);
+  color: var(--green);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  cursor: pointer;
+  text-align: left;
+}
+.chain-run-btn:hover { background: rgba(74,158,47,0.12); }
+.chain-output {
+  display: none;
+  margin-top: 8px;
+  background: var(--code-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  color: #81C784;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+.chain-output.shown { display: block; }
+
+/* ===== CHAIN GUIDE ===== */
+.chain-guide {
+  background: rgba(112,200,240,0.07);
+  border: 1px solid rgba(112,200,240,0.2);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-top: 14px;
+}
+.chain-guide-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sky);
+  margin-bottom: 10px;
+}
+.chain-guide-steps { display: flex; flex-direction: column; gap: 8px; }
+.cg-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.cg-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(112,200,240,0.2);
+  color: var(--sky);
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cg-step strong { color: var(--text); }
+.cg-step code {
+  background: rgba(255,255,255,0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--yellow);
+}
+
+/* ===== CERTIFICATE ===== */
+.cert-card { margin-top: 20px; display: none; }
+.cert-card-gradient {
+  background: linear-gradient(135deg, #FED90F 0%, #70C8F0 50%, #FED90F 100%);
+  padding: 3px;
+  border-radius: 18px;
+  margin-bottom: 12px;
+}
+.cert-card-inner {
+  background: var(--dark2);
+  border-radius: 16px;
+  padding: 28px 24px 20px;
+  text-align: center;
+}
+.cert-trophy { font-size: 3rem; margin-bottom: 6px; }
+.cert-heading {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--yellow);
+  font-size: 1.7rem;
+  margin: 0 0 4px;
+}
+.cert-subheading {
+  color: var(--sky);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin: 0 0 18px;
+}
+.cert-certifies {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin-bottom: 6px;
+}
+.cert-name-input {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto 14px;
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.6rem;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 2px dashed rgba(254,217,15,0.5);
+  text-align: center;
+  outline: none;
+  padding: 4px 8px;
+}
+.cert-name-input::placeholder { color: rgba(255,255,255,0.18); }
+.cert-name-input:focus { border-bottom-color: var(--yellow); }
+.cert-body-text {
+  color: var(--text-muted);
+  font-size: 0.83rem;
+  line-height: 1.55;
+  max-width: 380px;
+  margin: 0 auto 16px;
+}
+.cert-metadata {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.cert-score-pill {
+  background: rgba(254,217,15,0.12);
+  border: 1px solid var(--yellow);
+  color: var(--yellow);
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.cert-date-text {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+.cert-domain {
+  color: rgba(255,255,255,0.3);
+  font-size: 0.7rem;
+  font-family: 'Space Mono', monospace;
+}
+.cert-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.cert-btn-print, .cert-btn-linkedin {
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+}
+.cert-btn-print { background: var(--yellow); color: #1a1a1a; }
+.cert-btn-linkedin { background: #0A66C2; color: #fff; }
+.cert-btn-print:hover { opacity: 0.88; }
+.cert-btn-linkedin:hover { opacity: 0.88; }
+
+@media print {
+  body > *:not(.cert-quiz-section) { display: none !important; }
+  .cert-quiz-section { max-width: none !important; margin: 0 !important; padding: 20px !important; border: none !important; box-shadow: none !important; background: white !important; }
+  .cert-quiz-header, .cert-progress, .cert-q, .cert-final-score, #cert-final-msg { display: none !important; }
+  #cert-final { display: block !important; background: white !important; border: none !important; padding: 0 !important; }
+  .cert-card-gradient { background: #1a1a1a !important; }
+  .cert-card-inner { background: white !important; border: 2px solid #1a1a1a !important; border-radius: 14px !important; }
+  .cert-heading { color: #1a1a1a !important; }
+  .cert-subheading, .cert-domain { color: #555 !important; }
+  .cert-name-input { color: #1a1a1a !important; border-bottom: 2px solid #1a1a1a !important; }
+  .cert-body-text, .cert-certifies, .cert-date-text { color: #333 !important; }
+  .cert-score-pill { background: #f5f5f5 !important; border-color: #1a1a1a !important; color: #1a1a1a !important; }
+  .cert-buttons { display: none !important; }
+}
 </style>
 </head>
 <body>
@@ -5032,6 +5331,111 @@ Write specific tests that would catch each mutation. Be minimal — one test per
         ]
       },
 
+      // ===================================================
+      // 14. CHAINS — multi-step prompt sequences
+      // ===================================================
+      chains: {
+        icon: '🔗',
+        title: 'Chains',
+        description: 'Multi-step prompt sequences that combine categories to reach a real outcome — applying a code archive, integrating an API, shipping a feature from a spec. Each chain lists the resources you need up front (zip files, API docs URLs, env vars, log files) so you can drop them straight into Claude and go.',
+        examples: [
+          {
+            title: 'Ship Changes from a Code Archive',
+            difficulty: 'advanced',
+            why: 'You have a folder of revised files from a colleague or export — apply them cleanly, verify nothing broke, and push without manually diffing each file.',
+            resources: [
+              './changes.zip — archive of updated source files',
+              'GITHUB_TOKEN env var — needed if pushing to a remote'
+            ],
+            steps: [
+              { category: 'prompting', icon: '💬', prompt: 'I have a zip archive at ./changes.zip that contains updated source files. Unzip it, list every file that changed, and apply the changes to this repo. Do not commit yet — show me a summary of what changed first.' },
+              { category: 'agents', icon: '🤖', prompt: 'Launch a subagent to review each modified file for conflicts with the existing codebase. Report any functions that were deleted, renamed, or whose signatures changed.' },
+              { category: 'testing', icon: '🧪', prompt: 'Run the full test suite. If any tests fail because of the applied changes, fix them before continuing. Show me the before/after test count.' },
+              { category: 'commands', icon: '/', prompt: '/review\n\nIf the review is clean, commit all changes with a descriptive message summarising what the archive contained, then push to the current branch.' }
+            ],
+            code: 'I have a zip archive at ./changes.zip that contains updated source files. Unzip it, list every file that changed, and apply the changes to this repo. Do not commit yet — show me a summary of what changed first.',
+            lang: 'text',
+            output: '[Step 1 — prompting]\nUnzipping ./changes.zip...\n  ✓ 7 files extracted\n  Modified: src/api/users.ts, src/api/orders.ts, src/models/user.ts\n  Added:    src/utils/pagination.ts\n  Removed:  src/utils/legacy-paginate.ts\nSummary ready. Awaiting confirmation to apply.\n\n[Step 2 — agents]\nSubagent launched: conflict review\n  ✓ src/api/users.ts — 3 signature changes detected\n    • getUser(id) → getUser(id, opts?)  (opts is optional, no callers break)\n  ✓ src/models/user.ts — new field "preferences: JsonB"\n  ⚠ src/utils/legacy-paginate.ts removed — 2 callers found\n    → Updated callers to use src/utils/pagination.ts\n\n[Step 3 — testing]\nRunning test suite...\n  PASS  src/api/users.test.ts   (31 tests)\n  PASS  src/api/orders.test.ts  (18 tests)\n  FAIL  src/utils/paginate.test.ts — 2 tests failed (removed module)\n    → Fixed: updated imports to new pagination util\n  PASS  src/utils/paginate.test.ts  (8 tests)  ✓ repaired\nAll 57 tests pass.\n\n[Step 4 — commands]\n/review complete — 0 critical issues, 1 info (migration note)\nCommitting...\n  [main a8f3c2d] feat: apply changes.zip — new pagination util, updated user API\n   7 files changed, 124 insertions(+), 48 deletions(-)\nPushing to origin/main... done.'
+          },
+          {
+            title: 'Integrate a Third-Party REST API',
+            difficulty: 'advanced',
+            why: 'Going from "I have an API key and a docs URL" to a production-safe integration with auth, error handling, and full test coverage — without skipping security.',
+            resources: [
+              '[API docs URL] — paste your actual docs URL when prompting',
+              'API_KEY in .env — set it before starting'
+            ],
+            steps: [
+              { category: 'prompting', icon: '💬', prompt: 'See the API docs at [URL]. I want to integrate the /users and /orders endpoints. The API key is in .env as API_KEY. Read the auth section carefully before writing any code.' },
+              { category: 'security', icon: '🔐', prompt: 'Review the integration plan for OWASP Top 10 issues — specifically: broken authentication, sensitive data exposure, and injection. Flag anything that needs fixing before we write code.' },
+              { category: 'patterns', icon: '🏗️', prompt: 'Wrap the API client in a repository pattern so all callers use an interface and never depend on the HTTP layer directly. Show the interface design before implementing.' },
+              { category: 'testing', icon: '🧪', prompt: 'Write unit tests using mocks for every repository method. Add one integration test that hits a sandbox endpoint. Target 100% coverage of the client layer.' },
+              { category: 'commands', icon: '/', prompt: '/review\n\nOnce clean, commit with a message that names the API being integrated.' }
+            ],
+            code: 'See the API docs at [URL]. I want to integrate the /users and /orders endpoints. The API key is in .env as API_KEY. Read the auth section carefully before writing any code.',
+            lang: 'text',
+            output: '[Step 1 — prompting]\nReading API docs at [URL]...\n  ✓ Auth method: Bearer token (Authorization header)\n  ✓ Base URL: https://api.example.com/v2\n  ✓ Rate limit: 1 000 req/min\n  ✓ Endpoints mapped: GET /users, GET /users/:id, GET /orders, POST /orders\n  ✓ .env key API_KEY found\n\n[Step 2 — security]\nOWASP review:\n  ✓ Auth: Bearer token via Authorization header — correct\n  ⚠ API_KEY must never appear in logs — adding redaction middleware\n  ✓ No SQL/injection surface (REST-only, no raw queries)\n  ⚠ Missing timeout on HTTP client — adding 10s default\n  ✓ HTTPS enforced at base URL level\n2 issues fixed before coding.\n\n[Step 3 — patterns]\nRepository interface designed:\n  interface UserRepository  { getUser(id), listUsers(opts) }\n  interface OrderRepository { getOrder(id), createOrder(data) }\nImplemented HttpUserRepository + HttpOrderRepository.\nCallers depend only on the interface — HTTP layer is hidden.\n\n[Step 4 — testing]\n  PASS  src/repos/user.repo.test.ts  (14 tests, 100% coverage)\n  PASS  src/repos/order.repo.test.ts (11 tests, 100% coverage)\n  PASS  src/repos/integration.test.ts (2 tests, sandbox)\nAll 27 tests pass.\n\n[Step 5 — commands]\n/review — 0 issues found\n  [main b2e91fa] feat: integrate Example API (users + orders endpoints)\n   8 files changed, 214 insertions(+)\nPushed to origin/main.'
+          },
+          {
+            title: 'Fix a Production Bug from Error Logs',
+            difficulty: 'advanced',
+            why: 'Turn a vague "something is broken in prod" into a reproduced failure, a regression test, a fix, and a security check — all before the next deploy.',
+            resources: [
+              './logs/error.log — your production error log (or a Sentry/Datadog URL)',
+              'Staging environment or sandbox to reproduce locally'
+            ],
+            steps: [
+              { category: 'prompting', icon: '💬', prompt: 'Read the error in ./logs/error.log (or at [observability URL]). Identify the exact line, function, and input that triggered the failure. Reproduce it in the test environment before touching any code.' },
+              { category: 'testing', icon: '🧪', prompt: 'Write a failing test that exactly reproduces the bug. The test should fail right now — do not fix the bug yet. This test becomes the regression guard.' },
+              { category: 'agents', icon: '🤖', prompt: 'Launch a subagent to search the entire codebase for any other locations with the same root-cause pattern. List every file and line that could fail the same way.' },
+              { category: 'security', icon: '🔐', prompt: 'Is this bug exploitable? Could an attacker trigger it intentionally via crafted input, timing, or auth bypass? Rate it: low / medium / high. If medium or high, treat it as a security fix.' },
+              { category: 'commands', icon: '/', prompt: 'Fix the bug. Run all tests — the regression test must now pass. Commit with a message that includes the error signature so it is searchable in git log.' }
+            ],
+            code: 'Read the error in ./logs/error.log (or at [observability URL]). Identify the exact line, function, and input that triggered the failure. Reproduce it in the test environment before touching any code.',
+            lang: 'text',
+            output: '[Step 1 — prompting]\nReading ./logs/error.log...\n  ERROR [2026-05-14 03:42:17] TypeError: Cannot read property \'email\' of null\n    at sendWelcomeEmail (src/auth/onboarding.ts:87)\n    at POST /api/register (src/api/auth.ts:44)\n  Triggered by: registration with OAuth when profile.email is null\nReproduced locally: POST /api/register {provider:\'github\', scope:\'read:user\'}\n\n[Step 2 — testing]\nFailing test written:\n  FAIL  src/auth/onboarding.test.ts\n    ✗ sendWelcomeEmail — throws when user.email is null\n      TypeError: Cannot read property \'email\' of null\nTest fails as expected — regression guard in place.\n\n[Step 3 — agents]\nSubagent search results:\n  src/auth/onboarding.ts:87      — the reported location\n  src/notifications/digest.ts:124 — same null pattern (user.email unchecked)\n  src/api/invites.ts:56          — similar risk (user?.name only, not email)\n3 locations identified for patching.\n\n[Step 4 — security]\nExploitability: MEDIUM\n  An attacker can intentionally register via OAuth without email scope\n  to trigger a 500, leaking a stack trace in non-production error pages.\n  → Added error boundary; stack traces suppressed in production.\n\n[Step 5 — commands]\nFix applied. Running tests...\n  PASS  src/auth/onboarding.test.ts  (regression test now green)\n  PASS  src/notifications/digest.test.ts\n  All 61 tests pass.\n  [main c4d8a2e] fix(auth): guard null email in sendWelcomeEmail [ERR-oauth-null-email]\n   3 files changed, 18 insertions(+), 4 deletions(-)\nPushed to origin/main.'
+          },
+          {
+            title: 'Build a Full Feature from a Spec Doc',
+            difficulty: 'overengineer',
+            why: 'From requirements doc to production-ready, documented, reviewed, and committed feature — with no skipped steps and an ADR for every major decision.',
+            resources: [
+              './docs/feature-spec.md — your requirements doc (or a Notion/Linear URL)',
+              'Existing test suite — TDD requires tests to be runnable from the start'
+            ],
+            steps: [
+              { category: 'markdown', icon: '📝', prompt: 'Read ./docs/feature-spec.md and write an Architecture Decision Record (ADR) for this feature. Include: context, decision, alternatives considered, and consequences. Save it to ./docs/adr/NNNN-feature-name.md.' },
+              { category: 'patterns', icon: '🏗️', prompt: 'Based on the ADR, design the data model and class structure. Show me the interfaces and data shapes before writing any implementation. I need to approve the design first.' },
+              { category: 'testing', icon: '🧪', prompt: 'Write the full test suite first (TDD). Cover: happy path, edge cases, and error cases. All tests should fail right now — the implementation does not exist yet.' },
+              { category: 'agents', icon: '🤖', prompt: 'Implement the feature. If any component is particularly complex, launch a subagent to handle it in isolation and report back the result.' },
+              { category: 'commands', icon: '/', prompt: '/review\n\nIf clean, commit with a conventional commit message. Link the ADR number in the commit body.' }
+            ],
+            code: 'Read ./docs/feature-spec.md and write an Architecture Decision Record (ADR) for this feature. Include: context, decision, alternatives considered, and consequences. Save it to ./docs/adr/NNNN-feature-name.md.',
+            lang: 'text',
+            output: '[Step 1 — markdown]\nReading ./docs/feature-spec.md...\n  Feature: User notification preferences\n  Scope: per-channel opt-out (email, push, SMS)\nADR written → ./docs/adr/0012-notification-preferences.md\n  Decision: separate notification_prefs table (not flags on users)\n  Rejected: feature flags (too coarse), user.settings JSON (unindexable)\n\n[Step 2 — patterns]\nData model proposed:\n  Table:     notification_prefs (user_id, channel, enabled, updated_at)\n  Interface: NotificationPrefRepository { get, set, listForUser }\n  Service:   NotificationService { shouldNotify(user, channel) }\n  → Awaiting design approval before implementation...\n  ✓ Design approved.\n\n[Step 3 — testing]\nTest suite written (all failing — correct TDD red phase):\n  FAIL  src/notifications/prefs.test.ts   (12 tests)\n  FAIL  src/notifications/service.test.ts  (8 tests)\nAll 20 tests fail as expected.\n\n[Step 4 — agents]\nImplementing...\n  ✓ NotificationPrefRepository (database layer)\n  ✓ NotificationService (business logic)\n  Subagent launched: email template rendering (complex)\n    → EmailTemplateAgent: 3 templates rendered, all tests pass\n  All 20 tests now pass — TDD green phase complete.\n\n[Step 5 — commands]\n/review — 0 issues found\n  [main d9f1b3c] feat(notifications): add per-channel preference opt-out\n\n  Implements ADR-0012: notification-preferences\n  Covers: email, push, SMS channels with per-user granularity.\n\n   14 files changed, 387 insertions(+)\nPushed to origin/main.'
+          },
+          {
+            title: 'Build a Data Pipeline from a File',
+            difficulty: 'overengineer',
+            why: 'Turn a raw CSV or JSON dump into a production-grade pipeline with validation, transformation, background monitoring, and tests — from a single starting prompt.',
+            resources: [
+              './data/input.csv (or .json) — your raw data file',
+              'Output format spec — describe the target shape in the first prompt'
+            ],
+            steps: [
+              { category: 'prompting', icon: '💬', prompt: 'I have a data file at ./data/input.csv. Read the first 20 rows and describe the schema: column names, inferred types, null rates, and any obvious quality issues. I want the output to be [describe target format].' },
+              { category: 'patterns', icon: '🏗️', prompt: 'Build a pipeline with four independent stages: validate → normalise → transform → output. Each stage must be a pure function that takes and returns a typed record array. No stage should know about the others.' },
+              { category: 'testing', icon: '🧪', prompt: 'Write tests for every pipeline stage. Include: empty input, null fields, malformed rows, duplicate keys, and at least one snapshot test of the final output shape.' },
+              { category: 'monitoring', icon: '📡', prompt: 'Add a progress reporter that streams one status line per batch: rows processed, rows skipped, and current stage. Use the Monitor tool pattern so it runs in the background and reports back when done.' },
+              { category: 'commands', icon: '/', prompt: 'Run the pipeline on the full ./data/input.csv. Commit the code with a comment block at the top of the main file documenting the expected input and output formats.' }
+            ],
+            code: 'I have a data file at ./data/input.csv. Read the first 20 rows and describe the schema: column names, inferred types, null rates, and any obvious quality issues. I want the output to be [describe target format].',
+            lang: 'text',
+            output: '[Step 1 — prompting]\nReading ./data/input.csv (first 20 rows)...\n  Schema detected:\n    id:         integer, 0% null\n    email:      string, 2% null\n    created_at: ISO-8601 string, 0% null\n    revenue:    float (comma-encoded string), 4% null\n    country:    string, 7% null — 42 distinct values\n  Quality issues:\n    • revenue uses comma as decimal separator\n    • 3 duplicate id values detected\n\n[Step 2 — patterns]\nPipeline stages built:\n  validate:   rejects rows missing id/email; flags revenue format errors\n  normalise:  parses revenue strings → float; lowercases country codes\n  transform:  computes revenue_usd via FX lookup; adds month_bucket field\n  output:     serialises to ./data/output.jsonl (one JSON object per line)\n  Each stage is a pure function — fully composable and independently testable.\n\n[Step 3 — testing]\n  PASS  src/pipeline/validate.test.ts  (9 tests — empty, null, malformed)\n  PASS  src/pipeline/normalise.test.ts (7 tests — comma decimals, casing)\n  PASS  src/pipeline/transform.test.ts (6 tests — FX, bucketing, snapshot)\n  PASS  src/pipeline/output.test.ts    (4 tests — round-trip, schema check)\nAll 26 tests pass.\n\n[Step 4 — monitoring]\nMonitor attached — streaming per batch:\n  [pipeline] batch  1/10 — 500 rows processed,  3 skipped (validate)\n  [pipeline] batch  2/10 — 500 rows processed,  1 skipped\n  [pipeline] batch  3/10 — 500 rows processed,  7 skipped\n  ...\n  [pipeline] done   — 4 872 rows output, 128 skipped (2.6%)\n  Skipped rows logged to ./data/skipped.log\n\n[Step 5 — commands]\nFull run on ./data/input.csv complete.\n  Input:  5 000 rows\n  Output: 4 872 rows → ./data/output.jsonl\n  [main e3a7f2b] feat(pipeline): CSV-to-JSONL transform pipeline\n   7 files changed, 312 insertions(+)\nPushed to origin/main.'
+          }
+        ]
+      },
+
 }; // end CATEGORIES
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -5067,6 +5471,45 @@ function getPrompt(ex) {
   return `${ex.title}.\n${sentence}`;
 }
 
+// ── Chain card renderer ────────────────────────────────────────────────────
+function renderChainCard(ex, idx) {
+  const resources = ex.resources && ex.resources.length
+    ? `<div class="chain-resources">
+        <span class="chain-resources-label">📎 Resources you'll need</span>
+        <ul>${ex.resources.map(r => `<li>${escText(r)}</li>`).join('')}</ul>
+       </div>`
+    : '';
+
+  const steps = ex.steps.map((step, si) => `
+    ${si > 0 ? '<div class="chain-connector"></div>' : ''}
+    <div class="chain-step">
+      <div class="step-num">${si + 1}</div>
+      <div class="step-body">
+        <div class="step-cat-badge">${step.icon} ${step.category}</div>
+        <div class="step-prompt-text">${escText(step.prompt)}</div>
+      </div>
+      <button class="copy-btn copy-step-btn" data-code="${escAttr(step.prompt)}">COPY</button>
+    </div>`).join('');
+
+  const allPrompts = escAttr(JSON.stringify(ex.steps.map(s => s.prompt)));
+
+  return `<div class="card">
+    <div class="card-header">
+      <div class="card-num">${String(idx + 1).padStart(2, '0')}</div>
+      <div class="card-title">${ex.title}</div>
+      <div class="diff-badge diff-${ex.difficulty}">${DIFF_LABELS[ex.difficulty] || ex.difficulty}</div>
+    </div>
+    <div class="card-body">
+      <div class="why-block"><strong>Goal</strong><span>${ex.why}</span></div>
+      ${resources}
+      <div class="chain-steps">${steps}</div>
+      <button class="copy-all-btn" data-prompts="${allPrompts}">⬆ Copy All Prompts in Sequence</button>
+      <button class="chain-run-btn" data-chain-run="${idx}">▶ Simulate full chain run</button>
+      <div class="chain-output" data-chain-output="${idx}">${escText(ex.output || '')}</div>
+    </div>
+  </div>`;
+}
+
 // ── Render category pills ──────────────────────────────────────────────────
 const ROW_1 = ['commands','loops','agents','skills','hooks','monitoring','prompting'];
 
@@ -5075,7 +5518,8 @@ function renderCategoryPills() {
   const row2 = document.querySelector('#category-pills [data-row="2"]');
   const pill = (id, c) => `<button class="pill${activeCategory === id ? ' active-cat' : ''}" data-cat="${id}">${c.icon} ${c.title} <span class="pill-count">${c.examples.length}</span></button>`;
   row1.innerHTML = ROW_1.filter(id => CATEGORIES[id]).map(id => pill(id, CATEGORIES[id])).join('');
-  row2.innerHTML = Object.entries(CATEGORIES).filter(([id]) => !ROW_1.includes(id)).map(([id, c]) => pill(id, c)).join('');
+  const row2Keys = ['chains', ...Object.keys(CATEGORIES).filter(id => !ROW_1.includes(id) && id !== 'chains')];
+  row2.innerHTML = row2Keys.filter(id => CATEGORIES[id]).map(id => pill(id, CATEGORIES[id])).join('');
 }
 
 // ── Render difficulty pills ────────────────────────────────────────────────
@@ -5096,10 +5540,24 @@ function renderContent() {
   if (activeDifficulty !== 'all') examples = examples.filter(e => e.difficulty === activeDifficulty);
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
-    examples = examples.filter(e =>
-      e.title.toLowerCase().includes(q) || e.why.toLowerCase().includes(q) || e.code.toLowerCase().includes(q)
-    );
+    examples = examples.filter(e => {
+      const base = (e.title + e.why + e.code).toLowerCase();
+      const stepText = (e.steps || []).map(s => s.prompt + ' ' + s.category).join(' ').toLowerCase();
+      return base.includes(q) || stepText.includes(q);
+    });
   }
+
+  const chainGuide = activeCategory === 'chains' ? `
+    <div class="chain-guide">
+      <div class="chain-guide-title">⚡ How to run a chain</div>
+      <div class="chain-guide-steps">
+        <div class="cg-step"><span class="cg-num">1</span><span>Open Claude Code (CLI, desktop app, or Web)</span></div>
+        <div class="cg-step"><span class="cg-num">2</span><span>Add any <strong>resources</strong> listed on the card — drop zip files in your project folder, set env vars, paste your API docs URL into the prompt</span></div>
+        <div class="cg-step"><span class="cg-num">3</span><span>Click <strong>COPY</strong> on Step 1 and paste it into Claude Code's <strong>chat input box</strong> — wait for Claude to finish before continuing</span></div>
+        <div class="cg-step"><span class="cg-num">4</span><span>Repeat for each step in order — or click <strong>Copy All Prompts in Sequence</strong> to get every prompt at once (separated by <code>---</code> so you know where one ends and the next begins)</span></div>
+        <div class="cg-step"><span class="cg-num">💡</span><span>Slash commands like <code>/review</code> go in the chat input too. Hook configs (<code>settings.json</code>) and file paths go directly in your project — the card tells you which is which</span></div>
+      </div>
+    </div>` : '';
 
   const header = `
     <div class="category-header">
@@ -5110,13 +5568,15 @@ function renderContent() {
         </div>
         <p>${cat.description}</p>
       </div>
-    </div>`;
+    </div>
+    ${chainGuide}`;
 
   const noResults = examples.length === 0
     ? `<div class="no-results"><h3>No examples match your filters</h3><p>Try a different difficulty level or clear your search.</p></div>`
     : '';
 
-  const cards = examples.map((ex, idx) => `
+  const cards = examples.map((ex, idx) =>
+    ex.steps ? renderChainCard(ex, idx) : `
     <div class="card">
       <div class="card-header">
         <div class="card-num">${String(idx+1).padStart(2,'0')}</div>
@@ -5179,11 +5639,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Card interactions (copy, try-it, run simulation) — delegated
   document.getElementById('main-content').addEventListener('click', e => {
+    // Copy all chain prompts in sequence
+    const copyAllBtn = e.target.closest('.copy-all-btn');
+    if (copyAllBtn) {
+      const prompts = JSON.parse(copyAllBtn.dataset.prompts);
+      navigator.clipboard.writeText(prompts.join('\n\n---\n\n')).then(() => {
+        copyAllBtn.textContent = '✓ Copied All!';
+        setTimeout(() => copyAllBtn.textContent = '⬆ Copy All Prompts in Sequence', 1500);
+      });
+      return;
+    }
+    // Simulate full chain run
+    const chainRunBtn = e.target.closest('.chain-run-btn');
+    if (chainRunBtn) {
+      const idx = chainRunBtn.dataset.chainRun;
+      const out = chainRunBtn.parentElement.querySelector(`[data-chain-output="${idx}"]`);
+      out.classList.toggle('shown');
+      chainRunBtn.textContent = out.classList.contains('shown') ? '▼ Hide simulation' : '▶ Simulate full chain run';
+      return;
+    }
     const copyBtn = e.target.closest('.copy-btn');
     if (copyBtn) {
       navigator.clipboard.writeText(copyBtn.dataset.code.trim()).then(() => {
+        const orig = copyBtn.textContent;
         copyBtn.textContent = 'COPIED!';
-        setTimeout(() => copyBtn.textContent = 'COPY', 1500);
+        setTimeout(() => copyBtn.textContent = orig, 1500);
       });
       return;
     }
@@ -5317,169 +5797,169 @@ function simulate(code, lang, defaultOutput) {
 // ── Quiz data ──
 const QUIZ_QUESTIONS = [
   {
-    q: "What does /clear do in Claude Code?",
+    q: "You just finished debugging a tricky auth bug and now want to start a separate task — adding a payments feature. Your session is full of auth-related context. What's the smartest first move?",
     options: [
-      "Deletes all files in the current directory",
-      "Clears the current conversation context and history",
-      "Removes Claude Code from your system",
-      "Resets your authentication token"
+      "Start typing the feature request immediately",
+      "/clear — wipe the stale context before switching tasks",
+      "/compact — summarise old messages and continue",
+      "Ask Claude to 'forget' the previous task"
     ],
     answer: 1,
-    explain: "/clear resets the conversation context. Use it between unrelated tasks so context from one job doesn't leak into the next."
+    explain: "/clear resets the conversation context without touching your files or git state. Stale context from a previous task causes Claude to make wrong assumptions — always /clear between unrelated tasks."
   },
   {
-    q: "Which file is read at the start of every Claude Code session for project context?",
+    q: "You've cloned a large TypeScript monorepo. Before writing a single line of code, what's the single best first command to give Claude?",
     options: [
-      "README.md",
-      "package.json",
-      "CLAUDE.md",
-      ".claude-config"
+      "Ask Claude to read every file in the repo",
+      "Paste the README into chat",
+      "/init — generate a CLAUDE.md with conventions, stack, and constraints",
+      "/model claude-opus-4-7 to maximise capability"
     ],
     answer: 2,
-    explain: "CLAUDE.md is the conventional file Claude Code reads for project-specific instructions, conventions, and constraints. Use it like a system prompt for your project."
+    explain: "/init scans your repo and writes a CLAUDE.md with the tech stack, test setup, and file conventions. Claude reads it at every session start — so you never have to re-explain the project."
   },
   {
-    q: "What is the purpose of a SessionStart hook?",
+    q: "After 2 hours of work, you've modified 8 files on your payments branch. Before pushing, you want to catch security issues and style violations. What do you type?",
     options: [
-      "Runs JavaScript inside the Claude Code UI",
-      "Logs you into Anthropic's API",
-      "Runs a script automatically when a new session starts (e.g., to install deps)",
-      "Starts a new git branch"
+      "/loop 5m git diff",
+      "Ask Claude 'is everything ok?'",
+      "/review",
+      "/compact"
     ],
     answer: 2,
-    explain: "SessionStart hooks fire when a session begins. Common uses: install dependencies, start a dev server, prime the environment."
+    explain: "/review reads your current branch diff and gives a structured review — catching security holes, null dereferences, and style issues — without needing a GitHub PR."
   },
   {
-    q: "What does the Plan agent specialize in?",
+    q: "A specific network test fails intermittently. You want Claude to run it every 3 minutes and auto-fix the first failure it sees. What do you type?",
     options: [
-      "Executing code changes",
-      "Designing implementation plans without making edits",
-      "Reviewing pull requests",
-      "Running tests"
+      "/loop 3m npm test -- --testPathPattern=network; if it fails fix the first failure",
+      "/monitor npm test",
+      "Manually run npm test and paste the failure each time",
+      "/review the test file"
+    ],
+    answer: 0,
+    explain: "/loop runs a task on a recurring interval. Combine it with a fix instruction and Claude will babysit the test suite — running, detecting failures, and patching them automatically."
+  },
+  {
+    q: "A colleague emails you a zip of source code changes from another branch. You want to apply them safely. What's the right first step?",
+    options: [
+      "Unzip manually and paste each file into chat",
+      "Tell Claude the zip path and ask it to summarise what changed before applying anything",
+      "Ask Claude to apply everything immediately without reviewing",
+      "/init to scan the zip"
     ],
     answer: 1,
-    explain: "The Plan agent is read-only — it researches and proposes step-by-step plans. It doesn't write code. Approve the plan first, then a separate agent (or you) executes."
+    explain: "Always ask for a summary before applying — Claude will list modified, added, and removed files. This surfaces surprises (deleted functions, renamed exports) before anything breaks."
   },
   {
-    q: "Which command lets Claude work on a recurring schedule?",
+    q: "You're adding a third-party payment API. You have docs at a URL and the key in .env. Which order of steps is safest?",
     options: [
-      "/cron",
-      "/loop",
-      "/schedule",
-      "/repeat"
+      "Code first, security review later, tests optional",
+      "Share the docs URL and key location → OWASP security review → repository pattern wrapper → tests → /review",
+      "Skip OWASP — it's a trusted third-party API",
+      "Paste the entire docs into chat and say 'just do it'"
     ],
     answer: 1,
-    explain: "/loop runs a slash command on an interval (e.g., /loop 5m /status-check). Use it for polling, CI babysitting, or until-condition workflows."
+    explain: "Security review before coding catches design mistakes early — like missing timeouts, logging API keys, or skipping HTTPS enforcement. Fixing those after the code is written is much harder."
   },
   {
-    q: "What's the safest way to refer to a file in a prompt?",
+    q: "A TypeError is flooding ./logs/error.log in production. Before touching any code, what should you do?",
     options: [
-      "By its purpose ('the auth file')",
-      "By its absolute or repo-relative path",
-      "By a description of its contents",
-      "By the line number alone"
+      "Edit the file that threw the error immediately",
+      "Ask Claude to read the log, reproduce the bug locally, then write a failing test first",
+      "/review the current branch",
+      "Deploy a hotfix to stop the error logs"
     ],
     answer: 1,
-    explain: "Exact paths are unambiguous. Vague references force Claude to guess and may cause it to edit the wrong file."
+    explain: "Writing a failing test first is the TDD bug-fix pattern. It proves you've reproduced the bug correctly and guarantees the fix actually works — not just that the error stopped appearing."
   },
   {
-    q: "What happens when you click /clear and start a new task?",
+    q: "You're deep in a refactor and Claude seems to be forgetting earlier decisions. Context is long but you don't want to lose the last 10 messages. What do you do?",
     options: [
-      "Old conversation context is preserved",
-      "Old context is wiped — fresh start",
-      "Claude restarts from scratch including model load",
-      "Your git working tree is reset"
+      "/clear — wipe everything and start fresh",
+      "/compact — summarise old messages while keeping recent ones intact",
+      "Copy the conversation to a text file and paste it back",
+      "/model switch to a larger context model"
     ],
     answer: 1,
-    explain: "/clear wipes conversation context. Your filesystem and git state are untouched. Use it between unrelated tasks for cleaner reasoning."
+    explain: "/compact summarises earlier turns into a compact summary and keeps recent messages verbatim. You get most of your context budget back without losing the current thread."
   },
   {
-    q: "Which is the safest git command to use without explicit user authorization?",
+    q: "You need to: (a) refactor the auth module, (b) add API input validation, (c) update the DB schema. These three tasks are independent. What's the most efficient approach?",
     options: [
-      "git push --force",
-      "git reset --hard origin/main",
-      "git status",
-      "git checkout ."
+      "Do them sequentially in one long conversation",
+      "Launch three subagents in parallel, one per task",
+      "Ask Claude to tackle all three in one massive prompt",
+      "/loop through each task one at a time"
+    ],
+    answer: 1,
+    explain: "Independent tasks run in parallel with no waiting. Three subagents finish in roughly the time it takes one subagent to do one task — that's a 3x speed-up."
+  },
+  {
+    q: "Your team practices TDD. You're adding a calculateDiscount() function. In what order should you work?",
+    options: [
+      "Write the function, then write tests to verify it works",
+      "Write tests that fail first, implement until they pass, then refactor",
+      "Write the function, skip tests, /review instead",
+      "Ask Claude to write both function and tests simultaneously"
+    ],
+    answer: 1,
+    explain: "Red → Green → Refactor. Writing the failing test first proves the test actually tests something. If you write the implementation first, you may write a test that's already green and tells you nothing."
+  },
+  {
+    q: "Every time Claude runs git push, you want a Slack notification sent automatically — without Claude needing to remember to do it each time. How?",
+    options: [
+      "Put a reminder in CLAUDE.md",
+      "Ask Claude to send the notification after each push",
+      "Add a PostToolUse hook that fires on Bash tool calls containing 'git push'",
+      "Use /loop to watch for new commits"
     ],
     answer: 2,
-    explain: "git status is read-only and safe. The others are destructive: force-push overwrites history, reset --hard discards local changes, checkout . wipes uncommitted edits."
+    explain: "PostToolUse hooks fire after any tool call and run a shell script. They're deterministic — Claude can't forget to trigger them. Perfect for notifications, audit logs, and side-effects."
   },
   {
-    q: "What does the Explore agent NOT do?",
+    q: "You're using Claude Code in a remote web session. You've written 200 lines of new code. The session will end in a few minutes. What must you do?",
     options: [
-      "Search files by pattern",
-      "Grep for symbols",
-      "Edit or write code",
-      "Read excerpts of files"
+      "Save files to /tmp — they'll persist across sessions",
+      "/compact so Claude remembers your work",
+      "Commit and push to git — remote containers are ephemeral",
+      "Download the files via the browser download manager"
     ],
     answer: 2,
-    explain: "Explore is read-only — it searches and reads but never edits. Use it to answer 'where is X?' or 'which files reference Y?' without risking changes."
+    explain: "Remote Claude Code containers are reclaimed after inactivity. /tmp, memory, and in-session changes all vanish. Git is the only durable store — always commit and push before stepping away."
   },
   {
-    q: "What's a PreToolUse hook good for?",
+    q: "You're batch-processing 50,000 simple CSV rows — just reformatting dates and normalising casing. Speed and cost matter. Which model?",
     options: [
-      "Running after a tool completes",
-      "Intercepting tool calls before they execute (e.g., blocking dangerous commands)",
-      "Showing a notification when Claude is idle",
-      "Logging into GitHub"
-    ],
-    answer: 1,
-    explain: "PreToolUse runs before a tool call executes. Common use: a safety-check script that exits with code 2 to block dangerous bash commands like 'rm -rf'."
-  },
-  {
-    q: "How do you persist data across Claude Code sessions in a managed remote environment?",
-    options: [
-      "Save it in /tmp",
-      "Use environment variables only",
-      "Commit and push it to git — the container is ephemeral",
-      "Email it to yourself"
+      "Claude Opus — most capable, handles everything",
+      "Claude Sonnet — the safe daily-driver default",
+      "Claude Haiku — fastest and cheapest for simple, high-volume tasks",
+      "It doesn't matter which model you pick"
     ],
     answer: 2,
-    explain: "Remote Claude Code containers are ephemeral and reclaimed after inactivity. Anything you want to keep must be committed and pushed to git."
+    explain: "Simple, high-volume tasks don't need Opus reasoning or Sonnet quality. Haiku runs faster and costs a fraction of Opus — matching the model to the task is a core cost discipline."
   },
   {
-    q: "What does the Agent tool's `isolation: \"worktree\"` parameter do?",
+    q: "Your team uses tabs (not spaces), snake_case variables, and a specific commit format. You keep re-explaining these rules every session. What's the fix?",
     options: [
-      "Encrypts the agent's memory",
-      "Spawns the agent inside a temporary git worktree on a separate branch",
-      "Runs the agent in a Docker container",
-      "Prevents the agent from reading the disk"
+      "Start every session with a long system message listing the rules",
+      "Write the conventions into CLAUDE.md so Claude reads them automatically at session start",
+      "/model switch to a more instruction-following model",
+      "Add a manual reminder to each individual prompt"
     ],
     answer: 1,
-    explain: "isolation: 'worktree' creates a temporary git worktree so the agent works on an isolated copy. The harness cleans it up automatically if no changes are made."
+    explain: "CLAUDE.md is read at every session start. Put your team conventions there once and they're always in context — no re-explaining, no forgotten rules."
   },
   {
-    q: "When should you launch multiple subagents in parallel (single message, multiple tool calls)?",
+    q: "You want Claude to attempt a large, risky module extraction, but don't want to risk breaking your working branch. What's the safest approach?",
     options: [
-      "Never — agents must run one at a time",
-      "When their work is independent and dependency-free",
-      "Only when one agent fails",
-      "Only on Tuesdays"
-    ],
-    answer: 1,
-    explain: "Parallel agent launches are encouraged when the work is independent. Don't parallelize when one agent's result feeds into another — those must run sequentially."
-  },
-  {
-    q: "What's the difference between `git commit --amend` and a new commit, per Claude Code best practices?",
-    options: [
-      "There's no difference",
-      "Amend is preferred — it keeps history clean",
-      "Prefer new commits — amend can destroy work if a pre-commit hook failed",
-      "Amend is faster"
+      "Let Claude work directly on main",
+      "Create a new branch manually, then run Claude",
+      "Launch the agent with isolation: 'worktree' — it works on an isolated copy, cleaned up automatically",
+      "/compact before starting to protect context"
     ],
     answer: 2,
-    explain: "If a pre-commit hook fails, the commit didn't happen — so --amend would modify the PREVIOUS commit, destroying earlier work. Always create new commits instead."
-  },
-  {
-    q: "What does the 'Why this matters' field on each card teach you?",
-    options: [
-      "The exact runtime cost of the pattern",
-      "The motivation — why this pattern matters and what it prevents or enables",
-      "The author of the pattern",
-      "The date the pattern was discovered"
-    ],
-    answer: 1,
-    explain: "'Why this matters' is the rationale. Knowing the WHY is what turns a copied snippet into a reusable mental model — you'll know when to apply it elsewhere."
+    explain: "isolation: 'worktree' spins up a temporary git worktree on a separate branch. The agent makes changes there, not on your working branch. If it makes no changes, the worktree is cleaned up automatically."
   },
 ];
 
@@ -5492,12 +5972,12 @@ function renderQuiz() {
   el.innerHTML = `
     <div class="cert-quiz-header">
       <h2>🎓 Claude Code Certified</h2>
-      <p>15 questions. Pick the best answer, hit Submit, and read the explanation. Score 12+ to "pass" (no real cert, but you'll know your stuff).</p>
+      <p>15 real-world scenarios. Choose the best response, hit Submit, and read why. Score 12+ to earn your certificate.</p>
     </div>
     <div class="cert-progress" id="cert-progress">0 / 15 answered</div>
     ${QUIZ_QUESTIONS.map((q, qi) => `
       <div class="cert-q" data-qi="${qi}">
-        <div class="cert-q-num">Question ${qi + 1} of ${QUIZ_QUESTIONS.length}</div>
+        <div class="cert-q-num">Scenario ${qi + 1} of ${QUIZ_QUESTIONS.length}</div>
         <div class="cert-q-text">${escText(q.q)}</div>
         <div class="cert-options">
           ${q.options.map((opt, oi) => `
@@ -5512,9 +5992,30 @@ function renderQuiz() {
       </div>
     `).join('')}
     <div class="cert-final" id="cert-final">
-      <h3>Done!</h3>
+      <h3>All done!</h3>
       <div class="cert-final-score" id="cert-final-score"></div>
       <p id="cert-final-msg"></p>
+      <div class="cert-card" id="cert-card">
+        <div class="cert-card-gradient">
+          <div class="cert-card-inner">
+            <div class="cert-trophy">🏆</div>
+            <div class="cert-heading">Claude Code Practitioner</div>
+            <div class="cert-subheading">Certificate of Proficiency</div>
+            <div class="cert-certifies">This certifies that</div>
+            <input type="text" class="cert-name-input" id="cert-name-input" placeholder="Type your name here" maxlength="60" />
+            <div class="cert-body-text">has demonstrated proficiency in Claude Code patterns, prompt chains, and real-world developer workflows.</div>
+            <div class="cert-metadata">
+              <span class="cert-score-pill" id="cert-score-pill"></span>
+              <span class="cert-date-text" id="cert-date-text"></span>
+            </div>
+            <div class="cert-domain">700799.github.io/claudecodey</div>
+          </div>
+        </div>
+        <div class="cert-buttons">
+          <button class="cert-btn-print" id="cert-btn-print">🖨 Print Certificate</button>
+          <button class="cert-btn-linkedin" id="cert-btn-linkedin">💼 Copy for LinkedIn</button>
+        </div>
+      </div>
     </div>
   `;
 
@@ -5557,10 +6058,31 @@ function renderQuiz() {
         let msg = '';
         if (quizState.score >= 13) msg = '🏆 Top of the class. You know Claude Code inside out.';
         else if (quizState.score >= 12) msg = '🎉 Passed! You\'ve got the fundamentals locked in.';
-        else if (quizState.score >= 9) msg = '📚 Solid. Re-read the categories you missed and you\'re golden.';
-        else msg = '💡 Plenty to learn. Browse the Prompting and Skills sections, then retake.';
+        else if (quizState.score >= 9) msg = '📚 Solid foundation. Review the scenarios you missed, then retake.';
+        else msg = '💡 Keep exploring. Browse the Prompting and Chains sections, then retake.';
         document.getElementById('cert-final-msg').textContent = msg;
+        // Set up certificate
+        const tier = quizState.score >= 13 ? 'Expert' : quizState.score >= 12 ? 'Advanced' : quizState.score >= 9 ? 'Practitioner' : 'Learner';
+        document.getElementById('cert-score-pill').textContent = `Score: ${quizState.score} / ${QUIZ_QUESTIONS.length} · ${tier}`;
+        document.getElementById('cert-date-text').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        document.querySelector('.cert-heading').textContent = `Claude Code ${tier}`;
+        const certCard = document.getElementById('cert-card');
+        if (quizState.score >= 9) certCard.style.display = 'block';
         final.classList.add('shown');
+        // Print button
+        document.getElementById('cert-btn-print').addEventListener('click', () => window.print());
+        // LinkedIn copy
+        document.getElementById('cert-btn-linkedin').addEventListener('click', () => {
+          const name = document.getElementById('cert-name-input').value.trim();
+          const dateStr = document.getElementById('cert-date-text').textContent;
+          const intro = name ? `${name} just earned` : 'I just earned';
+          const text = `${intro} the Claude Code ${tier} Certificate! 🏆\n\nScore: ${quizState.score}/${QUIZ_QUESTIONS.length} · ${dateStr}\n\nTest your Claude Code knowledge at:\nhttps://700799.github.io/claudecodey\n\n#ClaudeCode #AI #DeveloperTools #Anthropic`;
+          navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById('cert-btn-linkedin');
+            btn.textContent = '✓ Copied to clipboard!';
+            setTimeout(() => btn.textContent = '💼 Copy for LinkedIn', 2000);
+          });
+        });
       }
       return;
     }
