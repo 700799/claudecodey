@@ -1,0 +1,2838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Claude Code Missing Manual</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍩</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<style>
+:root {
+  --yellow: #FED90F;
+  --yellow-dark: #E8C400;
+  --yellow-pale: #FFF9D6;
+  --sky: #70C8F0;
+  --sky-dark: #3AACD8;
+  --donut-pink: #E34F8E;
+  --donut-glaze: #F5B8D2;
+  --springfield-blue: #1B4F8A;
+  --orange: #F15A22;
+  --green: #4A9E2F;
+  --green-pale: #E8F5E0;
+  --skin: #FFD5B4;
+  --dark: #0D0D1A;
+  --dark2: #1A1A2E;
+  --dark3: #252540;
+  --card-bg: #1E1E3A;
+  --card-border: #2E2E5A;
+  --text: #F0F0FF;
+  --text-muted: #A0A0C0;
+  --code-bg: #0A0A1A;
+  --radius: 14px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--dark);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== SPRINGFIELD SKY HEADER ===== */
+.sky-header {
+  background: linear-gradient(180deg, #1B4F8A 0%, #2E7DD6 40%, #70C8F0 80%, #A8DFF0 100%);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.clouds {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+}
+
+.cloud {
+  position: absolute;
+  background: rgba(255,255,255,0.85);
+  border-radius: 50px;
+  filter: blur(1px);
+}
+.cloud::before, .cloud::after {
+  content: '';
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
+.cloud-1 { width: 120px; height: 35px; top: 15%; left: 5%; animation: drift 18s linear infinite; }
+.cloud-1::before { width: 60px; height: 55px; top: -30px; left: 15px; }
+.cloud-1::after { width: 50px; height: 45px; top: -20px; right: 15px; }
+.cloud-2 { width: 160px; height: 40px; top: 30%; left: 60%; animation: drift 25s linear infinite reverse; }
+.cloud-2::before { width: 80px; height: 60px; top: -35px; left: 20px; }
+.cloud-2::after { width: 60px; height: 50px; top: -25px; right: 20px; }
+.cloud-3 { width: 90px; height: 28px; top: 55%; left: 30%; animation: drift 20s linear infinite; }
+.cloud-3::before { width: 45px; height: 40px; top: -22px; left: 10px; }
+.cloud-3::after { width: 38px; height: 35px; top: -18px; right: 10px; }
+
+@keyframes drift {
+  0% { transform: translateX(-200px); }
+  100% { transform: translateX(calc(100vw + 200px)); }
+}
+
+.header-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 48px 24px 32px;
+}
+
+.donut-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 2.2rem;
+  animation: bounce-donuts 2s ease-in-out infinite alternate;
+}
+
+@keyframes bounce-donuts {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
+}
+
+h1 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: clamp(2rem, 6vw, 4rem);
+  color: var(--yellow);
+  text-shadow: 3px 3px 0 var(--springfield-blue), 5px 5px 0 rgba(0,0,0,0.3);
+  line-height: 1.1;
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  font-family: 'Permanent Marker', cursive;
+  font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+  color: #FFF;
+  text-shadow: 1px 1px 0 var(--springfield-blue);
+  margin-bottom: 24px;
+  opacity: 0.95;
+}
+
+/* ===== TOKEN SAVINGS BANNER ===== */
+.token-banner {
+  background: linear-gradient(135deg, var(--dark2) 0%, #1a1a3e 100%);
+  border-top: 3px solid var(--yellow);
+  border-bottom: 3px solid var(--donut-pink);
+  padding: 20px 24px;
+}
+
+.token-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.token-stat {
+  text-align: center;
+  background: var(--yellow);
+  color: var(--dark);
+  border-radius: 12px;
+  padding: 12px 20px;
+  min-width: 110px;
+  box-shadow: 0 4px 20px rgba(254,217,15,0.4);
+}
+
+.token-stat .number {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--springfield-blue);
+}
+
+.token-stat .label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--dark2);
+}
+
+.token-text h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--yellow);
+  margin-bottom: 6px;
+}
+
+.token-text p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.token-text strong { color: var(--donut-pink); }
+
+/* ===== STICKY NAV ===== */
+.sticky-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(13,13,26,0.97);
+  backdrop-filter: blur(12px);
+  border-bottom: 2px solid var(--card-border);
+  padding: 12px 16px 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.nav-row {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.pills::-webkit-scrollbar { display: none; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--card-border);
+  background: var(--dark2);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+
+.pill:hover {
+  border-color: var(--yellow);
+  color: var(--yellow);
+  background: rgba(254,217,15,0.08);
+}
+
+.pill.active-cat {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: var(--dark);
+  box-shadow: 0 0 16px rgba(254,217,15,0.4);
+}
+
+.pill.active-diff-simple { background: #4CAF50; border-color: #4CAF50; color: #fff; }
+.pill.active-diff-advanced { background: var(--sky-dark); border-color: var(--sky-dark); color: #fff; }
+.pill.active-diff-expert { background: var(--donut-pink); border-color: var(--donut-pink); color: #fff; }
+.pill.active-diff-overengineer { background: var(--orange); border-color: var(--orange); color: #fff; }
+.pill.active-diff-mistakes { background: #8B0000; border-color: #cc0000; color: #fff; }
+.pill.active-diff-all { background: var(--dark3); border-color: var(--text-muted); color: var(--text); }
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--dark3);
+  border: 1.5px solid var(--card-border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  margin-top: 6px;
+}
+
+.search-bar input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 0.8rem;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+}
+.search-bar input::placeholder { color: var(--text-muted); }
+.search-icon { color: var(--text-muted); font-size: 0.85rem; }
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(30,30,60,0.6) 100%);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--yellow);
+  box-shadow: var(--shadow);
+}
+
+.cat-icon { font-size: 2.5rem; }
+
+.cat-info h2 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.6rem;
+  color: var(--yellow);
+  margin-bottom: 4px;
+}
+
+.cat-info p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.count-badge {
+  margin-left: auto;
+  background: var(--yellow);
+  color: var(--dark);
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1.5px solid var(--card-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(254,217,15,0.3);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(254,217,15,0.1);
+}
+
+.card-header {
+  padding: 14px 16px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.card-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--yellow);
+  background: rgba(254,217,15,0.12);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  flex: 1;
+}
+
+.diff-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.diff-simple { background: rgba(76,175,80,0.2); color: #81C784; border: 1px solid #4CAF50; }
+.diff-advanced { background: rgba(58,172,216,0.2); color: #70C8F0; border: 1px solid #3AACD8; }
+.diff-expert { background: rgba(227,79,142,0.2); color: #F48FB1; border: 1px solid #E34F8E; }
+.diff-overengineer { background: rgba(241,90,34,0.2); color: #FFAB76; border: 1px solid #F15A22; }
+.diff-mistakes { background: rgba(139,0,0,0.3); color: #EF9A9A; border: 1px solid #cc0000; }
+
+.card-body {
+  padding: 12px 16px;
+}
+
+.why-block {
+  background: rgba(254,217,15,0.06);
+  border-left: 3px solid var(--yellow);
+  border-radius: 0 8px 8px 0;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.why-block strong {
+  color: var(--yellow);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.code-block {
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 0.73rem;
+  position: relative;
+}
+
+.code-lang-tag {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: rgba(0,0,0,0.4);
+  padding: 1px 6px;
+  border-radius: 4px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.code-block pre {
+  margin: 0 !important;
+}
+
+.code-block code {
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.72rem !important;
+  line-height: 1.5 !important;
+}
+
+.copy-btn {
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  background: rgba(254,217,15,0.15);
+  border: 1px solid rgba(254,217,15,0.3);
+  color: var(--yellow);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  z-index: 2;
+}
+
+.copy-btn:hover { background: rgba(254,217,15,0.3); }
+
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+.no-results .emoji { font-size: 3rem; margin-bottom: 12px; }
+.no-results h3 { font-size: 1.1rem; color: var(--yellow); margin-bottom: 6px; }
+
+/* ===== FOOTER ===== */
+.footer {
+  background: var(--dark2);
+  border-top: 2px solid var(--card-border);
+  padding: 24px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.footer a { color: var(--yellow); text-decoration: none; }
+.footer .donuts { font-size: 1.5rem; margin-bottom: 8px; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .cards-grid { grid-template-columns: 1fr; }
+  .token-inner { grid-template-columns: 1fr; text-align: center; }
+  h1 { font-size: 1.8rem; }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card { animation: fade-in 0.25s ease both; }
+.card:nth-child(1) { animation-delay: 0.02s; }
+.card:nth-child(2) { animation-delay: 0.04s; }
+.card:nth-child(3) { animation-delay: 0.06s; }
+.card:nth-child(4) { animation-delay: 0.08s; }
+.card:nth-child(5) { animation-delay: 0.10s; }
+.card:nth-child(6) { animation-delay: 0.12s; }
+.card:nth-child(7) { animation-delay: 0.14s; }
+.card:nth-child(8) { animation-delay: 0.16s; }
+
+/* Springfield grass strip */
+.grass-strip {
+  height: 22px;
+  background: linear-gradient(180deg, #4A9E2F 0%, #3A7D24 100%);
+  border-top: 3px solid #5CB833;
+  position: relative;
+}
+
+.grass-strip::before {
+  content: '';
+  position: absolute;
+  top: -8px; left: 0; right: 0;
+  height: 10px;
+  background: radial-gradient(ellipse 20px 10px at 50% 100%, #5CB833 0%, transparent 100%);
+  background-size: 40px 10px;
+  background-repeat: repeat-x;
+}
+</style>
+</head>
+<body x-data="app()">
+
+<!-- ===== HEADER ===== -->
+<div class="sky-header">
+  <div class="clouds">
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+  </div>
+  <div class="header-content">
+    <div class="donut-row">🍩 🤖 🍩 ⚡ 🍩</div>
+    <h1>The Claude Code<br>Missing Manual</h1>
+    <p class="subtitle">Everything Anthropic forgot to tell you · Patterns, tricks &amp; power moves</p>
+  </div>
+</div>
+<div class="grass-strip"></div>
+
+<!-- ===== TOKEN SAVINGS BANNER ===== -->
+<div class="token-banner">
+  <div class="token-inner">
+    <div class="token-stat">
+      <div class="number">30×</div>
+      <div class="label">Token Savings</div>
+    </div>
+    <div class="token-text">
+      <h3>🚀 Agentic Workflows vs. Old-School Multishot Prompts</h3>
+      <p>
+        Traditional multishot prompting resends the <strong>entire conversation history</strong> on every turn — token costs grow quadratically.
+        A 10-turn workflow costs <strong>55k tokens</strong> (1k+2k+…+10k) in multishot vs ~<strong>2k tokens</strong> in an agentic loop that reads only what it needs.
+        Complex real-world workflows with large codebases routinely show <strong>30:1 or greater savings</strong> — the agent fetches targeted file excerpts rather than pasting
+        entire files into context over and over. That's the difference between a $5 API bill and a $150 one for the same outcome.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STICKY NAV ===== -->
+<div class="sticky-nav">
+  <div class="nav-row">
+    <div>
+      <div class="row-label">📁 Category</div>
+      <div class="pills">
+        <template x-for="cat in categoryList" :key="cat.id">
+          <button
+            class="pill"
+            :class="{ 'active-cat': activeCategory === cat.id }"
+            @click="activeCategory = cat.id"
+            x-text="cat.icon + ' ' + cat.title"
+          ></button>
+        </template>
+      </div>
+    </div>
+    <div>
+      <div class="row-label">⚡ Difficulty</div>
+      <div class="pills">
+        <button class="pill" :class="activeDifficulty==='all' ? 'active-diff-all' : ''" @click="activeDifficulty='all'">🌐 All</button>
+        <button class="pill" :class="activeDifficulty==='simple' ? 'active-diff-simple' : ''" @click="activeDifficulty='simple'">🟢 Simple</button>
+        <button class="pill" :class="activeDifficulty==='advanced' ? 'active-diff-advanced' : ''" @click="activeDifficulty='advanced'">🔵 Advanced</button>
+        <button class="pill" :class="activeDifficulty==='expert' ? 'active-diff-expert' : ''" @click="activeDifficulty='expert'">🔴 Expert</button>
+        <button class="pill" :class="activeDifficulty==='overengineer' ? 'active-diff-overengineer' : ''" @click="activeDifficulty='overengineer'">🟠 OK to Over-Engineer</button>
+        <button class="pill" :class="activeDifficulty==='mistakes' ? 'active-diff-mistakes' : ''" @click="activeDifficulty='mistakes'">💀 Mistakes to Avoid</button>
+      </div>
+    </div>
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search examples, patterns, commands…" x-model="searchQuery">
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+  <template x-if="currentCategory">
+    <div>
+      <div class="category-header">
+        <div class="cat-icon" x-text="currentCategory.icon"></div>
+        <div class="cat-info">
+          <h2 x-text="currentCategory.title"></h2>
+          <p x-text="currentCategory.description"></p>
+        </div>
+        <div class="count-badge" x-text="filteredExamples.length + ' examples'"></div>
+      </div>
+
+      <template x-if="filteredExamples.length === 0">
+        <div class="no-results">
+          <div class="emoji">🍩</div>
+          <h3>No examples match your filters</h3>
+          <p>Try a different difficulty level or clear your search</p>
+        </div>
+      </template>
+
+      <div class="cards-grid">
+        <template x-for="(ex, idx) in filteredExamples" :key="ex.title">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-num" x-text="String(idx+1).padStart(2,'0')"></div>
+              <div class="card-title" x-text="ex.title"></div>
+              <div class="diff-badge" :class="'diff-'+ex.difficulty" x-text="diffLabel(ex.difficulty)"></div>
+            </div>
+            <div class="card-body">
+              <div class="why-block">
+                <strong>Why this matters</strong>
+                <span x-text="ex.why"></span>
+              </div>
+              <div class="code-block" style="position:relative">
+                <div class="code-lang-tag" x-text="ex.lang || 'bash'"></div>
+                <pre><code :class="'language-'+(ex.lang||'bash')" x-html="highlight(ex.code, ex.lang||'bash')"></code></pre>
+                <button class="copy-btn" @click="copyCode(ex.code, $event)">COPY</button>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </template>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+  <div class="donuts">🍩🍩🍩</div>
+  <p>The Claude Code Missing Manual &mdash; Community-powered patterns &amp; power moves</p>
+  <p style="margin-top:6px"><a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code Docs</a> · <a href="https://github.com/anthropics/claude-code">GitHub</a> · Built for Springfield, deployed everywhere</p>
+</div>
+
+<script>
+function app() {
+  return {
+    activeCategory: 'loops',
+    activeDifficulty: 'all',
+    searchQuery: '',
+
+    diffLabel(d) {
+      return { simple:'Simple', advanced:'Advanced', expert:'Expert', overengineer:'Over-Engineer', mistakes:'⚠ Avoid' }[d] || d;
+    },
+
+    highlight(code, lang) {
+      try {
+        return hljs.highlight(code.trim(), { language: lang }).value;
+      } catch(e) {
+        return hljs.highlightAuto(code.trim()).value;
+      }
+    },
+
+    async copyCode(code, evt) {
+      await navigator.clipboard.writeText(code.trim());
+      evt.target.textContent = 'COPIED!';
+      setTimeout(() => evt.target.textContent = 'COPY', 1500);
+    },
+
+    get categoryList() {
+      return Object.entries(this.categories).map(([id, c]) => ({ id, ...c }));
+    },
+
+    get currentCategory() {
+      return this.categories[this.activeCategory] || null;
+    },
+
+    get filteredExamples() {
+      const cat = this.currentCategory;
+      if (!cat) return [];
+      let ex = cat.examples;
+      if (this.activeDifficulty !== 'all') ex = ex.filter(e => e.difficulty === this.activeDifficulty);
+      if (this.searchQuery.trim()) {
+        const q = this.searchQuery.toLowerCase();
+        ex = ex.filter(e => e.title.toLowerCase().includes(q) || e.why.toLowerCase().includes(q) || e.code.toLowerCase().includes(q));
+      }
+      return ex;
+    },
+
+    categories: {
+
+      // ===================================================
+      // 1. LOOPS
+      // ===================================================
+      loops: {
+        icon: '🔄',
+        title: 'Loops',
+        description: 'Recurring tasks, polling, and long-running workflows using /loop and shell patterns. Keep Claude working while you sleep.',
+        examples: [
+          {
+            title: 'Basic /loop — poll every 10 minutes',
+            difficulty: 'simple',
+            why: 'The built-in /loop skill runs a slash command on an interval. Set it and forget it — Claude wakes up, checks state, acts, sleeps.',
+            lang: 'bash',
+            code: `/loop 10m /status-check
+# Runs /status-check every 10 minutes until you stop it`
+          },
+          {
+            title: 'Loop until tests pass',
+            difficulty: 'simple',
+            why: 'Instead of babysitting CI yourself, tell Claude to keep iterating until tests go green. The loop stops when you hit the exit condition.',
+            lang: 'bash',
+            code: `/loop 2m until tests pass: run npm test, if failing fix the first error then stop`
+          },
+          {
+            title: 'Exponential backoff loop',
+            difficulty: 'advanced',
+            why: 'Avoid hammering APIs or services. Backoff prevents rate-limit errors that cause the entire workflow to fail.',
+            lang: 'bash',
+            code: `# CLAUDE.md snippet — teach Claude this pattern:
+# Retry with exponential backoff
+for i in 1 2 3 4; do
+  if command_that_might_fail; then
+    break
+  fi
+  sleep $((2 ** i))
+done`
+          },
+          {
+            title: 'CI babysitting loop',
+            difficulty: 'simple',
+            why: 'Subscribe to PR events and let Claude monitor CI. When a check fails, Claude diagnoses and pushes a fix automatically.',
+            lang: 'bash',
+            code: `/loop 5m check CI on PR #42 — if red, read the failure log and push a fix`
+          },
+          {
+            title: 'Deploy monitoring loop',
+            difficulty: 'advanced',
+            why: 'After a deploy, you want real-time signal. This loop pings a health endpoint and alerts on degradation without you watching a dashboard.',
+            lang: 'bash',
+            code: `/loop 1m curl https://api.myapp.com/health | jq .status
+# If status != "ok", create a GitHub issue with the response body`
+          },
+          {
+            title: 'Rate-limited loop (stay under API quotas)',
+            difficulty: 'advanced',
+            why: 'When processing many items, a naive loop exhausts rate limits. Add a sleep between batches to stay in quota.',
+            lang: 'bash',
+            code: `# Process 100 files, 10 at a time, with a pause between batches
+for batch in $(seq 0 10 99); do
+  process_files $batch $((batch+9))
+  sleep 60  # respect 1 req/min limit
+done`
+          },
+          {
+            title: 'Loop with state file',
+            difficulty: 'advanced',
+            why: 'Loops that restart from the beginning waste tokens. A state file lets you resume from where you left off — essential for 24-hour runs.',
+            lang: 'bash',
+            code: `# Claude reads/writes .loop-state.json each iteration
+# {\"last_processed\": 42, \"errors\": [], \"started\": \"2024-01-15\"}
+STATE=$(cat .loop-state.json 2>/dev/null || echo '{}')
+LAST=$(echo $STATE | jq .last_processed // 0)
+# process from $LAST onward, then update the file`
+          },
+          {
+            title: 'Slack webhook alert from loop',
+            difficulty: 'advanced',
+            why: 'A loop that fails silently is worse than no loop. Wire in a Slack webhook so you get a ping on your phone when something goes wrong.',
+            lang: 'bash',
+            code: `# In your hook or loop body:
+curl -X POST $SLACK_WEBHOOK_URL \
+  -H 'Content-type: application/json' \
+  -d '{"text": "⚠️ Loop alert: deploy failed at step 3"}'`
+          },
+          {
+            title: 'Nested loop — outer retry, inner task',
+            difficulty: 'expert',
+            why: 'Some workflows need two levels: retry the whole task on transient failure, but step through sub-tasks in order. Nesting gives you both.',
+            lang: 'bash',
+            code: `for attempt in 1 2 3; do
+  success=true
+  for step in lint test build deploy; do
+    claude "run $step step" || { success=false; break; }
+  done
+  $success && break
+  echo "Attempt $attempt failed, retrying..."
+  sleep $((attempt * 30))
+done`
+          },
+          {
+            title: 'Cron-style scheduling',
+            difficulty: 'advanced',
+            why: 'GitHub Actions cron is overkill for quick tasks. Run a loop on a cloud VM or GitHub Codespace that wakes Claude at a fixed schedule.',
+            lang: 'yaml',
+            code: `# .github/workflows/nightly.yml
+on:
+  schedule:
+    - cron: '0 2 * * *'   # 2am UTC daily
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npx claude "run nightly data sync and commit results"`
+          },
+          {
+            title: 'Loop with cost guard',
+            difficulty: 'expert',
+            why: 'Runaway loops burn money. Track cumulative token spend in a state file and kill the loop if it crosses a threshold.',
+            lang: 'javascript',
+            code: `// In your loop body, check accumulated cost
+const state = JSON.parse(fs.readFileSync('.loop-state.json', 'utf8'));
+if (state.totalTokens > 500_000) {
+  console.error('Cost guard triggered — stopping loop');
+  process.exit(1);
+}
+state.totalTokens += response.usage.input_tokens + response.usage.output_tokens;
+fs.writeFileSync('.loop-state.json', JSON.stringify(state));`
+          },
+          {
+            title: 'Loop with git auto-commit checkpoint',
+            difficulty: 'advanced',
+            why: 'Long loops should commit progress so a crash does not lose work. Each iteration is a checkpoint you can roll back to.',
+            lang: 'bash',
+            code: `/loop 15m do the next batch of migration tasks, then git add -A && git commit -m "loop checkpoint $(date +%H:%M)"`
+          },
+        ]
+      },
+
+      // ===================================================
+      // 2. HOOKS
+      // ===================================================
+      hooks: {
+        icon: '🪝',
+        title: 'Hooks',
+        description: 'Intercept Claude\'s actions with PreToolUse, PostToolUse, Stop, and Notification hooks. Automation at the event level.',
+        examples: [
+          {
+            title: 'Block dangerous shell commands (PreToolUse)',
+            difficulty: 'simple',
+            why: 'A PreToolUse hook on Bash runs before every shell command. Return exit code 2 to block the command and tell Claude why.',
+            lang: 'json',
+            code: `// .claude/settings.json
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Bash",
+      "hooks": [{
+        "type": "command",
+        "command": "bash /home/user/scripts/safety-check.sh"
+      }]
+    }]
+  }
+}`
+          },
+          {
+            title: 'Safety check script',
+            difficulty: 'simple',
+            why: 'The script reads the proposed command from stdin as JSON and exits 2 (block) if it sees danger words like "rm -rf" or "DROP TABLE".',
+            lang: 'bash',
+            code: `#!/usr/bin/env bash
+# safety-check.sh — reads hook payload from stdin
+INPUT=$(cat)
+CMD=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
+
+DANGER_PATTERNS=("rm -rf /" "DROP TABLE" "DELETE FROM" "--force" "chmod 777")
+for pattern in "${DANGER_PATTERNS[@]}"; do
+  if echo "$CMD" | grep -q "$pattern"; then
+    echo "BLOCKED: dangerous pattern detected: $pattern" >&2
+    exit 2
+  fi
+done
+exit 0`
+          },
+          {
+            title: 'Auto-format on every file edit (PostToolUse)',
+            difficulty: 'simple',
+            why: 'PostToolUse fires after Claude edits a file. Plug in Prettier or Black so every save is always formatted — no more "forgot to format" commits.',
+            lang: 'json',
+            code: `{
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Edit|Write",
+      "hooks": [{
+        "type": "command",
+        "command": "npx prettier --write \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+      }]
+    }]
+  }
+}`
+          },
+          {
+            title: 'Run tests on every Stop',
+            difficulty: 'simple',
+            why: 'The Stop hook fires when Claude finishes a turn. Use it to auto-run your test suite and feed the result back so Claude can self-correct.',
+            lang: 'json',
+            code: `{
+  "hooks": {
+    "Stop": [{
+      "hooks": [{
+        "type": "command",
+        "command": "npm test 2>&1 | tail -20"
+      }]
+    }]
+  }
+}`
+          },
+          {
+            title: 'Slack notification when Claude stops',
+            difficulty: 'advanced',
+            why: 'Walk away from long tasks. A Stop hook pings your Slack so you know when Claude has finished — or failed.',
+            lang: 'bash',
+            code: `#!/usr/bin/env bash
+# notify-stop.sh
+INPUT=$(cat)
+STOP_REASON=$(echo "$INPUT" | jq -r '.stop_reason // "unknown"')
+curl -s -X POST "$SLACK_WEBHOOK" \
+  -H 'Content-type: application/json' \
+  -d "{\"text\": \"🤖 Claude stopped: $STOP_REASON\"}"
+exit 0`
+          },
+          {
+            title: 'Audit log — record every tool call',
+            difficulty: 'advanced',
+            why: 'In security-sensitive repos, you want a full audit trail of what Claude touched. A PostToolUse hook appends to a log file.',
+            lang: 'bash',
+            code: `#!/usr/bin/env bash
+# audit-log.sh — runs on every PostToolUse
+INPUT=$(cat)
+TOOL=$(echo "$INPUT" | jq -r '.tool_name')
+FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // "n/a"')
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) | $TOOL | $FILE" >> .claude/audit.log
+exit 0`
+          },
+          {
+            title: 'Git pre-commit via hook',
+            difficulty: 'advanced',
+            why: 'Hook into every Write/Edit to stage and lint the changed file immediately. By the time Claude says "done," the commit is clean.',
+            lang: 'bash',
+            code: `#!/usr/bin/env bash
+FILE=$(cat | jq -r '.tool_input.file_path // ""')
+[ -z "$FILE" ] && exit 0
+npx eslint --fix "$FILE" 2>/dev/null
+git add "$FILE"
+exit 0`
+          },
+          {
+            title: 'Environment validation on session start',
+            difficulty: 'advanced',
+            why: 'Missing env vars cause confusing mid-task failures. A session-start hook validates the environment before Claude does anything.',
+            lang: 'bash',
+            code: `#!/usr/bin/env bash
+# session-start-check.sh
+REQUIRED=(DATABASE_URL API_KEY NODE_ENV)
+for var in "${REQUIRED[@]}"; do
+  if [ -z "${!var}" ]; then
+    echo "ERROR: Required env var $var is not set" >&2
+    exit 1
+  fi
+done
+echo "✅ Environment validated"
+exit 0`
+          },
+          {
+            title: 'Cost tracking hook',
+            difficulty: 'expert',
+            why: 'Each API response includes usage metadata. A PostToolUse hook accumulates the spend so you can budget per-project.',
+            lang: 'python',
+            code: `#!/usr/bin/env python3
+import sys, json, os
+data = json.load(sys.stdin)
+usage = data.get('tool_response', {}).get('usage', {})
+inp = usage.get('input_tokens', 0)
+out = usage.get('output_tokens', 0)
+cost_file = '.claude/cost.json'
+costs = json.load(open(cost_file)) if os.path.exists(cost_file) else {'total_tokens': 0}
+costs['total_tokens'] += inp + out
+json.dump(costs, open(cost_file, 'w'))
+sys.exit(0)`
+          },
+          {
+            title: 'Desktop notification (macOS/Linux)',
+            difficulty: 'simple',
+            why: 'The Notification hook fires when Claude needs your input. Wire it to system notifications so you don\'t miss a blocked prompt.',
+            lang: 'bash',
+            code: `# macOS
+osascript -e 'display notification "Claude needs your input" with title "Claude Code"'
+
+# Linux (libnotify)
+notify-send "Claude Code" "Claude needs your input"`
+          },
+          {
+            title: 'Sound alert hook',
+            difficulty: 'simple',
+            why: 'Audible alerts for when Claude finishes a long task — no screen-watching required.',
+            lang: 'bash',
+            code: `# macOS — plays system sound on Stop
+afplay /System/Library/Sounds/Hero.aiff
+
+# Linux
+paplay /usr/share/sounds/freedesktop/stereo/complete.oga`
+          },
+          {
+            title: 'Block writes outside project root',
+            difficulty: 'expert',
+            why: 'Prevent runaway agents from writing files outside the project. A PreToolUse hook checks the target path and blocks anything outside CWD.',
+            lang: 'bash',
+            code: `#!/usr/bin/env bash
+INPUT=$(cat)
+FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
+CWD=$(pwd)
+if [[ "$FILE" == /* && "$FILE" != "$CWD"* ]]; then
+  echo "BLOCKED: write outside project root: $FILE" >&2
+  exit 2
+fi
+exit 0`
+          },
+        ]
+      },
+
+      // ===================================================
+      // 3. MONITORING
+      // ===================================================
+      monitoring: {
+        icon: '📡',
+        title: 'Monitoring',
+        description: 'The Monitor tool and background process patterns. Stream live output from long-running commands without polling.',
+        examples: [
+          {
+            title: 'Monitor a background command',
+            difficulty: 'simple',
+            why: 'Monitor streams stdout from a background process as notifications. Claude acts on each line — perfect for log-driven workflows.',
+            lang: 'bash',
+            code: `# In Claude's instructions:
+# "Run \`npm run build\` in the background and monitor its output.
+# If you see ERROR, create a GitHub issue with the details."
+# Claude will use the Monitor tool automatically.`
+          },
+          {
+            title: 'Tail production logs',
+            difficulty: 'simple',
+            why: 'Stream live logs to Claude so it can spot anomalies, parse errors, or trigger alerts — without you watching a terminal.',
+            lang: 'bash',
+            code: `# Claude runs this in background + monitors:
+tail -f /var/log/app/production.log | grep -E "ERROR|WARN|CRITICAL"
+# Each matching line becomes a notification Claude acts on`
+          },
+          {
+            title: 'Health check with auto-recovery',
+            difficulty: 'advanced',
+            why: 'Monitor a health endpoint. When it goes unhealthy, trigger a restart — the whole loop is autonomous.',
+            lang: 'bash',
+            code: `# Monitor script (runs in background):
+while true; do
+  STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health)
+  echo "health=$STATUS"
+  if [ "$STATUS" != "200" ]; then
+    echo "UNHEALTHY: restarting service"
+    systemctl restart myapp
+  fi
+  sleep 30
+done`
+          },
+          {
+            title: 'CI build monitor',
+            difficulty: 'advanced',
+            why: 'Start your build and let Claude watch it. The moment a test fails, Claude gets the failure message and starts diagnosing.',
+            lang: 'bash',
+            code: `# Claude runs npm run build in background, monitors output
+# Trigger: "monitor the build and fix any TypeScript errors you see"
+npm run build 2>&1 | tee build.log
+# Claude sees: "TS2345: Argument of type 'string' not assignable..."
+# and automatically opens the offending file`
+          },
+          {
+            title: 'Database slow query monitor',
+            difficulty: 'advanced',
+            why: 'Slow queries compound in production. Monitor the Postgres slow query log and let Claude generate index recommendations.',
+            lang: 'sql',
+            code: `-- Enable slow query logging in postgres.conf:
+-- log_min_duration_statement = 1000  (1 second)
+-- Then tail the log:
+-- tail -f /var/log/postgresql/postgresql.log | grep "duration:"
+-- Claude reads each slow query and suggests: EXPLAIN ANALYZE + index`
+          },
+          {
+            title: 'API response time monitor',
+            difficulty: 'advanced',
+            why: 'Catch API degradation before users notice. Stream latency measurements and alert when p95 exceeds your SLO.',
+            lang: 'bash',
+            code: `#!/usr/bin/env bash
+# latency-monitor.sh
+while true; do
+  T=$(curl -s -o /dev/null -w "%{time_total}" https://api.myapp.com/ping)
+  echo "latency=${T}s"
+  python3 -c "import sys; t=float('$T'); sys.exit(1 if t > 2.0 else 0)" \
+    || echo "ALERT: latency ${T}s exceeds 2s SLO"
+  sleep 10
+done`
+          },
+          {
+            title: 'File system watcher',
+            difficulty: 'simple',
+            why: 'Watch a directory for new files and process each one automatically. Great for ETL pipelines or upload processors.',
+            lang: 'bash',
+            code: `# Linux: inotifywait (inotify-tools)
+inotifywait -m -e close_write uploads/ |
+while read -r dir event file; do
+  echo "NEW_FILE: $dir$file"
+done
+# Claude monitors this stream and processes each new file`
+          },
+          {
+            title: 'Multi-service health dashboard in terminal',
+            difficulty: 'expert',
+            why: 'Run parallel monitors for multiple services. Claude aggregates and reports status across all of them.',
+            lang: 'bash',
+            code: `# services.txt
+# api    https://api.myapp.com/health
+# web    https://myapp.com
+# worker https://worker.myapp.com/ping
+
+while IFS= read -r line; do
+  name=$(echo $line | awk '{print $1}')
+  url=$(echo $line | awk '{print $2}')
+  status=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+  echo "$name: $status"
+done < services.txt`
+          },
+          {
+            title: 'Memory/CPU alert monitor',
+            difficulty: 'advanced',
+            why: 'Catch memory leaks before the OOM killer strikes. Stream system metrics and alert when thresholds are crossed.',
+            lang: 'bash',
+            code: `#!/usr/bin/env bash
+while true; do
+  MEM=$(free | awk '/^Mem:/{printf "%.0f", $3/$2*100}')
+  CPU=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d. -f1)
+  echo "mem=${MEM}% cpu=${CPU}%"
+  [ "$MEM" -gt 90 ] && echo "ALERT: memory at ${MEM}%"
+  [ "$CPU" -gt 95 ] && echo "ALERT: CPU at ${CPU}%"
+  sleep 15
+done`
+          },
+          {
+            title: 'Error rate monitor with rolling window',
+            difficulty: 'expert',
+            why: 'A spike in error rate over 60 seconds is more meaningful than a single error. A rolling window gives you rate, not noise.',
+            lang: 'python',
+            code: `from collections import deque
+import time, re
+
+WINDOW = 60  # seconds
+errors = deque()
+
+for line in iter(sys.stdin.readline, ''):
+    now = time.time()
+    if re.search(r'ERROR|EXCEPTION', line):
+        errors.append(now)
+    # evict old entries
+    while errors and now - errors[0] > WINDOW:
+        errors.popleft()
+    rate = len(errors)
+    print(f"error_rate={rate}/min")
+    if rate > 10:
+        print(f"ALERT: {rate} errors in last 60s")`
+          },
+          {
+            title: 'Watch test output and auto-fix failures',
+            difficulty: 'expert',
+            why: 'The ultimate TDD loop. Run tests in watch mode; Claude monitors output and fixes each failure as it appears.',
+            lang: 'bash',
+            code: `# Tell Claude:
+# "Run jest --watch in background, monitor output.
+# Every time you see a test failure:
+# 1. Read the failing test file
+# 2. Read the source file it tests
+# 3. Fix the source, not the test
+# 4. Wait for jest to re-run automatically"
+npx jest --watch --json 2>&1`
+          },
+        ]
+      },
+
+      // ===================================================
+      // 4. AGENTS
+      // ===================================================
+      agents: {
+        icon: '🤖',
+        title: 'Agents',
+        description: 'Spawn subagents, run work in parallel, chain specialists, and orchestrate multi-agent systems using the Agent tool.',
+        examples: [
+          {
+            title: 'Spawn a subagent for isolated research',
+            difficulty: 'simple',
+            why: 'Subagents protect the main context window. Research that would consume 50k tokens stays isolated — the parent gets a clean 200-word summary.',
+            lang: 'javascript',
+            code: `// In your Claude Code agent:
+Agent({
+  description: "Research auth libraries",
+  subagent_type: "Explore",
+  prompt: "Search src/ for all authentication-related files. List them with a one-line description of each. Under 100 words total."
+});`
+          },
+          {
+            title: 'Parallel agents for 3x speed',
+            difficulty: 'advanced',
+            why: 'Independent tasks sent to separate agents run concurrently. A 30-minute sequential workflow becomes 10 minutes.',
+            lang: 'javascript',
+            code: `// Send BOTH in one message — they run in parallel
+Agent({ description: "Lint check", prompt: "Run eslint on src/ and report errors" });
+Agent({ description: "Type check", prompt: "Run tsc --noEmit and report errors" });
+Agent({ description: "Test suite", prompt: "Run npm test and report failures" });
+// All three run simultaneously. Wait for all, then synthesize.`
+          },
+          {
+            title: 'Explore agent for code search',
+            difficulty: 'simple',
+            why: 'The Explore agent is read-only and fast. Use it to find where things live before you start editing — avoids wasted diffs.',
+            lang: 'javascript',
+            code: `Agent({
+  subagent_type: "Explore",
+  description: "Find payment code",
+  prompt: "Find all files that reference 'stripe' or 'payment' in src/. Return file paths and relevant line numbers. Quick search."
+});`
+          },
+          {
+            title: 'Plan agent before implementing',
+            difficulty: 'advanced',
+            why: 'The Plan agent designs architecture without writing code. Get a blueprint first — then implement against a clear spec.',
+            lang: 'javascript',
+            code: `Agent({
+  subagent_type: "Plan",
+  description: "Design auth system",
+  prompt: "Design a JWT auth system for this Express app. Identify the 3-5 files to create/modify. List the key trade-offs. No code — design doc only."
+});`
+          },
+          {
+            title: 'Worktree isolation for risky experiments',
+            difficulty: 'expert',
+            why: 'Worktree mode gives the agent a fresh git branch to work in. If it breaks everything, you just delete the worktree — main is untouched.',
+            lang: 'javascript',
+            code: `Agent({
+  description: "Experiment with new DB schema",
+  isolation: "worktree",
+  prompt: "Try migrating the users table to use UUIDs. Make the schema changes and update the ORM models. If it works cleanly, the worktree will be kept."
+});`
+          },
+          {
+            title: 'Background agent while you work',
+            difficulty: 'advanced',
+            why: 'Background agents let Claude do something non-blocking while you continue a conversation. You get notified when it finishes.',
+            lang: 'javascript',
+            code: `Agent({
+  description: "Generate test coverage",
+  run_in_background: true,
+  prompt: "Write unit tests for every exported function in src/utils/. Target 80% coverage. Commit the tests."
+});
+// You continue working — you'll be notified when it's done`
+          },
+          {
+            title: 'Sequential agent chain (handoff pattern)',
+            difficulty: 'expert',
+            why: 'Each agent receives the output of the previous one as its input. Specialist chains produce better quality than one generalist doing everything.',
+            lang: 'javascript',
+            code: `// Step 1: Plan
+const plan = await Agent({ subagent_type: "Plan", prompt: "Plan the API redesign" });
+// Step 2: Implement against the plan
+const impl = await Agent({ prompt: \`Implement this plan: \${plan.result}\` });
+// Step 3: Review the implementation
+const review = await Agent({ subagent_type: "code-reviewer", prompt: \`Review: \${impl.result}\` });`
+          },
+          {
+            title: 'Multi-repo agent orchestration',
+            difficulty: 'expert',
+            why: 'When a change spans multiple repos, spawn one agent per repo. Each agent handles its slice; the orchestrator merges the results.',
+            lang: 'javascript',
+            code: `// Orchestrator:
+const [apiResult, frontendResult, docsResult] = await Promise.all([
+  Agent({ prompt: "Update the /users API endpoint in api-repo" }),
+  Agent({ prompt: "Update the UserList component in frontend-repo" }),
+  Agent({ prompt: "Update the API docs in docs-repo" }),
+]);
+// Then: create a single PR linking all three changes`
+          },
+          {
+            title: 'Domain-specialist agents',
+            difficulty: 'advanced',
+            why: 'Specialized prompts make better decisions than generic ones. A "security agent" with security-specific instructions outperforms a general agent reviewing code.',
+            lang: 'javascript',
+            code: `Agent({
+  subagent_type: "security-review",
+  description: "Security audit of auth module",
+  prompt: "Review src/auth/ for OWASP Top 10 vulnerabilities. Focus on injection, broken auth, sensitive data exposure. Return findings with severity and line numbers."
+});`
+          },
+          {
+            title: 'Self-healing agent with error recovery',
+            difficulty: 'expert',
+            why: 'An agent that catches its own errors and retries with a different strategy — without human intervention — is the foundation of autonomous workflows.',
+            lang: 'javascript',
+            code: `async function resilientAgent(task, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    const result = await Agent({ prompt: task });
+    if (result.success) return result;
+    // Adjust the task based on the error
+    task = \`Previous attempt failed: \${result.error}. Try a different approach: \${task}\`;
+    await sleep(2000 * (i + 1));
+  }
+  throw new Error('Agent exhausted retries');
+}`
+          },
+          {
+            title: 'Claude as judge — evaluate other agents',
+            difficulty: 'expert',
+            why: 'Run two implementations in parallel, then spawn a judge agent to pick the better one. Competition improves output quality.',
+            lang: 'javascript',
+            code: `const [a, b] = await Promise.all([
+  Agent({ prompt: "Implement the cache layer using Redis" }),
+  Agent({ prompt: "Implement the cache layer using in-memory LRU" }),
+]);
+const winner = await Agent({
+  prompt: \`Compare these two implementations and pick the better one for production:
+Option A: \${a.result}
+Option B: \${b.result}
+Criteria: performance, simplicity, operational cost. Return your choice and why.\`
+});`
+          },
+          {
+            title: 'Agent result synthesis',
+            difficulty: 'advanced',
+            why: 'Raw agent output is noisy. A synthesis step distills multiple results into a clean, actionable summary.',
+            lang: 'javascript',
+            code: `const results = await Promise.all(repos.map(repo =>
+  Agent({ prompt: \`Audit \${repo} for outdated dependencies\` })
+));
+const summary = await Agent({
+  prompt: \`Synthesize these dependency audits into a prioritized action list.
+Top 5 critical updates, ignore patch versions.
+Data: \${JSON.stringify(results)}\`
+});`
+          },
+        ]
+      },
+
+      // ===================================================
+      // 5. NEVER HIT LIMITS
+      // ===================================================
+      limits: {
+        icon: '🚫',
+        title: 'Never Hit Limits',
+        description: 'Token budgeting, context compaction, chunking, and patterns that keep you under rate limits while doing more work.',
+        examples: [
+          {
+            title: 'Enable automatic context compaction',
+            difficulty: 'simple',
+            why: 'When context fills up, Claude Code automatically summarizes earlier turns. This extends sessions indefinitely without losing important state.',
+            lang: 'bash',
+            code: `# In claude settings or flag:
+claude --context-window 200k
+# Or add to .claude/settings.json:
+# { "contextWindowSize": "large" }
+# Auto-compaction kicks in before hitting the limit`
+          },
+          {
+            title: 'Read only what you need — avoid file dumps',
+            difficulty: 'simple',
+            why: 'Reading entire files "just in case" is the #1 token killer. Give Claude grep/search tools so it fetches only relevant sections.',
+            lang: 'bash',
+            code: `# Bad: "Read all files in src/"
+# Good: Instruct Claude to:
+grep -n "function authenticate" src/**/*.ts
+# Then read only src/auth/middleware.ts:45-89
+# Difference: 200 tokens vs 20,000 tokens`
+          },
+          {
+            title: 'Chunk large files for processing',
+            difficulty: 'advanced',
+            why: 'A 5,000-line file cannot be processed in one shot. Split it into logical chunks (by function or 500-line windows) and process each separately.',
+            lang: 'python',
+            code: `def chunk_file(path, chunk_size=500):
+    with open(path) as f:
+        lines = f.readlines()
+    return [
+        (i, lines[i:i+chunk_size])
+        for i in range(0, len(lines), chunk_size)
+    ]
+
+# Claude processes chunk by chunk:
+for start, chunk in chunk_file('large_file.py'):
+    claude(f"Refactor lines {start}-{start+500}: {''.join(chunk)}")`
+          },
+          {
+            title: 'Use .claudeignore to exclude noise',
+            difficulty: 'simple',
+            why: 'node_modules, .git, build artifacts — these consume tokens when Claude searches for files. Exclude them upfront.',
+            lang: 'bash',
+            code: `# .claudeignore (same syntax as .gitignore)
+node_modules/
+.git/
+dist/
+build/
+*.min.js
+*.map
+coverage/
+.cache/
+# Result: grep across the project stays fast and cheap`
+          },
+          {
+            title: 'Batch similar operations',
+            difficulty: 'advanced',
+            why: 'Ten separate "rename this variable" requests cost 10x the setup overhead. Batch them into one: "rename all of these in one pass."',
+            lang: 'bash',
+            code: `# Bad: 10 separate Claude calls
+# "rename userId to user_id in auth.ts"
+# "rename userId to user_id in profile.ts"
+# ...
+
+# Good: one call
+# "rename userId -> user_id throughout src/
+#  using find/replace, excluding tests"`
+          },
+          {
+            title: 'Progressive context building',
+            difficulty: 'advanced',
+            why: 'Start with a high-level summary; drill in only when needed. Like a surgeon who reads the chart before opening — not after.',
+            lang: 'bash',
+            code: `# Step 1: summarize the codebase structure (cheap)
+find src -name "*.ts" | head -30
+# Step 2: read only the relevant module
+# Step 3: read only the relevant function
+# Never start at step 3 without steps 1 and 2`
+          },
+          {
+            title: 'Cache-friendly prompting',
+            difficulty: 'expert',
+            why: 'Anthropic\'s prompt cache stores the first ~90% of your prompt for reuse. Front-load stable content (system prompt, codebase context) and keep dynamic content at the end.',
+            lang: 'javascript',
+            code: `// Cache-friendly structure:
+{
+  system: "[STABLE] You are a senior engineer on ProjectX. " +
+          "[STABLE] Codebase overview: ... (big, rarely changes)",
+  messages: [
+    // [DYNAMIC] This is the part that changes each turn
+    { role: "user", content: "Fix the bug in auth.ts" }
+  ]
+}
+// The stable prefix is cached — you pay for it once, not every call`
+          },
+          {
+            title: 'Rate limit handling with backoff',
+            difficulty: 'advanced',
+            why: 'When you hit the API rate limit, a naive retry hammers the endpoint. Exponential backoff is the correct response.',
+            lang: 'python',
+            code: `import anthropic, time, random
+
+def call_with_backoff(client, **kwargs):
+    for attempt in range(5):
+        try:
+            return client.messages.create(**kwargs)
+        except anthropic.RateLimitError:
+            if attempt == 4: raise
+            wait = (2 ** attempt) + random.random()
+            print(f"Rate limited, waiting {wait:.1f}s")
+            time.sleep(wait)`
+          },
+          {
+            title: 'Token counting before submission',
+            difficulty: 'advanced',
+            why: 'Count tokens before sending a request to avoid hitting context limits mid-turn. The count_tokens API is free.',
+            lang: 'python',
+            code: `import anthropic
+client = anthropic.Anthropic()
+
+response = client.messages.count_tokens(
+    model="claude-opus-4-7",
+    messages=[{"role": "user", "content": huge_document}]
+)
+print(f"Input tokens: {response.input_tokens}")
+# If > 150k, chunk the document before sending`
+          },
+          {
+            title: 'Streaming for long outputs',
+            difficulty: 'advanced',
+            why: 'For outputs >4k tokens, streaming lets you process and display results as they arrive — no waiting for the full response.',
+            lang: 'python',
+            code: `import anthropic
+client = anthropic.Anthropic()
+
+with client.messages.stream(
+    model="claude-opus-4-7",
+    max_tokens=8192,
+    messages=[{"role": "user", "content": "Generate comprehensive docs for all 200 functions..."}]
+) as stream:
+    for text in stream.text_stream:
+        print(text, end="", flush=True)`
+          },
+          {
+            title: 'Avoid re-reading files Claude just wrote',
+            difficulty: 'simple',
+            why: 'After Claude writes a file, you do not need to read it back to verify. The write either succeeded or errored — trust the tool result.',
+            lang: 'bash',
+            code: `# Bad pattern in prompts:
+# "Write auth.ts, then read it back to confirm it looks right"
+# (costs 2x tokens for zero benefit)
+
+# Good:
+# "Write auth.ts"
+# If the Write tool succeeds, it succeeded. Move on.`
+          },
+          {
+            title: 'Use glob patterns for targeted searches',
+            difficulty: 'simple',
+            why: 'grep\'s -l flag returns only filenames; add line numbers only when you need context. Grep across 1,000 files costs tokens — filter first.',
+            lang: 'bash',
+            code: `# Find which files have the pattern (filenames only = cheap)
+grep -rl "useAuthContext" src/
+
+# Then read only the matching files
+# Never: find . -name "*.ts" -exec cat {} \\; (catastrophic)`
+          },
+        ]
+      },
+
+      // ===================================================
+      // 6. RUN 24 HOURS
+      // ===================================================
+      run24: {
+        icon: '⏰',
+        title: 'Run 24 Hours',
+        description: 'Long-running autonomous workflows: persistence, checkpointing, error recovery, and keeping sessions alive across restarts.',
+        examples: [
+          {
+            title: 'Auto-commit every N minutes',
+            difficulty: 'simple',
+            why: 'A 24-hour run that crashes at hour 23 loses nothing if you auto-commit every 15 minutes. Git is your crash recovery system.',
+            lang: 'bash',
+            code: `# Add to your loop body or a cron:
+git add -A
+git commit -m "auto: checkpoint $(date +%Y-%m-%dT%H:%M:%S)" \
+  --allow-empty
+git push origin HEAD`
+          },
+          {
+            title: 'Checkpoint pattern with JSON state',
+            difficulty: 'advanced',
+            why: 'Store progress in a JSON file so the workflow can resume from the last checkpoint after a crash or container restart.',
+            lang: 'javascript',
+            code: `const CHECKPOINT_FILE = '.claude/checkpoint.json';
+
+function saveCheckpoint(state) {
+  fs.writeFileSync(CHECKPOINT_FILE, JSON.stringify({ ...state, savedAt: new Date().toISOString() }));
+}
+
+function loadCheckpoint() {
+  try { return JSON.parse(fs.readFileSync(CHECKPOINT_FILE, 'utf8')); }
+  catch { return { processed: 0, errors: [] }; }
+}
+
+// At the start: const state = loadCheckpoint();
+// After each item: saveCheckpoint(state);`
+          },
+          {
+            title: 'Idempotent operations — safe to retry',
+            difficulty: 'advanced',
+            why: 'A workflow that restarts from a checkpoint must not double-process items. Design every step to be idempotent — running it twice has the same effect as once.',
+            lang: 'python',
+            code: `def process_file(path, state):
+    # Check if already processed
+    if path in state['processed']:
+        print(f"Skipping {path} — already done")
+        return
+
+    # Do the work
+    result = transform(path)
+    write_output(path, result)
+
+    # Mark as done AFTER success
+    state['processed'].add(path)
+    save_checkpoint(state)`
+          },
+          {
+            title: 'Health ping to keep session alive',
+            difficulty: 'simple',
+            why: 'Cloud environments idle-timeout inactive sessions. A periodic no-op keeps the connection alive during slow processing steps.',
+            lang: 'bash',
+            code: `# In a background thread or separate process:
+while true; do
+  echo "$(date): still alive, processing item $CURRENT_ITEM"
+  sleep 300  # every 5 minutes
+done &
+PING_PID=$!
+
+# Clean up when main process exits:
+trap "kill $PING_PID" EXIT`
+          },
+          {
+            title: 'Error recovery — log, skip, continue',
+            difficulty: 'advanced',
+            why: 'A 24-hour run that stops on the first error is useless. Log errors, skip the bad item, and continue processing the rest.',
+            lang: 'python',
+            code: `import logging
+logging.basicConfig(filename='workflow.log', level=logging.ERROR)
+
+for item in items:
+    try:
+        process(item)
+        state['processed'].append(item)
+    except Exception as e:
+        logging.error(f"Failed {item}: {e}", exc_info=True)
+        state['errors'].append({'item': item, 'error': str(e)})
+        # Don't re-raise — continue to next item
+    finally:
+        save_checkpoint(state)`
+          },
+          {
+            title: 'Push to GitHub on every checkpoint',
+            difficulty: 'simple',
+            why: 'Remote storage is more durable than local. Push every checkpoint so a container death does not lose your progress.',
+            lang: 'bash',
+            code: `checkpoint() {
+  local msg="$1"
+  git add -A
+  git commit -m "checkpoint: $msg" --allow-empty
+  git push -u origin HEAD
+  echo "✅ Checkpoint pushed: $msg"
+}
+
+# Call at key points:
+checkpoint "processed 50/200 items"
+checkpoint "migration phase 1 complete"`
+          },
+          {
+            title: 'Resume from last commit on restart',
+            difficulty: 'advanced',
+            why: 'When a session restarts, read the last commit message or a state file to know exactly where to pick up.',
+            lang: 'bash',
+            code: `# Read last checkpoint from git log:
+LAST_COMMIT=$(git log --oneline -1)
+echo "Last checkpoint: $LAST_COMMIT"
+
+# Read structured state:
+if [ -f .claude/checkpoint.json ]; then
+  LAST_IDX=$(jq .processed_count .claude/checkpoint.json)
+  echo "Resuming from item $LAST_IDX"
+else
+  echo "Starting fresh"
+  LAST_IDX=0
+fi`
+          },
+          {
+            title: 'Notify on completion (email / Slack)',
+            difficulty: 'advanced',
+            why: 'For overnight runs, you want a message when the job finishes — success or failure. Don\'t wake up to silence and wonder.',
+            lang: 'bash',
+            code: `#!/usr/bin/env bash
+# notify.sh — call at the end of your workflow
+RESULT="$1"  # "success" or "error: $message"
+ELAPSED="$2"  # human-readable duration
+
+curl -s -X POST "$SLACK_WEBHOOK" \
+  -H 'Content-type: application/json' \
+  -d "$(jq -n \
+    --arg text "🤖 24h workflow finished in $ELAPSED: $RESULT" \
+    '{text: $arg}')"
+
+# Or email:
+echo "$RESULT" | mail -s "Workflow complete" you@example.com`
+          },
+          {
+            title: 'Rate-limit your workflow to avoid quota exhaustion',
+            difficulty: 'advanced',
+            why: 'A 24-hour run that burns all API tokens in hour 3 leaves you dark for 21 hours. Budget tokens per hour and throttle if ahead of pace.',
+            lang: 'javascript',
+            code: `const HOURLY_TOKEN_BUDGET = 100_000;
+let tokensThisHour = 0;
+let hourStart = Date.now();
+
+async function throttledCall(prompt) {
+  const now = Date.now();
+  if (now - hourStart > 3_600_000) {
+    hourStart = now;
+    tokensThisHour = 0;
+  }
+  if (tokensThisHour > HOURLY_TOKEN_BUDGET) {
+    const wait = 3_600_000 - (now - hourStart);
+    await sleep(wait); // wait until next hour
+  }
+  const result = await claude(prompt);
+  tokensThisHour += result.usage.total_tokens;
+  return result;
+}`
+          },
+          {
+            title: 'Use tmux or screen for persistence',
+            difficulty: 'simple',
+            why: 'SSH sessions die. Run Claude inside tmux so the workflow survives a network drop — detach and reattach from anywhere.',
+            lang: 'bash',
+            code: `# Start a named session:
+tmux new-session -d -s claude-run
+
+# Run your workflow inside it:
+tmux send-keys -t claude-run 'claude "run 24-hour migration workflow"' Enter
+
+# Detach (Ctrl+B, D) — the session lives on
+# Reattach from anywhere:
+tmux attach-session -t claude-run`
+          },
+          {
+            title: 'Graceful shutdown with cleanup',
+            difficulty: 'expert',
+            why: 'SIGTERM is sent before container shutdown. Catch it and do a final checkpoint so you can resume cleanly.',
+            lang: 'python',
+            code: `import signal, sys
+
+def shutdown_handler(sig, frame):
+    print("Shutdown signal received — saving checkpoint")
+    save_checkpoint(state)
+    push_to_git("emergency checkpoint on shutdown")
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, shutdown_handler)
+signal.signal(signal.SIGINT, shutdown_handler)`
+          },
+        ]
+      },
+
+      // ===================================================
+      // 7. SKILLS
+      // ===================================================
+      skills: {
+        icon: '🎯',
+        title: 'Skills',
+        description: 'Custom slash commands that package multi-step workflows. Build, chain, and share skills across projects.',
+        examples: [
+          {
+            title: 'What is a skill?',
+            difficulty: 'simple',
+            why: 'A skill is a markdown file in .claude/commands/ that Claude treats as a reusable slash command. Call it with /my-skill. No code required.',
+            lang: 'bash',
+            code: `# Create a skill:
+mkdir -p .claude/commands
+cat > .claude/commands/deploy.md << 'EOF'
+# Deploy to staging
+Run: npm run build
+Then: docker build -t myapp .
+Then: kubectl apply -f k8s/staging/
+Report: deployment status
+EOF
+# Use it:
+/deploy`
+          },
+          {
+            title: 'Skill with $ARGUMENTS placeholder',
+            difficulty: 'simple',
+            why: '$ARGUMENTS passes whatever you type after the slash command into the skill template. Makes skills parameterizable.',
+            lang: 'markdown',
+            code: `# .claude/commands/review-pr.md
+Review pull request $ARGUMENTS on GitHub.
+- Read the diff with mcp__github__pull_request_read
+- Check for security issues
+- Check for test coverage
+- Leave a review comment with findings
+
+# Usage: /review-pr 42`
+          },
+          {
+            title: 'Built-in skills to know',
+            difficulty: 'simple',
+            why: 'Claude Code ships with built-in skills. Knowing them saves you from reinventing the wheel.',
+            lang: 'bash',
+            code: `/init          # Generate CLAUDE.md for the project
+/review        # Review current branch changes
+/security-review  # OWASP-focused security review
+/simplify      # Refactor and clean up recent changes
+/loop 5m /foo  # Run /foo every 5 minutes
+/update-config # Modify .claude/settings.json via chat`
+          },
+          {
+            title: 'Chain skills together',
+            difficulty: 'advanced',
+            why: 'Skills can invoke other skills. Build pipelines from composable steps — each skill does one thing well.',
+            lang: 'markdown',
+            code: `# .claude/commands/ship.md
+Run the full shipping pipeline:
+1. /review — check changes are clean
+2. /security-review — no vulnerabilities
+3. Run npm test — must be green
+4. git push origin main
+5. /deploy — trigger production deploy
+6. /notify-slack "Deployed to production"
+
+Stop and report if any step fails.`
+          },
+          {
+            title: 'Skill for generating release notes',
+            difficulty: 'advanced',
+            why: 'Consistent release notes from git log — no more "forgot to update CHANGELOG." The skill does it every time.',
+            lang: 'markdown',
+            code: `# .claude/commands/changelog.md
+Generate release notes for version $ARGUMENTS.
+
+1. Run: git log $(git describe --tags --abbrev=0)..HEAD --oneline
+2. Group commits by type: feat, fix, chore, docs, refactor
+3. Write human-readable release notes in CHANGELOG.md
+4. Format: ## $ARGUMENTS (YYYY-MM-DD) with bullet points
+5. Commit: "chore: update changelog for $ARGUMENTS"`
+          },
+          {
+            title: 'Skill for database migration',
+            difficulty: 'advanced',
+            why: 'Database migrations follow a pattern. Encode that pattern in a skill so junior devs can\'t skip steps.',
+            lang: 'markdown',
+            code: `# .claude/commands/migrate.md
+Create a safe database migration for: $ARGUMENTS
+
+Steps:
+1. Create migration file in db/migrations/ with timestamp prefix
+2. Write UP migration (additive changes only)
+3. Write DOWN migration (rollback)
+4. Verify migration is idempotent
+5. Add index if this is a new foreign key
+6. Run: npx knex migrate:latest --env test
+7. Report: migration name and what it changes`
+          },
+          {
+            title: 'Skill for onboarding new engineers',
+            difficulty: 'advanced',
+            why: 'Document your setup steps once in a skill. Every new hire gets identical, working, up-to-date setup instructions.',
+            lang: 'markdown',
+            code: `# .claude/commands/onboard.md
+Set up this project for a new developer.
+
+1. Check node version matches .nvmrc
+2. Run: npm install
+3. Copy .env.example to .env
+4. Run: docker-compose up -d (postgres, redis)
+5. Run: npm run db:migrate
+6. Run: npm run db:seed
+7. Run: npm test (must pass)
+8. Print: "Ready! Run npm run dev to start"`
+          },
+          {
+            title: 'Global skills (user-level)',
+            difficulty: 'simple',
+            why: 'Project skills live in .claude/commands/. User skills in ~/.claude/commands/ work across every project.',
+            lang: 'bash',
+            code: `# Global skill — available everywhere:
+mkdir -p ~/.claude/commands
+
+cat > ~/.claude/commands/standup.md << 'EOF'
+Generate my standup update.
+1. git log --since=yesterday --oneline --author=$(git config user.email)
+2. Check open PRs assigned to me
+3. Format as: Yesterday / Today / Blockers
+EOF
+# Works in any repo: /standup`
+          },
+          {
+            title: 'Skill for code review comments',
+            difficulty: 'advanced',
+            why: 'Encode your team\'s code review standards in a skill. Every review follows the same checklist.',
+            lang: 'markdown',
+            code: `# .claude/commands/review.md
+Review the changes on the current branch against $ARGUMENTS (default: main).
+
+Checklist:
+- [ ] No hardcoded secrets or credentials
+- [ ] Error cases are handled
+- [ ] Tests exist for new functionality
+- [ ] No console.log left in production code
+- [ ] API changes are backwards compatible
+- [ ] Performance: no N+1 queries
+
+Output: summary + inline comments on changed lines`
+          },
+          {
+            title: 'Skill with environment awareness',
+            difficulty: 'expert',
+            why: 'Skills can read environment variables to behave differently in dev vs. CI vs. production. One skill, three environments.',
+            lang: 'markdown',
+            code: `# .claude/commands/deploy.md
+Deploy the application. $ARGUMENTS overrides the environment.
+
+Check $NODE_ENV or $ARGUMENTS:
+- development: npm run dev (no docker)
+- staging: docker build && kubectl apply -f k8s/staging
+- production: Require confirmation, then kubectl apply -f k8s/prod
+
+Always run health check after deploy.`
+          },
+          {
+            title: 'Skill testing',
+            difficulty: 'advanced',
+            why: 'Skills that work in dev might fail in CI due to missing tools. Write a simple test: invoke the skill in a clean env and assert it completes.',
+            lang: 'bash',
+            code: `#!/usr/bin/env bash
+# test-skills.sh
+SKILLS=(deploy review changelog onboard)
+for skill in "${SKILLS[@]}"; do
+  echo "Testing /$skill..."
+  # Check the skill file exists and has required sections:
+  if grep -q "\\$ARGUMENTS" ".claude/commands/$skill.md" 2>/dev/null; then
+    echo "  ✅ $skill has \\$ARGUMENTS"
+  fi
+done`
+          },
+        ]
+      },
+
+      // ===================================================
+      // 8. DESIGN PATTERNS
+      // ===================================================
+      patterns: {
+        icon: '🏗️',
+        title: 'Design Patterns',
+        description: 'Architecture patterns for Claude-powered systems: pipelines, observers, factories, circuit breakers, and more.',
+        examples: [
+          {
+            title: 'Pipeline pattern',
+            difficulty: 'advanced',
+            why: 'Chain transformations: each stage receives the output of the previous. Each stage is independently testable and replaceable.',
+            lang: 'javascript',
+            code: `const pipeline = [
+  async (input) => ({ ...input, parsed: parse(input.raw) }),
+  async (input) => ({ ...input, validated: validate(input.parsed) }),
+  async (input) => ({ ...input, enriched: await enrich(input.validated) }),
+  async (input) => ({ ...input, result: await store(input.enriched) }),
+];
+
+async function runPipeline(initial) {
+  return pipeline.reduce(async (acc, fn) => fn(await acc), Promise.resolve(initial));
+}`
+          },
+          {
+            title: 'Observer pattern via hooks',
+            difficulty: 'advanced',
+            why: 'Claude\'s PostToolUse hook is a built-in observer bus. Subscribe to any tool event without modifying the tool code.',
+            lang: 'bash',
+            code: `# Observers on file-write events:
+# Observer 1: auto-format
+# Observer 2: update imports
+# Observer 3: run related tests
+# Observer 4: update dependency graph
+
+# All in PostToolUse — no coordination needed, fire independently`
+          },
+          {
+            title: 'Circuit breaker — stop on repeated failure',
+            difficulty: 'expert',
+            why: 'Without a circuit breaker, a broken downstream service causes infinite retries and bill explosion. Open the circuit after N failures, reset after a timeout.',
+            lang: 'javascript',
+            code: `class CircuitBreaker {
+  constructor(threshold = 3, timeout = 30000) {
+    this.failures = 0;
+    this.threshold = threshold;
+    this.timeout = timeout;
+    this.state = 'closed'; // closed=normal, open=failing, half-open=testing
+    this.nextAttempt = 0;
+  }
+  async call(fn) {
+    if (this.state === 'open') {
+      if (Date.now() < this.nextAttempt) throw new Error('Circuit open');
+      this.state = 'half-open';
+    }
+    try {
+      const result = await fn();
+      this.reset();
+      return result;
+    } catch (e) {
+      this.failure();
+      throw e;
+    }
+  }
+  failure() { this.failures++; if (this.failures >= this.threshold) { this.state='open'; this.nextAttempt=Date.now()+this.timeout; } }
+  reset() { this.failures=0; this.state='closed'; }
+}`
+          },
+          {
+            title: 'Strategy pattern — swap models by task',
+            difficulty: 'advanced',
+            why: 'Use Haiku for cheap classification, Sonnet for code, Opus for complex reasoning. The strategy pattern makes this pluggable.',
+            lang: 'javascript',
+            code: `const strategies = {
+  classify: { model: 'claude-haiku-4-5-20251001', max_tokens: 100 },
+  code:     { model: 'claude-sonnet-4-6', max_tokens: 4096 },
+  reason:   { model: 'claude-opus-4-7', max_tokens: 8192 },
+};
+
+async function claude(prompt, task = 'code') {
+  const config = strategies[task];
+  return client.messages.create({ ...config, messages: [{ role:'user', content: prompt }] });
+}`
+          },
+          {
+            title: 'Factory pattern — create specialized agents',
+            difficulty: 'expert',
+            why: 'A factory builds the right agent configuration for a task type. Keeps agent creation DRY and ensures consistent system prompts.',
+            lang: 'javascript',
+            code: `function agentFactory(type, context) {
+  const configs = {
+    security: { subagent_type: 'security-review', prompt: \`Security focus. Context: \${context}\` },
+    explore:  { subagent_type: 'Explore', prompt: \`Read-only search. Context: \${context}\` },
+    plan:     { subagent_type: 'Plan', prompt: \`Architecture design only. Context: \${context}\` },
+  };
+  return Agent({ description: \`\${type} agent\`, ...configs[type] });
+}`
+          },
+          {
+            title: 'Saga pattern for distributed workflows',
+            difficulty: 'expert',
+            why: 'When a multi-step workflow fails mid-way, a saga defines compensating actions to undo completed steps — like a distributed transaction.',
+            lang: 'javascript',
+            code: `const saga = [
+  { do: createUser,    undo: deleteUser },
+  { do: sendWelcome,   undo: () => {} }, // emails can't be unsent
+  { do: createStripe,  undo: deleteStripeCustomer },
+  { do: createProject, undo: deleteProject },
+];
+
+async function runSaga(data) {
+  const completed = [];
+  for (const step of saga) {
+    try {
+      await step.do(data);
+      completed.push(step);
+    } catch (e) {
+      for (const done of completed.reverse()) await done.undo(data);
+      throw e;
+    }
+  }
+}`
+          },
+          {
+            title: 'Template method — enforce workflow structure',
+            difficulty: 'advanced',
+            why: 'Define the skeleton of an algorithm in a base class; let subclasses fill in the steps. Ensures every PR review follows the same structure.',
+            lang: 'python',
+            code: `class PRReviewer:
+    def review(self, pr):
+        issues = self.check_security(pr)  # abstract
+        issues += self.check_tests(pr)    # abstract
+        issues += self.check_style(pr)    # abstract
+        return self.format_report(issues) # concrete
+
+class PythonPRReviewer(PRReviewer):
+    def check_security(self, pr): return check_python_security(pr)
+    def check_tests(self, pr): return check_pytest_coverage(pr)
+    def check_style(self, pr): return check_black_format(pr)`
+          },
+          {
+            title: 'Event sourcing — log every action',
+            difficulty: 'expert',
+            why: 'Instead of updating state in place, append events to a log. You can replay the log to reconstruct any past state — invaluable for debugging autonomous agents.',
+            lang: 'python',
+            code: `import json, time
+
+EVENT_LOG = '.claude/events.jsonl'
+
+def append_event(event_type, data):
+    event = {'type': event_type, 'ts': time.time(), 'data': data}
+    with open(EVENT_LOG, 'a') as f:
+        f.write(json.dumps(event) + '\\n')
+
+# Usage:
+append_event('FILE_EDITED', {'path': 'src/auth.ts', 'lines': [42, 89]})
+append_event('TEST_RUN', {'passed': 47, 'failed': 2})
+append_event('COMMIT', {'sha': 'abc123', 'message': 'fix: auth token expiry'})`
+          },
+          {
+            title: 'Retry with jitter — avoid thundering herd',
+            difficulty: 'advanced',
+            why: 'Multiple agents retrying at the same time cause synchronized spikes. Add random jitter to spread retries out.',
+            lang: 'javascript',
+            code: `async function retryWithJitter(fn, maxAttempts = 4) {
+  for (let i = 0; i < maxAttempts; i++) {
+    try { return await fn(); }
+    catch (e) {
+      if (i === maxAttempts - 1) throw e;
+      const base = Math.min(1000 * 2 ** i, 30000);
+      const jitter = Math.random() * base * 0.3;
+      await new Promise(r => setTimeout(r, base + jitter));
+    }
+  }
+}`
+          },
+          {
+            title: 'Bulkhead pattern — isolate failures',
+            difficulty: 'expert',
+            why: 'If one agent pool (e.g., test runners) fails, it should not starve other pools (e.g., file writers). Bulkheads prevent cascading failures.',
+            lang: 'javascript',
+            code: `// Separate concurrency limits per pool
+const pools = {
+  readers: new Semaphore(10),  // 10 concurrent reads
+  writers: new Semaphore(3),   // 3 concurrent writes
+  external: new Semaphore(2),  // 2 concurrent API calls
+};
+
+async function readFile(path) {
+  await pools.readers.acquire();
+  try { return fs.readFileSync(path, 'utf8'); }
+  finally { pools.readers.release(); }
+}`
+          },
+          {
+            title: 'Dead letter queue — handle unprocessable items',
+            difficulty: 'expert',
+            why: 'Some items will always fail processing. Instead of blocking the queue, move them to a dead letter file for later human review.',
+            lang: 'python',
+            code: `DLQ_FILE = '.claude/dead-letter-queue.jsonl'
+
+def process_with_dlq(items):
+    for item in items:
+        try:
+            process(item)
+        except Exception as e:
+            # Can't process this item — park it
+            with open(DLQ_FILE, 'a') as f:
+                json.dump({'item': item, 'error': str(e), 'ts': time.time()}, f)
+                f.write('\\n')
+
+# Review DLQ periodically and process manually`
+          },
+          {
+            title: 'CQRS — separate reads from writes',
+            difficulty: 'expert',
+            why: 'Read operations (Explore agents) have different throughput needs than write operations. Separate them to optimize each path independently.',
+            lang: 'javascript',
+            code: `// Command side — writes, always serialized
+async function writeCommand(cmd) {
+  await commandQueue.enqueue(cmd);
+  return await commandQueue.process();
+}
+
+// Query side — reads, massively parallel
+async function readQuery(query) {
+  return await Promise.all(
+    shards.map(shard => Agent({ subagent_type: 'Explore', prompt: \`\${query} in \${shard}\` }))
+  );
+}`
+          },
+        ]
+      },
+
+      // ===================================================
+      // 9. HALL OF FAME
+      // ===================================================
+      halloffame: {
+        icon: '🏆',
+        title: 'Hall of Fame',
+        description: 'Community legends — the most powerful, most elegant, and most surprising Claude Code patterns ever discovered.',
+        examples: [
+          {
+            title: 'The one-liner that refactored a monolith',
+            difficulty: 'expert',
+            why: 'Single instruction. One agent. 3 hours of autonomous work. Split a 50k-line Rails monolith into 8 services, with tests and docs.',
+            lang: 'bash',
+            code: `# The legendary prompt:
+claude "Analyze this Rails monolith. Identify service boundaries by domain.
+Extract each domain into a separate gem with its own specs.
+Maintain the existing API surface. Commit each extraction separately.
+Start with the Auth domain."
+
+# Result: 8 clean commits, all tests passing, 6 hours later`
+          },
+          {
+            title: 'Gary Tan\'s gstack pattern',
+            difficulty: 'expert',
+            why: 'Garry Tan\'s productivity stack: Claude Code for all engineering, with every change immediately validated by tests and deployed to a preview. Zero manual steps.',
+            lang: 'bash',
+            code: `# The gstack loop:
+# 1. Describe feature in plain English
+# 2. Claude implements + writes tests
+# 3. Tests auto-run via hook
+# 4. Preview deploy auto-triggers on push
+# 5. Claude monitors deploy, fixes issues
+# 6. You review the preview link, approve
+# Total human input: ~50 words per feature`
+          },
+          {
+            title: 'The self-healing test suite',
+            difficulty: 'expert',
+            why: 'Loop + Monitor + Stop hook. Claude writes code, tests fail, Claude fixes code, repeat. Ran for 6 hours unattended, went from 40% to 94% coverage.',
+            lang: 'bash',
+            code: `/loop 2m run npm test — fix all failing tests before proceeding to the next loop.
+If all tests pass, add a test for the next untested function in coverage report.
+Keep going until coverage > 90%.`
+          },
+          {
+            title: 'Best CLAUDE.md ever (template)',
+            difficulty: 'advanced',
+            why: 'The CLAUDE.md that ships with every project. 200 words that save 200,000 tokens per session by establishing context once.',
+            lang: 'markdown',
+            code: `# Project: MyApp
+Stack: Next.js 14, TypeScript, Postgres, Prisma, Tailwind
+
+## Critical rules
+- NEVER modify schema without a migration
+- All API routes require auth middleware
+- Use Server Components by default; 'use client' only for interactivity
+- Tests use Vitest + Testing Library
+
+## Commands
+- dev: npm run dev (port 3000)
+- test: npm test
+- build: npm run build
+- db: npx prisma migrate dev
+
+## Architecture
+- src/app/ — Next.js App Router pages
+- src/components/ — shared UI
+- src/lib/ — utilities, db client
+- src/server/ — server-only logic
+
+## Current focus
+Building the billing module (Stripe integration). See BILLING.md.`
+          },
+          {
+            title: 'The 10x code review',
+            difficulty: 'advanced',
+            why: 'Three agents in parallel: security, correctness, performance. One synthesis agent picks the top 5 issues. Better than any single reviewer.',
+            lang: 'javascript',
+            code: `const [sec, perf, qual] = await Promise.all([
+  Agent({ subagent_type: 'security-review', prompt: 'Review this PR for OWASP Top 10' }),
+  Agent({ prompt: 'Review for performance: N+1, missing indexes, large payloads' }),
+  Agent({ prompt: 'Review for code quality: naming, duplication, complexity' }),
+]);
+
+const review = await Agent({
+  prompt: \`Synthesize these 3 reviews into top 5 must-fix issues, ordered by severity.
+Security: \${sec.result}
+Performance: \${perf.result}
+Quality: \${qual.result}\`
+});`
+          },
+          {
+            title: 'Fastest PR ever: idea to merged in 11 minutes',
+            difficulty: 'expert',
+            why: 'Workflow: describe → implement → tests → PR → CI → merged. Human involvement: the feature description and clicking "Merge."',
+            lang: 'bash',
+            code: `# t=0: claude "Add email verification to user signup. JWT tokens, 24h expiry, resend endpoint."
+# t=2: Claude reads auth module, plans approach
+# t=5: Implementation complete, 3 files changed
+# t=6: Tests written and passing (hook auto-ran them)
+# t=7: PR created automatically
+# t=8: CI starts (triggered by push)
+# t=10: CI passes (Claude fixed a lint error via PR event)
+# t=11: Human approves + merges
+echo "11 minutes, 0 context switches, 1 human decision"`
+          },
+          {
+            title: 'The nuclear option: full repo migration',
+            difficulty: 'expert',
+            why: 'JavaScript → TypeScript, class components → hooks, CommonJS → ESM — all in one overnight run. Worktree isolation kept main safe.',
+            lang: 'bash',
+            code: `# Prompt for the overnight run:
+claude --isolation worktree "
+Migrate this entire React codebase from JavaScript to TypeScript:
+1. Add tsconfig.json with strict mode
+2. Rename .js/.jsx to .ts/.tsx
+3. Add types for all props, state, and functions
+4. Fix all TypeScript errors
+5. Ensure npm test passes at each stage
+6. Commit each file separately for easy review
+Start with leaf components (no dependencies), work toward the root.
+"`
+          },
+          {
+            title: 'Most tokens saved: 50:1 ratio achieved',
+            difficulty: 'expert',
+            why: 'A team replaced a multishot prompt workflow (2M tokens/day) with an agentic loop (40k tokens/day). Same output. 50x cheaper.',
+            lang: 'javascript',
+            code: `// Old multishot: send full codebase + full conversation every turn
+// 10 turns × 200k context = 2,000,000 tokens
+
+// New agentic:
+// Turn 1: read only changed files (5k tokens)
+// Turn 2: grep for related code (2k tokens)
+// Turn 3: implement fix (10k tokens)
+// Turn 4: run tests, read only failures (3k tokens)
+// Total: 20,000 tokens — 100x less per session
+
+// Key insight: agents PULL context on demand
+// Multishot PUSHES all context every time`
+          },
+          {
+            title: 'The unbreakable deploy hook',
+            difficulty: 'expert',
+            why: 'This combination blocks bad deploys automatically: no failing tests, no security issues, no hardcoded secrets, no unreviewed migrations.',
+            lang: 'bash',
+            code: `#!/usr/bin/env bash
+# pre-deploy.sh — runs as a PreToolUse hook on any deploy command
+set -e
+
+echo "🔍 Running pre-deploy checks..."
+npm test || { echo "❌ Tests failed"; exit 2; }
+npx secretlint --secretlintrc .secretlintrc src/ || { echo "❌ Secrets found"; exit 2; }
+npx audit-ci --moderate || { echo "❌ Vulnerabilities found"; exit 2; }
+
+# Check for unreviewed migrations
+PENDING=$(ls db/migrations/*.ts 2>/dev/null | while read f; do
+  git log --oneline -1 -- "$f" | grep -v "reviewed:" && echo "$f"
+done)
+[ -n "$PENDING" ] && { echo "❌ Unreviewed migrations: $PENDING"; exit 2; }
+
+echo "✅ All checks passed"`
+          },
+          {
+            title: 'The legendary CLAUDE.md that writes itself',
+            difficulty: 'expert',
+            why: 'A skill that keeps CLAUDE.md current automatically — invoked by a PostToolUse hook when certain files change.',
+            lang: 'markdown',
+            code: `# .claude/commands/update-claude-md.md
+Update CLAUDE.md to reflect current codebase state.
+
+1. Run: find src -name "*.ts" | head -50
+2. Read package.json for stack and scripts
+3. Check recent git log for current focus area
+4. Read existing CLAUDE.md
+5. Update only sections that are stale
+6. Keep it under 300 words — brevity saves tokens
+7. Commit: "docs: auto-update CLAUDE.md"`
+          },
+        ]
+      },
+
+      // ===================================================
+      // 10. MARKDOWN ESSENTIALS
+      // ===================================================
+      markdown: {
+        icon: '📝',
+        title: 'Markdown Essentials',
+        description: 'CLAUDE.md mastery, project documentation, ADRs, runbooks, and the writing patterns that save the most tokens.',
+        examples: [
+          {
+            title: 'Minimal CLAUDE.md that works hardest',
+            difficulty: 'simple',
+            why: 'CLAUDE.md is loaded into every Claude session. Every word is context. Less is more — focus on what Claude can\'t infer from code.',
+            lang: 'markdown',
+            code: `# MyProject
+Node 20, TypeScript 5, PostgreSQL 15, React 18
+
+## Run
+\`\`\`bash
+npm install && npm run dev  # http://localhost:3000
+npm test                    # vitest watch mode
+npx prisma migrate dev      # apply migrations
+\`\`\`
+
+## Must-know
+- Auth via Clerk (not custom)
+- DB access only through \`src/lib/db.ts\`
+- No direct console.log in production code — use \`src/lib/logger.ts\`
+- All API routes validate input with Zod
+
+## Now working on
+Feature: user dashboard (see GitHub issue #47)`
+          },
+          {
+            title: 'Architecture Decision Record (ADR)',
+            difficulty: 'advanced',
+            why: 'ADRs explain WHY a technical decision was made. Future Claude sessions read them and don\'t undo decisions that were made deliberately.',
+            lang: 'markdown',
+            code: `# ADR-0042: Use Postgres for session storage
+
+## Status: Accepted
+
+## Context
+We need session storage. Options: Redis, Postgres, in-memory.
+
+## Decision
+Use Postgres via connect-pg-simple.
+
+## Consequences
+- Good: one less infrastructure dependency
+- Good: sessions survive server restart
+- Bad: slightly higher query overhead vs Redis
+- Mitigation: index on session_id, 5min TTL, auto-purge cron`
+          },
+          {
+            title: 'API endpoint documentation template',
+            difficulty: 'simple',
+            why: 'Structured API docs mean Claude can implement clients and tests without asking clarifying questions.',
+            lang: 'markdown',
+            code: `## POST /api/users
+
+Creates a new user account.
+
+**Auth**: None required
+**Rate limit**: 10/min per IP
+
+### Request
+\`\`\`json
+{ "email": "string (required)", "password": "string (required, min 8 chars)" }
+\`\`\`
+
+### Response 201
+\`\`\`json
+{ "id": "uuid", "email": "string", "createdAt": "ISO8601" }
+\`\`\`
+
+### Errors
+- 400: Validation failed
+- 409: Email already exists`
+          },
+          {
+            title: 'PR template that gets good reviews',
+            difficulty: 'simple',
+            why: 'A consistent PR template prevents Claude (and humans) from creating "WIP" PRs with no context.',
+            lang: 'markdown',
+            code: `<!-- .github/pull_request_template.md -->
+## What
+<!-- One sentence: what does this PR do? -->
+
+## Why
+<!-- What problem does this solve? Link to issue if applicable -->
+
+## How
+<!-- Key implementation decisions. What should reviewers focus on? -->
+
+## Testing
+- [ ] Unit tests added/updated
+- [ ] Manual testing done
+- [ ] Edge cases considered: <!-- list them -->
+
+## Screenshots
+<!-- For UI changes -->`
+          },
+          {
+            title: 'Runbook for common incidents',
+            difficulty: 'advanced',
+            why: 'A runbook that Claude can follow autonomously turns a 3am page into an automated fix. Every incident that repeats should have a runbook.',
+            lang: 'markdown',
+            code: `# Runbook: High Error Rate
+
+## Trigger
+Error rate > 1% for 2+ minutes
+
+## Diagnosis
+1. \`tail -100 /var/log/app/error.log\`
+2. Check Postgres connections: \`SELECT count(*) FROM pg_stat_activity;\`
+3. Check memory: \`free -m\`
+
+## Fix
+- If connection pool exhausted: \`systemctl restart pgbouncer\`
+- If OOM: \`systemctl restart app && echo "scale: check for memory leak"\`
+- If specific error repeating: grep error, find source, hotfix
+
+## Escalate if
+Not resolved in 15 minutes → page @oncall`
+          },
+          {
+            title: 'Changelog format Claude can generate',
+            difficulty: 'simple',
+            why: 'Keep-a-Changelog format is parseable by Claude. A structured format means automated changelog generation works reliably.',
+            lang: 'markdown',
+            code: `# Changelog
+
+## [Unreleased]
+### Added
+- Email verification for new signups (#45)
+
+### Fixed
+- Session tokens now expire correctly (#51)
+
+## [2.1.0] - 2024-01-15
+### Added
+- Stripe billing integration
+
+### Changed
+- User dashboard redesign
+
+### Deprecated
+- Legacy /api/v1 endpoints (remove in 3.0)`
+          },
+          {
+            title: 'CONTRIBUTING.md that actually helps',
+            difficulty: 'simple',
+            why: 'A CONTRIBUTING.md with concrete commands prevents "how do I run the tests?" questions. Saves Claude (and humans) from asking.',
+            lang: 'markdown',
+            code: `# Contributing
+
+## Setup
+\`\`\`bash
+git clone <repo> && cd <repo>
+cp .env.example .env  # fill in your values
+npm install
+npm run db:setup      # creates + seeds test DB
+npm test              # should all pass
+\`\`\`
+
+## Workflow
+1. Branch from main: \`git checkout -b feat/my-feature\`
+2. Make changes + write tests
+3. \`npm run lint && npm test\` — both must pass
+4. PR to main — add screenshots for UI changes
+
+## Code style
+Prettier + ESLint auto-fix: \`npm run fix\``
+          },
+          {
+            title: 'Security policy for Claude-generated code',
+            difficulty: 'advanced',
+            why: 'Tell Claude explicitly what security policies apply. Without this, Claude may default to patterns that work but aren\'t compliant with your requirements.',
+            lang: 'markdown',
+            code: `# Security Policy (CLAUDE.md section)
+
+## Never do
+- Store passwords in plain text (use bcrypt, min cost 12)
+- Trust user-supplied IDs without ownership check
+- Concatenate SQL strings (parameterized queries only)
+- Log PII (emails, names, IPs are PII)
+- Put secrets in code (use process.env only)
+
+## Always do
+- Validate all input at the API boundary with Zod
+- Rate-limit auth endpoints (10/min)
+- Add CSRF protection to state-changing endpoints
+- Use parameterized queries for all DB access`
+          },
+          {
+            title: 'Architecture overview for new sessions',
+            difficulty: 'advanced',
+            why: 'A 100-word architecture overview at the top of CLAUDE.md means every session starts with the mental model fully loaded.',
+            lang: 'markdown',
+            code: `## Architecture
+
+Frontend (Next.js App Router) → API Routes (tRPC) → Service Layer → Postgres
+
+**Key flows:**
+- Auth: Clerk handles session, our DB stores user preferences
+- Billing: Stripe webhook → billing-service → DB
+- Emails: Queue in Postgres (pg-boss) → Resend API
+- Background jobs: pg-boss workers in /src/workers/
+
+**Do not:**
+- Call DB from frontend components
+- Skip the service layer
+- Use Prisma outside src/lib/db.ts`
+          },
+          {
+            title: 'Test documentation pattern',
+            difficulty: 'simple',
+            why: 'When Claude reads test files, well-named tests with good descriptions act as living documentation of expected behavior.',
+            lang: 'typescript',
+            code: `// Good test docs — Claude understands the system from tests alone
+describe('UserService', () => {
+  describe('createUser', () => {
+    it('hashes the password before storing', async () => { ... });
+    it('sends a verification email', async () => { ... });
+    it('throws ConflictError when email already exists', async () => { ... });
+    it('requires email and password (rejects partial input)', async () => { ... });
+  });
+});`
+          },
+          {
+            title: 'Environment variables reference',
+            difficulty: 'simple',
+            why: 'Document every env var in CLAUDE.md or .env.example. Claude can\'t read your .env — this is its source of truth.',
+            lang: 'bash',
+            code: `# .env.example — source of truth for all env vars
+# Database
+DATABASE_URL=postgresql://user:pass@localhost:5432/mydb
+
+# Auth (Clerk)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+
+# Payments (Stripe)
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Email (Resend)
+RESEND_API_KEY=re_...
+
+# Required in production only:
+SENTRY_DSN=https://...`
+          },
+        ]
+      },
+
+      // ===================================================
+      // 11. SECURE CODE
+      // ===================================================
+      security: {
+        icon: '🔐',
+        title: 'Secure Code',
+        description: 'Patterns for writing secure code: injection prevention, secrets management, auth, input validation, and the OWASP Top 10.',
+        examples: [
+          {
+            title: 'Parameterized queries — prevent SQL injection',
+            difficulty: 'simple',
+            why: 'SQL injection is still the #1 vulnerability. NEVER concatenate user input into SQL strings. Always use parameterized queries.',
+            lang: 'typescript',
+            code: `// ❌ NEVER — SQL injection vulnerability
+const user = await db.query(\`SELECT * FROM users WHERE email = '\${email}'\`);
+
+// ✅ ALWAYS — parameterized
+const user = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+
+// ✅ With Prisma (always safe)
+const user = await prisma.user.findUnique({ where: { email } });`
+          },
+          {
+            title: 'Input validation at the boundary',
+            difficulty: 'simple',
+            why: 'Validate ALL external input at the API boundary with a schema validator. Never trust user-supplied data anywhere downstream.',
+            lang: 'typescript',
+            code: `import { z } from 'zod';
+
+const CreateUserSchema = z.object({
+  email: z.string().email().max(255),
+  password: z.string().min(8).max(128),
+  name: z.string().min(1).max(100).optional(),
+});
+
+export async function POST(req: Request) {
+  const body = await req.json();
+  const input = CreateUserSchema.safeParse(body);
+  if (!input.success) return Response.json({ error: input.error }, { status: 400 });
+  // input.data is now safe to use
+}`
+          },
+          {
+            title: 'Secrets management — never in code',
+            difficulty: 'simple',
+            why: 'Hardcoded secrets get committed to git and live there forever in history. Use environment variables; scan for leaks before every commit.',
+            lang: 'bash',
+            code: `# ✅ Read from environment
+const apiKey = process.env.STRIPE_SECRET_KEY;
+if (!apiKey) throw new Error('STRIPE_SECRET_KEY is required');
+
+# Scan for secrets before commit (add to pre-commit hook):
+npx secretlint "**/*"
+
+# Or use git-secrets:
+git secrets --install
+git secrets --register-aws  # also checks for generic API keys`
+          },
+          {
+            title: 'Password hashing with bcrypt',
+            difficulty: 'simple',
+            why: 'Passwords must never be stored in plain text or with weak hashing (MD5, SHA1). Use bcrypt with a cost factor of at least 12.',
+            lang: 'typescript',
+            code: `import bcrypt from 'bcrypt';
+
+const COST_FACTOR = 12; // 12 = ~250ms per hash, good default
+
+async function hashPassword(plain: string): Promise<string> {
+  return bcrypt.hash(plain, COST_FACTOR);
+}
+
+async function verifyPassword(plain: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(plain, hash);
+  // Safe against timing attacks — always takes COST_FACTOR time
+}`
+          },
+          {
+            title: 'Authorization check — verify ownership',
+            difficulty: 'advanced',
+            why: 'The most common auth mistake: checking that a user is logged in, but not checking that they own the resource they\'re accessing.',
+            lang: 'typescript',
+            code: `// ❌ BROKEN — checks auth but not ownership
+async function getDocument(userId: string, docId: string) {
+  return db.document.findUnique({ where: { id: docId } });
+  // Any logged-in user can read ANY document!
+}
+
+// ✅ CORRECT — always scope queries to the authenticated user
+async function getDocument(userId: string, docId: string) {
+  return db.document.findUnique({
+    where: { id: docId, userId }, // Postgres enforces ownership
+  });
+}`
+          },
+          {
+            title: 'Rate limiting — protect auth endpoints',
+            difficulty: 'advanced',
+            why: 'Without rate limiting, attackers can try millions of passwords. Limit auth endpoints to ~10 attempts per minute per IP.',
+            lang: 'typescript',
+            code: `import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, '1 m'), // 10 per minute
+});
+
+export async function POST(req: Request) {
+  const ip = req.headers.get('x-forwarded-for') ?? 'anon';
+  const { success } = await ratelimit.limit(ip);
+  if (!success) return Response.json({ error: 'Too many attempts' }, { status: 429 });
+  // proceed with auth
+}`
+          },
+          {
+            title: 'XSS prevention — sanitize before rendering',
+            difficulty: 'advanced',
+            why: 'Cross-site scripting lets attackers inject JavaScript that runs in other users\' browsers. Sanitize any user-generated content before rendering.',
+            lang: 'typescript',
+            code: `import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
+
+const window = new JSDOM('').window;
+const purify = DOMPurify(window);
+
+// For server-side rendering of user HTML:
+function sanitizeHtml(dirty: string): string {
+  return purify.sanitize(dirty, {
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br'],
+    ALLOWED_ATTR: [],
+  });
+}
+// In React: use dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }}`
+          },
+          {
+            title: 'CSRF protection for state-changing endpoints',
+            difficulty: 'advanced',
+            why: 'CSRF lets attacker sites make authenticated requests on behalf of your users. Origin/referer checks or CSRF tokens prevent this.',
+            lang: 'typescript',
+            code: `// Simple origin check middleware:
+export function csrfGuard(req: Request) {
+  const origin = req.headers.get('origin');
+  const allowed = ['https://myapp.com', 'http://localhost:3000'];
+  if (req.method !== 'GET' && !allowed.includes(origin ?? '')) {
+    throw new Response('Forbidden', { status: 403 });
+  }
+}
+
+// Or use SameSite=Lax cookies — browsers enforce CSRF protection automatically:
+// Set-Cookie: session=...; SameSite=Lax; Secure; HttpOnly`
+          },
+          {
+            title: 'Security headers — protect every response',
+            difficulty: 'advanced',
+            why: 'Security headers are free protection against clickjacking, MIME sniffing, and protocol downgrade. Add them to every HTTP response.',
+            lang: 'typescript',
+            code: `// next.config.js
+const securityHeaders = [
+  { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+  { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self'" },
+];`
+          },
+          {
+            title: 'Audit logging — track sensitive actions',
+            difficulty: 'expert',
+            why: 'Audit logs let you answer "who did what when" after a security incident. Log every sensitive action — not as part of error handling, but as a matter of course.',
+            lang: 'typescript',
+            code: `interface AuditEvent {
+  userId: string;
+  action: 'PASSWORD_CHANGED' | 'PAYMENT_INITIATED' | 'ROLE_UPDATED' | 'DATA_EXPORTED';
+  resourceType: string;
+  resourceId: string;
+  ipAddress: string;
+  userAgent: string;
+  outcome: 'success' | 'failure';
+  metadata?: Record<string, unknown>;
+}
+
+async function audit(event: AuditEvent) {
+  await db.auditLog.create({
+    data: { ...event, createdAt: new Date() },
+  });
+  // Never throw — audit failure should never break the main flow
+}`
+          },
+          {
+            title: 'Dependency scanning in CI',
+            difficulty: 'advanced',
+            why: 'Vulnerable dependencies are one of the most common attack vectors. Scan in CI so vulnerabilities can\'t be merged undetected.',
+            lang: 'yaml',
+            code: `# .github/workflows/security.yml
+name: Security Scan
+on: [push, pull_request]
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm audit --audit-level=moderate
+      - uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: \${{ secrets.SNYK_TOKEN }}`
+          },
+          {
+            title: 'Never log PII or secrets',
+            difficulty: 'simple',
+            why: 'Logs are often less secured than databases. Logging an email, password, or token means that data leaks to everyone with log access.',
+            lang: 'typescript',
+            code: `// ❌ NEVER log these
+console.log('User logged in:', { email, password });
+logger.info({ user, token, creditCard });
+
+// ✅ Log IDs and events, not data
+logger.info({ event: 'user.login', userId: user.id, success: true });
+
+// ✅ If you must log request bodies, scrub sensitive fields:
+function scrub(obj: Record<string, unknown>) {
+  const SENSITIVE = ['password', 'token', 'secret', 'ssn', 'cardNumber'];
+  return Object.fromEntries(
+    Object.entries(obj).map(([k, v]) => [k, SENSITIVE.includes(k) ? '[REDACTED]' : v])
+  );
+}`
+          },
+        ]
+      },
+
+    } // end categories
+  }
+}
+
+// Initialize highlight.js after Alpine mounts
+document.addEventListener('alpine:init', () => {
+  hljs.configure({ ignoreUnescapedHTML: true });
+});
+</script>
+</body>
+</html>
