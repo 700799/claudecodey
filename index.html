@@ -131,60 +131,62 @@ h1 {
 
 /* ===== TOKEN SAVINGS BANNER ===== */
 .token-banner {
-  background: linear-gradient(135deg, var(--dark2) 0%, #222222 100%);
-  border-top: 3px solid var(--yellow);
-  border-bottom: 3px solid var(--donut-pink);
-  padding: 20px 24px;
+  background: var(--dark2);
+  border-bottom: 1px solid var(--card-border);
+  padding: 8px 16px;
 }
 
-.token-inner {
-  max-width: 900px;
+.token-inner-compact {
+  max-width: 1200px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 20px;
+  display: flex;
   align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.token-stat {
-  text-align: center;
+.token-chip {
   background: var(--yellow);
   color: var(--dark);
-  border-radius: 12px;
-  padding: 12px 20px;
-  min-width: 110px;
-  box-shadow: 0 4px 20px rgba(254,217,15,0.4);
-}
-
-.token-stat .number {
-  font-family: 'Permanent Marker', cursive;
-  font-size: 2.5rem;
-  line-height: 1;
-  color: var(--springfield-blue);
-}
-
-.token-stat .label {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--dark2);
+  padding: 2px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.token-text h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--yellow);
-  margin-bottom: 6px;
-}
-
-.token-text p {
-  font-size: 0.82rem;
+.token-summary {
+  font-size: 0.78rem;
   color: var(--text-muted);
-  line-height: 1.5;
+  flex: 1;
+  min-width: 0;
 }
 
-.token-text strong { color: var(--donut-pink); }
+.token-toggle {
+  background: none;
+  border: 1px solid var(--card-border);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+.token-toggle:hover { border-color: var(--yellow); color: var(--yellow); }
+
+.token-detail {
+  max-width: 1200px;
+  margin: 6px auto 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  padding-top: 6px;
+  border-top: 1px solid var(--card-border);
+}
+.token-detail strong { color: var(--yellow); }
 
 /* ===== STICKY NAV ===== */
 .sticky-nav {
@@ -545,7 +547,6 @@ h1 {
     <div class="cloud cloud-3"></div>
   </div>
   <div class="header-content">
-    <div class="donut-row">🍩 🤖 🍩 ⚡ 🍩</div>
     <h1>The Claude Code<br>Missing Manual</h1>
     <p class="subtitle">Everything Anthropic forgot to tell you · Patterns, tricks &amp; power moves</p>
   </div>
@@ -553,21 +554,14 @@ h1 {
 <div class="grass-strip"></div>
 
 <!-- ===== TOKEN SAVINGS BANNER ===== -->
-<div class="token-banner">
-  <div class="token-inner">
-    <div class="token-stat">
-      <div class="number">30×</div>
-      <div class="label">Token Savings</div>
-    </div>
-    <div class="token-text">
-      <h3>🚀 Agentic Workflows vs. Old-School Multishot Prompts</h3>
-      <p>
-        Traditional multishot prompting resends the <strong>entire conversation history</strong> on every turn — token costs grow quadratically.
-        A 10-turn workflow costs <strong>55k tokens</strong> (1k+2k+…+10k) in multishot vs ~<strong>2k tokens</strong> in an agentic loop that reads only what it needs.
-        Complex real-world workflows with large codebases routinely show <strong>30:1 or greater savings</strong> — the agent fetches targeted file excerpts rather than pasting
-        entire files into context over and over. That's the difference between a $5 API bill and a $150 one for the same outcome.
-      </p>
-    </div>
+<div class="token-banner" x-data="{ open: false }">
+  <div class="token-inner-compact">
+    <span class="token-chip">30x token savings</span>
+    <span class="token-summary">Agentic workflows vs. multishot prompts — agents pull targeted context; multishot resends everything every turn.</span>
+    <button class="token-toggle" @click="open = !open" x-text="open ? 'Less' : 'More'"></button>
+  </div>
+  <div class="token-detail" x-show="open" x-collapse>
+    <p>A 10-turn multishot workflow costs ~55k tokens (1k+2k+…+10k) because each turn resends the full history. An agentic loop doing the same work costs ~2k tokens — it reads only what it needs. Real codebases routinely show <strong>30:1 savings</strong>: the difference between a $5 bill and a $150 one.</p>
   </div>
 </div>
 
@@ -654,7 +648,6 @@ h1 {
 
 <!-- ===== FOOTER ===== -->
 <div class="footer">
-  <div class="donuts">🍩🍩🍩</div>
   <p>The Claude Code Missing Manual &mdash; Community-powered patterns &amp; power moves</p>
   <p style="margin-top:6px"><a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code Docs</a> · <a href="https://github.com/anthropics/claude-code">GitHub</a> · Built for Springfield, deployed everywhere</p>
 </div>
