@@ -203,6 +203,251 @@ h1 {
   background: rgba(0,0,0,0.2);
 }
 
+/* ===== Get Certified Button ===== */
+.cert-btn {
+  margin-top: 18px;
+  background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%);
+  color: #1a1a1a;
+  border: 3px solid #1a1a1a;
+  border-radius: 999px;
+  padding: 14px 32px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #1a1a1a, 0 10px 24px rgba(0,0,0,0.25);
+  transition: all 0.18s ease;
+  font-family: inherit;
+  text-transform: uppercase;
+}
+.cert-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 9px 0 #1a1a1a, 0 14px 28px rgba(0,0,0,0.3);
+}
+.cert-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 #1a1a1a, 0 6px 14px rgba(0,0,0,0.2);
+}
+
+/* ===== Try-it panel ===== */
+.try-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  background: transparent;
+  color: var(--yellow);
+  border: 1.5px solid var(--yellow);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+.try-btn:hover {
+  background: var(--yellow);
+  color: #1a1a1a;
+}
+.try-panel {
+  display: none;
+  margin-top: 12px;
+  padding: 14px;
+  background: rgba(254,217,15,0.04);
+  border: 1px dashed rgba(254,217,15,0.4);
+  border-radius: 10px;
+}
+.try-panel.open { display: block; }
+.try-panel-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--yellow);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.try-editor {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  background: #0d1117;
+  color: #e6edf3;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.try-run-btn {
+  margin-top: 8px;
+  background: var(--yellow);
+  color: #1a1a1a;
+  border: 2px solid #1a1a1a;
+  border-radius: 999px;
+  padding: 6px 18px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  text-transform: uppercase;
+}
+.try-run-btn:hover { background: var(--yellow-dark); }
+.try-output {
+  margin-top: 10px;
+  padding: 12px;
+  background: #0a0e14;
+  color: #b8d4a0;
+  border-left: 3px solid #5CB833;
+  border-radius: 4px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  min-height: 30px;
+  display: none;
+}
+.try-output.shown { display: block; }
+.try-output.empty { color: #888; font-style: italic; }
+
+/* ===== Quiz ===== */
+.cert-quiz-section {
+  max-width: 800px;
+  margin: 60px auto 40px;
+  padding: 30px;
+  background: var(--dark2);
+  border: 3px solid var(--yellow);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+.cert-quiz-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.cert-quiz-header h2 {
+  font-family: 'Permanent Marker', cursive;
+  color: var(--yellow);
+  font-size: 2.2rem;
+  margin: 0 0 10px;
+}
+.cert-quiz-header p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+.cert-progress {
+  text-align: center;
+  margin: 16px 0;
+  font-weight: 700;
+  color: var(--yellow);
+  font-size: 0.9rem;
+}
+.cert-q {
+  margin-bottom: 24px;
+  padding: 18px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 12px;
+  border-left: 4px solid var(--sky-dark);
+}
+.cert-q-num {
+  display: inline-block;
+  background: var(--sky-dark);
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+.cert-q-text {
+  font-weight: 600;
+  font-size: 1.02rem;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+.cert-options { display: flex; flex-direction: column; gap: 8px; }
+.cert-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--dark);
+  border: 1.5px solid var(--card-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--text);
+  font-size: 0.9rem;
+  text-align: left;
+  font-family: inherit;
+}
+.cert-option:hover { border-color: var(--yellow); }
+.cert-option.selected { border-color: var(--yellow); background: rgba(254,217,15,0.08); }
+.cert-option.correct { border-color: #4CAF50; background: rgba(76,175,80,0.15); color: #C5E1A5; }
+.cert-option.wrong { border-color: #cc3344; background: rgba(204,51,68,0.15); color: #FFAB91; }
+.cert-option-letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.cert-option.correct .cert-option-letter { background: #4CAF50; color: #fff; }
+.cert-option.wrong .cert-option-letter { background: #cc3344; color: #fff; }
+.cert-submit {
+  margin-top: 12px;
+  background: var(--yellow);
+  color: #1a1a1a;
+  border: 2px solid #1a1a1a;
+  border-radius: 999px;
+  padding: 8px 22px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  text-transform: uppercase;
+}
+.cert-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+.cert-explanation {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(112,200,240,0.08);
+  border-left: 3px solid var(--sky);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+.cert-explanation.shown { display: block; }
+.cert-explanation strong { color: var(--sky); }
+.cert-final {
+  display: none;
+  text-align: center;
+  margin-top: 30px;
+  padding: 26px;
+  background: linear-gradient(135deg, rgba(254,217,15,0.12) 0%, rgba(112,200,240,0.12) 100%);
+  border: 2px solid var(--yellow);
+  border-radius: 16px;
+}
+.cert-final.shown { display: block; }
+.cert-final h3 {
+  margin: 0 0 10px;
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.8rem;
+  color: var(--yellow);
+}
+.cert-final-score { font-size: 1.4rem; font-weight: 800; margin: 10px 0; }
+
 .pill.active-cat {
   background: var(--yellow);
   border-color: var(--yellow);
@@ -210,7 +455,7 @@ h1 {
   box-shadow: 0 0 16px rgba(254,217,15,0.4);
 }
 
-.pill.active-diff-simple { background: #4CAF50; border-color: #4CAF50; color: #fff; }
+.pill.active-diff-essential { background: #4CAF50; border-color: #4CAF50; color: #fff; }
 .pill.active-diff-advanced { background: var(--sky-dark); border-color: var(--sky-dark); color: #fff; }
 .pill.active-diff-expert { background: var(--donut-pink); border-color: var(--donut-pink); color: #fff; }
 .pill.active-diff-overengineer { background: var(--orange); border-color: var(--orange); color: #fff; }
@@ -345,7 +590,7 @@ h1 {
   flex-shrink: 0;
 }
 
-.diff-simple { background: rgba(76,175,80,0.2); color: #81C784; border: 1px solid #4CAF50; }
+.diff-essential { background: rgba(76,175,80,0.2); color: #81C784; border: 1px solid #4CAF50; }
 .diff-advanced { background: rgba(58,172,216,0.2); color: #70C8F0; border: 1px solid #3AACD8; }
 .diff-expert { background: rgba(227,79,142,0.2); color: #F48FB1; border: 1px solid #E34F8E; }
 .diff-overengineer { background: rgba(241,90,34,0.2); color: #FFAB76; border: 1px solid #F15A22; }
@@ -500,6 +745,9 @@ h1 {
   <div class="header-content">
     <h1>The Claude Code<br>Missing Manual</h1>
     <p class="subtitle">Everything Anthropic forgot to tell you · Patterns, tricks &amp; power moves</p>
+    <button class="cert-btn" onclick="document.getElementById('cert-quiz').scrollIntoView({behavior:'smooth'})">
+      🎓 Get Certified — Take the Quiz
+    </button>
   </div>
 </div>
 <div class="grass-strip"></div>
@@ -515,7 +763,7 @@ h1 {
       <div class="row-label">Difficulty</div>
       <div class="pills" id="difficulty-pills">
         <button class="pill active-diff-all" data-diff="all">All</button>
-        <button class="pill" data-diff="simple">Simple</button>
+        <button class="pill" data-diff="essential">Essential</button>
         <button class="pill" data-diff="advanced">Advanced</button>
         <button class="pill" data-diff="expert">Expert</button>
       </div>
@@ -529,6 +777,9 @@ h1 {
 
 <!-- ===== MAIN ===== -->
 <div class="main" id="main-content"></div>
+
+<!-- ===== CERTIFICATION QUIZ ===== -->
+<div class="cert-quiz-section" id="cert-quiz"></div>
 
 <!-- ===== FOOTER ===== -->
 <div class="footer">
@@ -551,7 +802,7 @@ const CATEGORIES = {
         examples: [
           {
             title: 'Basic /loop — poll every 10 minutes',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'The built-in /loop skill runs a slash command on an interval. Set it and forget it — Claude wakes up, checks state, acts, sleeps.',
             lang: 'bash',
             code: `/loop 10m /status-check
@@ -559,7 +810,7 @@ const CATEGORIES = {
           },
           {
             title: 'Loop until tests pass',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Instead of babysitting CI yourself, tell Claude to keep iterating until tests go green. The loop stops when you hit the exit condition.',
             lang: 'bash',
             code: `/loop 2m until tests pass: run npm test, if failing fix the first error then stop`
@@ -580,7 +831,7 @@ done`
           },
           {
             title: 'CI babysitting loop',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Subscribe to PR events and let Claude monitor CI. When a check fails, Claude diagnoses and pushes a fix automatically.',
             lang: 'bash',
             code: `/loop 5m check CI on PR #42 — if red, read the failure log and push a fix`
@@ -679,7 +930,7 @@ fs.writeFileSync('.loop-state.json', JSON.stringify(state));`
           },
           {
             title: 'Watch a directory for new files',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A directory watcher trigger gives you near-instant reactivity without polling overhead. Great for ETL drop zones and upload processors.',
             lang: 'bash',
             code: `inotifywait -m -e close_write ./uploads/ |
@@ -856,7 +1107,7 @@ for item in stream:
         examples: [
           {
             title: 'Block dangerous shell commands (PreToolUse)',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A PreToolUse hook on Bash runs before every shell command. Return exit code 2 to block the command and tell Claude why.',
             lang: 'json',
             code: `// .claude/settings.json
@@ -874,7 +1125,7 @@ for item in stream:
           },
           {
             title: 'Safety check script',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'The script reads the proposed command from stdin as JSON and exits 2 (block) if it sees danger words like "rm -rf" or "DROP TABLE".',
             lang: 'bash',
             code: `#!/usr/bin/env bash
@@ -893,7 +1144,7 @@ exit 0`
           },
           {
             title: 'Auto-format on every file edit (PostToolUse)',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'PostToolUse fires after Claude edits a file. Plug in Prettier or Black so every save is always formatted — no more "forgot to format" commits.',
             lang: 'json',
             code: `{
@@ -910,7 +1161,7 @@ exit 0`
           },
           {
             title: 'Run tests on every Stop',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'The Stop hook fires when Claude finishes a turn. Use it to auto-run your test suite and feed the result back so Claude can self-correct.',
             lang: 'json',
             code: `{
@@ -999,7 +1250,7 @@ sys.exit(0)`
           },
           {
             title: 'Desktop notification (macOS/Linux)',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'The Notification hook fires when Claude needs your input. Wire it to system notifications so you don\'t miss a blocked prompt.',
             lang: 'bash',
             code: `# macOS
@@ -1010,7 +1261,7 @@ notify-send "Claude Code" "Claude needs your input"`
           },
           {
             title: 'Sound alert hook',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Audible alerts for when Claude finishes a long task — no screen-watching required.',
             lang: 'bash',
             code: `# macOS — plays system sound on Stop
@@ -1087,7 +1338,7 @@ exit 0`
           },
           {
             title: 'Type-check on stop',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A Stop hook that runs tsc --noEmit catches type errors before Claude says "done." Better feedback than discovering them in CI later.',
             lang: 'json',
             code: `{
@@ -1216,7 +1467,7 @@ exit 0`
         examples: [
           {
             title: 'Monitor a background command',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Monitor streams stdout from a background process as notifications. Claude acts on each line — perfect for log-driven workflows.',
             lang: 'bash',
             code: `# In Claude's instructions:
@@ -1226,7 +1477,7 @@ exit 0`
           },
           {
             title: 'Tail production logs',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Stream live logs to Claude so it can spot anomalies, parse errors, or trigger alerts — without you watching a terminal.',
             lang: 'bash',
             code: `# Claude runs this in background + monitors:
@@ -1288,7 +1539,7 @@ done`
           },
           {
             title: 'File system watcher',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Watch a directory for new files and process each one automatically. Great for ETL pipelines or upload processors.',
             lang: 'bash',
             code: `# Linux: inotifywait (inotify-tools)
@@ -1387,7 +1638,7 @@ done`
           },
           {
             title: 'SSL certificate expiry watcher',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A cert expiring on a weekend takes down production. Check every domain you serve and alert 14 days before expiry.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
@@ -1564,7 +1815,7 @@ setInterval(check, 60_000);`
         examples: [
           {
             title: 'Spawn a subagent for isolated research',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Subagents protect the main context window. Research that would consume 50k tokens stays isolated — the parent gets a clean 200-word summary.',
             lang: 'javascript',
             code: `// In your Claude Code agent:
@@ -1587,7 +1838,7 @@ Agent({ description: "Test suite", prompt: "Run npm test and report failures" })
           },
           {
             title: 'Explore agent for code search',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'The Explore agent is read-only and fast. Use it to find where things live before you start editing — avoids wasted diffs.',
             lang: 'javascript',
             code: `Agent({
@@ -1813,7 +2064,7 @@ Report any 500 responses with the request that caused them.\`
           },
           {
             title: 'Doc-writer agent — JSDoc from code',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Documentation written after the fact is always stale. An agent reads each exported function and writes a JSDoc block — consistent, repeatable.',
             lang: 'javascript',
             code: `Agent({
@@ -1899,7 +2150,7 @@ Output top 10 fixes with file:line references.\`
         examples: [
           {
             title: 'Enable automatic context compaction',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'When context fills up, Claude Code automatically summarizes earlier turns. This extends sessions indefinitely without losing important state.',
             lang: 'bash',
             code: `# In claude settings or flag:
@@ -1910,7 +2161,7 @@ claude --context-window 200k
           },
           {
             title: 'Read only what you need — avoid file dumps',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Reading entire files "just in case" is the #1 token killer. Give Claude grep/search tools so it fetches only relevant sections.',
             lang: 'bash',
             code: `# Bad: "Read all files in src/"
@@ -1938,7 +2189,7 @@ for start, chunk in chunk_file('large_file.py'):
           },
           {
             title: 'Use .claudeignore to exclude noise',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'node_modules, .git, build artifacts — these consume tokens when Claude searches for files. Exclude them upfront.',
             lang: 'bash',
             code: `# .claudeignore (same syntax as .gitignore)
@@ -2043,7 +2294,7 @@ with client.messages.stream(
           },
           {
             title: 'Avoid re-reading files Claude just wrote',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'After Claude writes a file, you do not need to read it back to verify. The write either succeeded or errored — trust the tool result.',
             lang: 'bash',
             code: `# Bad pattern in prompts:
@@ -2056,7 +2307,7 @@ with client.messages.stream(
           },
           {
             title: 'Use glob patterns for targeted searches',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'grep\'s -l flag returns only filenames; add line numbers only when you need context. Grep across 1,000 files costs tokens — filter first.',
             lang: 'bash',
             code: `# Find which files have the pattern (filenames only = cheap)
@@ -2067,7 +2318,7 @@ grep -rl "useAuthContext" src/
           },
           {
             title: 'Read with offset and limit',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'The Read tool takes offset and limit parameters. For a 5000-line file, reading lines 1200-1280 costs 80 lines, not 5000. The biggest single optimization most users miss.',
             lang: 'javascript',
             code: `// Bad — reads the whole file
@@ -2078,7 +2329,7 @@ Read({ file_path: "src/big-file.ts", offset: 1200, limit: 80 });`
           },
           {
             title: 'Reset context after a major task',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A 100k-token session researching one bug doesn\'t need to remember everything when you pivot. /clear (or a new session) gives Claude a fresh, cheap context.',
             lang: 'bash',
             code: `/clear         # Reset conversation, keep CLAUDE.md
@@ -2114,7 +2365,7 @@ client.messages.create({
           },
           {
             title: 'Pick the cheapest capable model',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Haiku is 1/12th the cost of Opus and handles classification, simple edits, and JSON extraction perfectly. Reserve Opus for hard reasoning.',
             lang: 'javascript',
             code: `// Classification, JSON extraction, simple regex work
@@ -2139,7 +2390,7 @@ grep -rn "TODO" src/ | awk -F: '{print $1}' | sort -u`
           },
           {
             title: 'Avoid Read-then-Edit-then-Read pattern',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Reading a file you just edited to verify is redundant: Edit errors loudly if it fails. Don\'t pay the token cost of a verification pass.',
             lang: 'bash',
             code: `# BAD pattern (in prompts):
@@ -2151,7 +2402,7 @@ grep -rn "TODO" src/ | awk -F: '{print $1}' | sort -u`
           },
           {
             title: 'Strict system prompts to limit verbosity',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A 4-paragraph answer when you wanted a yes/no is wasted output tokens. Tell Claude up-front: "answer in one sentence" or "table format only."',
             lang: 'bash',
             code: `# In your prompt or CLAUDE.md:
@@ -2179,7 +2430,7 @@ for attempt in range(MAX):
           },
           {
             title: 'Trim tool result lists with --max-count',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'grep -m 5 returns 5 hits and stops. Faster to run, cheaper to send, easier for Claude to reason about than 500 hits.',
             lang: 'bash',
             code: `# Cap results upfront:
@@ -2215,7 +2466,7 @@ find . -name "*.ts" | head -20`
         examples: [
           {
             title: 'Auto-commit every N minutes',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A 24-hour run that crashes at hour 23 loses nothing if you auto-commit every 15 minutes. Git is your crash recovery system.',
             lang: 'bash',
             code: `# Add to your loop body or a cron:
@@ -2264,7 +2515,7 @@ function loadCheckpoint() {
           },
           {
             title: 'Health ping to keep session alive',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Cloud environments idle-timeout inactive sessions. A periodic no-op keeps the connection alive during slow processing steps.',
             lang: 'bash',
             code: `# In a background thread or separate process:
@@ -2298,7 +2549,7 @@ for item in items:
           },
           {
             title: 'Push to GitHub on every checkpoint',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Remote storage is more durable than local. Push every checkpoint so a container death does not lose your progress.',
             lang: 'bash',
             code: `checkpoint() {
@@ -2376,7 +2627,7 @@ async function throttledCall(prompt) {
           },
           {
             title: 'Use tmux or screen for persistence',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'SSH sessions die. Run Claude inside tmux so the workflow survives a network drop — detach and reattach from anywhere.',
             lang: 'bash',
             code: `# Start a named session:
@@ -2441,7 +2692,7 @@ def with_conn(fn):
           },
           {
             title: 'File handle cleanup',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Long loops leak file handles. Use context managers / with statements / try-finally so every file is closed even on exception.',
             lang: 'python',
             code: `# BAD: handle leaks on exception
@@ -2506,7 +2757,7 @@ for item in items:
           },
           {
             title: 'Heartbeat to external monitor',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'healthchecks.io and similar services alert you if a ping doesn\'t arrive on schedule. Free dead-man\'s switch with zero infra cost.',
             lang: 'bash',
             code: `# At the start of each iteration:
@@ -2565,7 +2816,7 @@ sys.excepthook = crash_dump`
         examples: [
           {
             title: 'What is a skill?',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A skill is a markdown file in .claude/commands/ that Claude treats as a reusable slash command. Call it with /my-skill. No code required.',
             lang: 'bash',
             code: `# Create a skill:
@@ -2582,7 +2833,7 @@ EOF
           },
           {
             title: 'Skill with $ARGUMENTS placeholder',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: '$ARGUMENTS passes whatever you type after the slash command into the skill template. Makes skills parameterizable.',
             lang: 'markdown',
             code: `# .claude/commands/review-pr.md
@@ -2596,7 +2847,7 @@ Review pull request $ARGUMENTS on GitHub.
           },
           {
             title: 'Built-in skills to know',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Claude Code ships with built-in skills. Knowing them saves you from reinventing the wheel.',
             lang: 'bash',
             code: `/init          # Generate CLAUDE.md for the project
@@ -2672,7 +2923,7 @@ Set up this project for a new developer.
           },
           {
             title: 'Global skills (user-level)',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Project skills live in .claude/commands/. User skills in ~/.claude/commands/ work across every project.',
             lang: 'bash',
             code: `# Global skill — available everywhere:
@@ -2736,7 +2987,7 @@ done`
           },
           {
             title: 'Git workflow skill',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Encode your team\'s git etiquette in a skill: branch naming, commit format, pre-push checks. Every contributor follows the same flow.',
             lang: 'markdown',
             code: `# .claude/commands/branch.md
@@ -2863,7 +3114,7 @@ Find code related to: $ARGUMENTS
           },
           {
             title: 'Skill for changelog generation',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Changelogs after every release are toil; a skill removes the toil. Reads git log, groups by conventional-commits type, writes pretty markdown.',
             lang: 'markdown',
             code: `# .claude/commands/release-notes.md
@@ -3195,7 +3446,7 @@ class PaddleAdapter implements PaymentProvider { /* same interface, different SD
           },
           {
             title: 'Throttle and debounce',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Throttle limits how often a function CAN run (1/sec). Debounce delays execution until activity stops (typing finished). Use throttle for scroll, debounce for search input.',
             lang: 'typescript',
             code: `function throttle<F extends Function>(fn: F, ms: number): F {
@@ -3597,7 +3848,7 @@ Target: tsc clean with strict mode."`
           },
           {
             title: 'The 30-second new-engineer setup',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A /onboard skill that runs every setup step, installs dependencies, copies env files, seeds the DB, and verifies everything works. One command, ready to go.',
             lang: 'markdown',
             code: `# .claude/commands/onboard.md
@@ -3688,7 +3939,7 @@ Re-run lighthouse after each batch. Stop at 100/100.
         examples: [
           {
             title: 'Minimal CLAUDE.md that works hardest',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'CLAUDE.md is loaded into every Claude session. Every word is context. Less is more — focus on what Claude can\'t infer from code.',
             lang: 'markdown',
             code: `# MyProject
@@ -3733,7 +3984,7 @@ Use Postgres via connect-pg-simple.
           },
           {
             title: 'API endpoint documentation template',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Structured API docs mean Claude can implement clients and tests without asking clarifying questions.',
             lang: 'markdown',
             code: `## POST /api/users
@@ -3759,7 +4010,7 @@ Creates a new user account.
           },
           {
             title: 'PR template that gets good reviews',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A consistent PR template prevents Claude (and humans) from creating "WIP" PRs with no context.',
             lang: 'markdown',
             code: `<!-- .github/pull_request_template.md -->
@@ -3805,7 +4056,7 @@ Not resolved in 15 minutes → page @oncall`
           },
           {
             title: 'Changelog format Claude can generate',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Keep-a-Changelog format is parseable by Claude. A structured format means automated changelog generation works reliably.',
             lang: 'markdown',
             code: `# Changelog
@@ -3829,7 +4080,7 @@ Not resolved in 15 minutes → page @oncall`
           },
           {
             title: 'CONTRIBUTING.md that actually helps',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A CONTRIBUTING.md with concrete commands prevents "how do I run the tests?" questions. Saves Claude (and humans) from asking.',
             lang: 'markdown',
             code: `# Contributing
@@ -3894,7 +4145,7 @@ Frontend (Next.js App Router) → API Routes (tRPC) → Service Layer → Postgr
           },
           {
             title: 'Test documentation pattern',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'When Claude reads test files, well-named tests with good descriptions act as living documentation of expected behavior.',
             lang: 'typescript',
             code: `// Good test docs — Claude understands the system from tests alone
@@ -3909,7 +4160,7 @@ describe('UserService', () => {
           },
           {
             title: 'Environment variables reference',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Document every env var in CLAUDE.md or .env.example. Claude can\'t read your .env — this is its source of truth.',
             lang: 'bash',
             code: `# .env.example — source of truth for all env vars
@@ -3924,7 +4175,7 @@ SENTRY_DSN=https://...`
           },
           {
             title: 'Glossary file for domain terms',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'When your domain has special vocabulary (Mortgage, Premium, Tranche), a GLOSSARY.md prevents Claude from confusing them with the generic English meaning.',
             lang: 'markdown',
             code: `# Glossary
@@ -3938,7 +4189,7 @@ SENTRY_DSN=https://...`
           },
           {
             title: 'Naming convention guide',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Conventions you don\'t document, Claude will violate. Spell out: files in kebab-case, types in PascalCase, hooks start with use, etc.',
             lang: 'markdown',
             code: `# Naming conventions
@@ -3955,7 +4206,7 @@ SENTRY_DSN=https://...`
           },
           {
             title: 'Code review checklist',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A consistent checklist beats institutional memory. Put it where Claude (and humans) will read it on every PR.',
             lang: 'markdown',
             code: `# Code Review Checklist
@@ -4020,7 +4271,7 @@ Specific technical cause.
           },
           {
             title: 'Onboarding doc — first day to first PR',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Most onboarding docs assume things. List the literal commands a new dev runs, in order, with success criteria for each step.',
             lang: 'markdown',
             code: `# Day 1: Setup
@@ -4109,7 +4360,7 @@ BAD:  "An error occurred. Please try again."`
           },
           {
             title: 'PR description template (for Claude)',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'A template forces Claude (and humans) to articulate what/why/test. Vague PRs become useful PRs.',
             lang: 'markdown',
             code: `<!-- .github/pull_request_template.md -->
@@ -4172,7 +4423,7 @@ If not resolved in 10 min → page on-call lead.`
         examples: [
           {
             title: 'Parameterized queries — prevent SQL injection',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'SQL injection is still the #1 vulnerability. NEVER concatenate user input into SQL strings. Always use parameterized queries.',
             lang: 'typescript',
             code: `// ❌ NEVER — SQL injection vulnerability
@@ -4186,7 +4437,7 @@ const user = await prisma.user.findUnique({ where: { email } });`
           },
           {
             title: 'Input validation at the boundary',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Validate ALL external input at the API boundary with a schema validator. Never trust user-supplied data anywhere downstream.',
             lang: 'typescript',
             code: `import { z } from 'zod';
@@ -4206,7 +4457,7 @@ export async function POST(req: Request) {
           },
           {
             title: 'Secrets management — never in code',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Hardcoded secrets get committed to git and live there forever in history. Use environment variables; scan for leaks before every commit.',
             lang: 'bash',
             code: `# ✅ Read from environment
@@ -4222,7 +4473,7 @@ git secrets --register-aws  # also checks for generic API keys`
           },
           {
             title: 'Password hashing with bcrypt',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Passwords must never be stored in plain text or with weak hashing (MD5, SHA1). Use bcrypt with a cost factor of at least 12.',
             lang: 'typescript',
             code: `import bcrypt from 'bcrypt';
@@ -4371,7 +4622,7 @@ jobs:
           },
           {
             title: 'Never log PII or secrets',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Logs are often less secured than databases. Logging an email, password, or token means that data leaks to everyone with log access.',
             lang: 'typescript',
             code: `// NEVER log these
@@ -4424,7 +4675,7 @@ if (req.query.state !== session.oauth.state) throw new Error('CSRF');
           },
           {
             title: 'SameSite cookies — CSRF for free',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Set SameSite=Lax (or Strict) and modern browsers block cross-site CSRF automatically. Free defense in depth on top of CSRF tokens.',
             lang: 'typescript',
             code: `// Express:
@@ -4508,7 +4759,7 @@ app.post('/admin/users/:id/promote',
           },
           {
             title: 'Server-side authorization — never trust the client',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Hiding the admin UI is not security; the client can call the API directly. Authorization decisions belong on the server, every request.',
             lang: 'typescript',
             code: `// Bad: client hides admin button
@@ -4586,7 +4837,7 @@ CREATE INDEX ON audit_log (actor_id, ts DESC);`
         examples: [
           {
             title: 'Prime context before a big task',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Claude performs better when it understands the project before you ask it to change things. Read key files first, then issue the task.',
             lang: 'bash',
             code: `# Bad: jump straight to the ask
@@ -4597,7 +4848,7 @@ CREATE INDEX ON audit_log (actor_id, ts DESC);`
           },
           {
             title: 'Use one-shot examples for formatting',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'When you want output in a specific format, show one example rather than describing it. Claude matches patterns better than it follows prose descriptions.',
             lang: 'bash',
             code: `# Instead of: "Write a changelog entry in our style"
@@ -4610,7 +4861,7 @@ PR diff: <paste diff here>"`
           },
           {
             title: 'Break large tasks into numbered steps',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Monolithic prompts produce monolithic (often wrong) output. Numbered steps let Claude checkpoint and let you inspect each stage.',
             lang: 'bash',
             code: `"Do this in 3 steps:
@@ -4622,7 +4873,7 @@ PR diff: <paste diff here>"`
           },
           {
             title: 'Constrain the scope explicitly',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Claude defaults to being helpful, which means it may refactor, add tests, or rename things you didn\'t ask for. Tell it exactly what not to touch.',
             lang: 'bash',
             code: `"Fix the bug on line 47 of src/parser.ts.
@@ -4633,7 +4884,7 @@ Only fix the off-by-one error in the slice call."`
           },
           {
             title: 'Ask for a plan before code',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'For non-trivial tasks, get the plan approved before any code is written. Catching a wrong approach costs 0 tokens; catching it after 500 lines of code costs a lot more.',
             lang: 'bash',
             code: `"Before writing any code, describe your plan for migrating the users table to add a soft-delete column. Include: what SQL you'll run, whether it requires downtime, and any risks. Wait for my approval."
@@ -4642,7 +4893,7 @@ Only fix the off-by-one error in the slice call."`
           },
           {
             title: 'Reference files by path, not by description',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Vague references like "the auth file" force Claude to guess. Exact paths are unambiguous and prevent it from editing the wrong file.',
             lang: 'bash',
             code: `# Vague (Claude may pick the wrong file)
@@ -4653,7 +4904,7 @@ Only fix the off-by-one error in the slice call."`
           },
           {
             title: 'Use /clear between unrelated tasks',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Context from a previous task leaks into the next one and can cause Claude to make assumptions based on stale information. Clear it.',
             lang: 'bash',
             code: `/clear
@@ -4724,7 +4975,7 @@ Do not create new files."`
         examples: [
           {
             title: 'Test-first: write the test, then the implementation',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'TDD with Claude is fast. Write the failing test in natural language, let Claude write it, verify it fails, then ask Claude to make it pass.',
             lang: 'bash',
             code: `"Write a failing test for a function called parseISO8601Duration that:
@@ -4735,7 +4986,7 @@ Use Jest. Don't write the implementation yet."`
           },
           {
             title: 'Generate tests from a function signature',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Claude can infer edge cases from a type signature that humans miss. Give it the function and ask for comprehensive coverage.',
             lang: 'bash',
             code: `"Read src/utils/pricing.ts. For the calculateDiscount function, write Jest tests covering:
@@ -4748,7 +4999,7 @@ Use Jest. Don't write the implementation yet."`
           },
           {
             title: 'Find untested branches and fill them',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Instead of chasing a coverage number, ask Claude to read the code and identify which branches have no tests. More targeted than a coverage report.',
             lang: 'bash',
             code: `"Read src/auth/session.ts and src/__tests__/session.test.ts.
@@ -4757,7 +5008,7 @@ Then write the missing tests. Don't modify session.ts."`
           },
           {
             title: 'Run tests, read failures, fix, repeat',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'The fastest way to fix a broken test suite. Give Claude the test runner command and let it iterate.',
             lang: 'bash',
             code: `/loop 2m run npm test -- --bail; if any test fails, read the failure output and fix only the first failing test, then stop`
@@ -4791,7 +5042,7 @@ Identify why it's flaky and fix it without changing the test assertions."`
           },
           {
             title: 'Generate test fixtures from real data shapes',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Realistic fixtures expose bugs that toy data doesn\'t. Ask Claude to create fixtures that match your actual API response shapes.',
             lang: 'bash',
             code: `"Read the API response type in src/types/stripe.ts.
@@ -4803,7 +5054,7 @@ All fields must have realistic values, not 'test' or 'foo'."`
           },
           {
             title: 'Snapshot test for a UI component',
-            difficulty: 'simple',
+            difficulty: 'essential',
             why: 'Snapshot tests catch unintended rendering changes. Claude can write them faster than you can, and update them when intentional changes happen.',
             lang: 'typescript',
             code: `// Ask: "Write a React Testing Library snapshot test for the UserCard component.
@@ -4904,8 +5155,8 @@ let activeDifficulty = 'all';
 let searchQuery     = '';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-const DIFF_LABELS = { simple:'Simple', advanced:'Advanced', expert:'Expert', overengineer:'Over-Engineer', mistakes:'Avoid' };
-const DIFF_ACTIVE = { all:'active-diff-all', simple:'active-diff-simple', advanced:'active-diff-advanced', expert:'active-diff-expert', overengineer:'active-diff-overengineer', mistakes:'active-diff-mistakes' };
+const DIFF_LABELS = { essential:'Essential', advanced:'Advanced', expert:'Expert' };
+const DIFF_ACTIVE = { all:'active-diff-all', essential:'active-diff-essential', advanced:'active-diff-advanced', expert:'active-diff-expert' };
 
 function hl(code, lang) {
   try { return hljs.highlight(code.trim(), { language: lang }).value; }
@@ -4915,7 +5166,8 @@ function hl(code, lang) {
   }
 }
 
-function escAttr(s) { return String(s).replace(/"/g,'&quot;'); }
+function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escText(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── Render category pills ──────────────────────────────────────────────────
 function renderCategoryPills() {
@@ -4976,6 +5228,13 @@ function renderContent() {
           <pre><code class="language-${ex.lang||'bash'}">${hl(ex.code, ex.lang||'bash')}</code></pre>
           <button class="copy-btn" data-code="${escAttr(ex.code)}">COPY</button>
         </div>
+        <button class="try-btn" data-try="${idx}">▶ Try it — edit & simulate</button>
+        <div class="try-panel" data-try-panel="${idx}">
+          <div class="try-panel-label">Edit the code</div>
+          <textarea class="try-editor" data-lang="${ex.lang||'bash'}">${escText(ex.code)}</textarea>
+          <button class="try-run-btn" data-run="${idx}">Run simulation</button>
+          <div class="try-output" data-output="${idx}" data-default-output="${escAttr(ex.output || '')}"></div>
+        </div>
       </div>
     </div>`).join('');
 
@@ -5011,21 +5270,344 @@ document.addEventListener('DOMContentLoaded', () => {
     renderContent();
   });
 
-  // Copy buttons (delegated)
+  // Card interactions (copy, try-it, run simulation) — delegated
   document.getElementById('main-content').addEventListener('click', e => {
-    const btn = e.target.closest('.copy-btn');
-    if (!btn) return;
-    navigator.clipboard.writeText(btn.dataset.code.trim()).then(() => {
-      btn.textContent = 'COPIED!';
-      setTimeout(() => btn.textContent = 'COPY', 1500);
-    });
+    const copyBtn = e.target.closest('.copy-btn');
+    if (copyBtn) {
+      navigator.clipboard.writeText(copyBtn.dataset.code.trim()).then(() => {
+        copyBtn.textContent = 'COPIED!';
+        setTimeout(() => copyBtn.textContent = 'COPY', 1500);
+      });
+      return;
+    }
+    const tryBtn = e.target.closest('.try-btn');
+    if (tryBtn) {
+      const idx = tryBtn.dataset.try;
+      const panel = tryBtn.parentElement.querySelector(`[data-try-panel="${idx}"]`);
+      panel.classList.toggle('open');
+      tryBtn.textContent = panel.classList.contains('open') ? '▼ Hide simulator' : '▶ Try it — edit & simulate';
+      return;
+    }
+    const runBtn = e.target.closest('.try-run-btn');
+    if (runBtn) {
+      const idx = runBtn.dataset.run;
+      const panel = runBtn.closest('.try-panel');
+      const editor = panel.querySelector('.try-editor');
+      const out = panel.querySelector(`[data-output="${idx}"]`);
+      const code = editor.value;
+      const lang = editor.dataset.lang;
+      const defaultOutput = out.dataset.defaultOutput;
+      out.classList.add('shown');
+      out.classList.remove('empty');
+      const result = simulate(code, lang, defaultOutput);
+      out.textContent = result;
+      return;
+    }
   });
+
+  // ── Quiz ──
+  renderQuiz();
 
   // Initial render
   renderCategoryPills();
   renderDiffPills();
   renderContent();
 });
+
+// ── Simulator — explain or echo expected behavior ──
+function simulate(code, lang, defaultOutput) {
+  if (defaultOutput && defaultOutput.trim()) return defaultOutput;
+  const trimmed = code.trim();
+  const firstLine = trimmed.split('\n')[0].slice(0, 80);
+  if (lang === 'bash' || !lang) {
+    if (/^\/(loop|clear|skill|model|help|init|review)/.test(trimmed)) {
+      return `[Claude Code]  Detected slash command: ${trimmed.split(/\s+/)[0]}\n` +
+             `→ This would run inside an active Claude Code session.\n` +
+             `→ Try it in your terminal: claude\n   then paste the line above.`;
+    }
+    if (/git\s+(push|commit|rebase|reset)/.test(trimmed)) {
+      return `[Simulated git]  Would run: ${firstLine}\n→ Not executed here. Run locally to apply.`;
+    }
+    return `[Simulated shell]  $ ${firstLine}${trimmed.includes('\n') ? '\n  …(' + (trimmed.split('\n').length-1) + ' more lines)' : ''}\n→ Output simulation: copy & run locally to see real result.`;
+  }
+  if (lang === 'javascript' || lang === 'typescript') {
+    return `[Simulated ${lang}]\n→ Code parsed (${trimmed.split('\n').length} lines).\n→ Run with: node script.${lang === 'typescript' ? 'ts' : 'js'}\n→ Expected: see the "Why this matters" note above.`;
+  }
+  if (lang === 'json' || lang === 'yaml') {
+    try {
+      if (lang === 'json') {
+        const parsed = JSON.parse(trimmed);
+        return `[Valid JSON]  ✓ Parsed ${Object.keys(parsed).length} top-level key(s).\n${JSON.stringify(parsed, null, 2).slice(0, 400)}`;
+      }
+    } catch (err) {
+      return `[Invalid JSON]  ✗ ${err.message}`;
+    }
+    return `[Valid ${lang}]  ✓ Drop this into the appropriate config file.`;
+  }
+  if (lang === 'sql') {
+    return `[Simulated SQL]\n→ ${firstLine}\n→ Execute on your database to see actual rows affected.`;
+  }
+  if (lang === 'python') {
+    return `[Simulated python]\n→ Would run: python -c "..."\n→ ${trimmed.split('\n').length} lines parsed.\n→ See "Why this matters" for expected behavior.`;
+  }
+  if (lang === 'html') {
+    return `[Rendered as HTML preview not available]\n→ Save as .html and open in a browser to inspect.`;
+  }
+  return `[Simulator]  Language: ${lang}\n→ ${trimmed.split('\n').length} lines of code.\n→ Behavior: see "Why this matters" above.`;
+}
+
+// ── Quiz data ──
+const QUIZ_QUESTIONS = [
+  {
+    q: "What does /clear do in Claude Code?",
+    options: [
+      "Deletes all files in the current directory",
+      "Clears the current conversation context and history",
+      "Removes Claude Code from your system",
+      "Resets your authentication token"
+    ],
+    answer: 1,
+    explain: "/clear resets the conversation context. Use it between unrelated tasks so context from one job doesn't leak into the next."
+  },
+  {
+    q: "Which file is read at the start of every Claude Code session for project context?",
+    options: [
+      "README.md",
+      "package.json",
+      "CLAUDE.md",
+      ".claude-config"
+    ],
+    answer: 2,
+    explain: "CLAUDE.md is the conventional file Claude Code reads for project-specific instructions, conventions, and constraints. Use it like a system prompt for your project."
+  },
+  {
+    q: "What is the purpose of a SessionStart hook?",
+    options: [
+      "Runs JavaScript inside the Claude Code UI",
+      "Logs you into Anthropic's API",
+      "Runs a script automatically when a new session starts (e.g., to install deps)",
+      "Starts a new git branch"
+    ],
+    answer: 2,
+    explain: "SessionStart hooks fire when a session begins. Common uses: install dependencies, start a dev server, prime the environment."
+  },
+  {
+    q: "What does the Plan agent specialize in?",
+    options: [
+      "Executing code changes",
+      "Designing implementation plans without making edits",
+      "Reviewing pull requests",
+      "Running tests"
+    ],
+    answer: 1,
+    explain: "The Plan agent is read-only — it researches and proposes step-by-step plans. It doesn't write code. Approve the plan first, then a separate agent (or you) executes."
+  },
+  {
+    q: "Which command lets Claude work on a recurring schedule?",
+    options: [
+      "/cron",
+      "/loop",
+      "/schedule",
+      "/repeat"
+    ],
+    answer: 1,
+    explain: "/loop runs a slash command on an interval (e.g., /loop 5m /status-check). Use it for polling, CI babysitting, or until-condition workflows."
+  },
+  {
+    q: "What's the safest way to refer to a file in a prompt?",
+    options: [
+      "By its purpose ('the auth file')",
+      "By its absolute or repo-relative path",
+      "By a description of its contents",
+      "By the line number alone"
+    ],
+    answer: 1,
+    explain: "Exact paths are unambiguous. Vague references force Claude to guess and may cause it to edit the wrong file."
+  },
+  {
+    q: "What happens when you click /clear and start a new task?",
+    options: [
+      "Old conversation context is preserved",
+      "Old context is wiped — fresh start",
+      "Claude restarts from scratch including model load",
+      "Your git working tree is reset"
+    ],
+    answer: 1,
+    explain: "/clear wipes conversation context. Your filesystem and git state are untouched. Use it between unrelated tasks for cleaner reasoning."
+  },
+  {
+    q: "Which is the safest git command to use without explicit user authorization?",
+    options: [
+      "git push --force",
+      "git reset --hard origin/main",
+      "git status",
+      "git checkout ."
+    ],
+    answer: 2,
+    explain: "git status is read-only and safe. The others are destructive: force-push overwrites history, reset --hard discards local changes, checkout . wipes uncommitted edits."
+  },
+  {
+    q: "What does the Explore agent NOT do?",
+    options: [
+      "Search files by pattern",
+      "Grep for symbols",
+      "Edit or write code",
+      "Read excerpts of files"
+    ],
+    answer: 2,
+    explain: "Explore is read-only — it searches and reads but never edits. Use it to answer 'where is X?' or 'which files reference Y?' without risking changes."
+  },
+  {
+    q: "What's a PreToolUse hook good for?",
+    options: [
+      "Running after a tool completes",
+      "Intercepting tool calls before they execute (e.g., blocking dangerous commands)",
+      "Showing a notification when Claude is idle",
+      "Logging into GitHub"
+    ],
+    answer: 1,
+    explain: "PreToolUse runs before a tool call executes. Common use: a safety-check script that exits with code 2 to block dangerous bash commands like 'rm -rf'."
+  },
+  {
+    q: "How do you persist data across Claude Code sessions in a managed remote environment?",
+    options: [
+      "Save it in /tmp",
+      "Use environment variables only",
+      "Commit and push it to git — the container is ephemeral",
+      "Email it to yourself"
+    ],
+    answer: 2,
+    explain: "Remote Claude Code containers are ephemeral and reclaimed after inactivity. Anything you want to keep must be committed and pushed to git."
+  },
+  {
+    q: "What does the Agent tool's `isolation: \"worktree\"` parameter do?",
+    options: [
+      "Encrypts the agent's memory",
+      "Spawns the agent inside a temporary git worktree on a separate branch",
+      "Runs the agent in a Docker container",
+      "Prevents the agent from reading the disk"
+    ],
+    answer: 1,
+    explain: "isolation: 'worktree' creates a temporary git worktree so the agent works on an isolated copy. The harness cleans it up automatically if no changes are made."
+  },
+  {
+    q: "When should you launch multiple subagents in parallel (single message, multiple tool calls)?",
+    options: [
+      "Never — agents must run one at a time",
+      "When their work is independent and dependency-free",
+      "Only when one agent fails",
+      "Only on Tuesdays"
+    ],
+    answer: 1,
+    explain: "Parallel agent launches are encouraged when the work is independent. Don't parallelize when one agent's result feeds into another — those must run sequentially."
+  },
+  {
+    q: "What's the difference between `git commit --amend` and a new commit, per Claude Code best practices?",
+    options: [
+      "There's no difference",
+      "Amend is preferred — it keeps history clean",
+      "Prefer new commits — amend can destroy work if a pre-commit hook failed",
+      "Amend is faster"
+    ],
+    answer: 2,
+    explain: "If a pre-commit hook fails, the commit didn't happen — so --amend would modify the PREVIOUS commit, destroying earlier work. Always create new commits instead."
+  },
+  {
+    q: "What does the 'Why this matters' field on each card teach you?",
+    options: [
+      "The exact runtime cost of the pattern",
+      "The motivation — why this pattern matters and what it prevents or enables",
+      "The author of the pattern",
+      "The date the pattern was discovered"
+    ],
+    answer: 1,
+    explain: "'Why this matters' is the rationale. Knowing the WHY is what turns a copied snippet into a reusable mental model — you'll know when to apply it elsewhere."
+  },
+];
+
+// ── Quiz state ──
+const quizState = { submitted: {}, score: 0, selected: {} };
+
+function renderQuiz() {
+  const el = document.getElementById('cert-quiz');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="cert-quiz-header">
+      <h2>🎓 Claude Code Certified</h2>
+      <p>15 questions. Pick the best answer, hit Submit, and read the explanation. Score 12+ to "pass" (no real cert, but you'll know your stuff).</p>
+    </div>
+    <div class="cert-progress" id="cert-progress">0 / 15 answered</div>
+    ${QUIZ_QUESTIONS.map((q, qi) => `
+      <div class="cert-q" data-qi="${qi}">
+        <div class="cert-q-num">Question ${qi + 1} of ${QUIZ_QUESTIONS.length}</div>
+        <div class="cert-q-text">${escText(q.q)}</div>
+        <div class="cert-options">
+          ${q.options.map((opt, oi) => `
+            <button class="cert-option" data-qi="${qi}" data-oi="${oi}">
+              <span class="cert-option-letter">${String.fromCharCode(65 + oi)}</span>
+              <span>${escText(opt)}</span>
+            </button>
+          `).join('')}
+        </div>
+        <button class="cert-submit" data-submit="${qi}" disabled>Submit answer</button>
+        <div class="cert-explanation" data-explain="${qi}"></div>
+      </div>
+    `).join('')}
+    <div class="cert-final" id="cert-final">
+      <h3>Done!</h3>
+      <div class="cert-final-score" id="cert-final-score"></div>
+      <p id="cert-final-msg"></p>
+    </div>
+  `;
+
+  el.addEventListener('click', e => {
+    const opt = e.target.closest('.cert-option');
+    if (opt) {
+      const qi = +opt.dataset.qi;
+      const oi = +opt.dataset.oi;
+      if (quizState.submitted[qi]) return;
+      quizState.selected[qi] = oi;
+      el.querySelectorAll(`.cert-option[data-qi="${qi}"]`).forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      el.querySelector(`[data-submit="${qi}"]`).disabled = false;
+      return;
+    }
+    const submit = e.target.closest('.cert-submit');
+    if (submit) {
+      const qi = +submit.dataset.submit;
+      if (quizState.submitted[qi]) return;
+      const selected = quizState.selected[qi];
+      const correct = QUIZ_QUESTIONS[qi].answer;
+      quizState.submitted[qi] = true;
+      el.querySelectorAll(`.cert-option[data-qi="${qi}"]`).forEach((o, idx) => {
+        o.classList.remove('selected');
+        if (idx === correct) o.classList.add('correct');
+        else if (idx === selected) o.classList.add('wrong');
+      });
+      if (selected === correct) quizState.score++;
+      const exp = el.querySelector(`[data-explain="${qi}"]`);
+      const verdict = selected === correct ? '<strong>✓ Correct!</strong>' : '<strong>✗ Not quite.</strong>';
+      exp.innerHTML = `${verdict} ${escText(QUIZ_QUESTIONS[qi].explain)}`;
+      exp.classList.add('shown');
+      submit.disabled = true;
+      submit.textContent = 'Submitted';
+      const answered = Object.keys(quizState.submitted).length;
+      document.getElementById('cert-progress').textContent = `${answered} / ${QUIZ_QUESTIONS.length} answered`;
+      if (answered === QUIZ_QUESTIONS.length) {
+        const final = document.getElementById('cert-final');
+        document.getElementById('cert-final-score').textContent = `${quizState.score} / ${QUIZ_QUESTIONS.length}`;
+        let msg = '';
+        if (quizState.score >= 13) msg = '🏆 Top of the class. You know Claude Code inside out.';
+        else if (quizState.score >= 12) msg = '🎉 Passed! You\'ve got the fundamentals locked in.';
+        else if (quizState.score >= 9) msg = '📚 Solid. Re-read the categories you missed and you\'re golden.';
+        else msg = '💡 Plenty to learn. Browse the Prompting and Skills sections, then retake.';
+        document.getElementById('cert-final-msg').textContent = msg;
+        final.classList.add('shown');
+      }
+      return;
+    }
+  });
+}
 </script>
 </body>
 </html>
