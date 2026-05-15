@@ -231,7 +231,8 @@ h1 {
 
 /* ===== Two-row category pill layout ===== */
 .pills-rows { display: flex; flex-direction: column; gap: 4px; }
-.pills-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.pills-row { display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.pills-row::-webkit-scrollbar { display: none; }
 
 /* ===== Try-it panel ===== */
 .try-btn {
@@ -2100,7 +2101,7 @@ Output top 10 fixes with file:line references.\`
       // ===================================================
       limits: {
         icon: '🚫',
-        title: 'Never Hit Limits',
+        title: 'No Limits',
         description: 'Stay productive in long sessions without burning through context or hitting rate limits. Use /compact to summarize old messages, /clear between unrelated tasks, .claudeignore to exclude noise from glob searches, and Explore subagents to keep large search results out of your main context. Read with offset/limit instead of dumping whole files. Choose the cheapest capable model for each task.',
         examples: [
           {
@@ -2406,7 +2407,7 @@ grep -rn "TODO" src/ | awk -F: '{print $1}' | sort -u`
       // ===================================================
       run24: {
         icon: '⏰',
-        title: 'Run 24 Hours',
+        title: 'Continuous',
         description: 'Run workflows that survive crashes, disconnections, and restarts. Use JSON checkpoint files so Claude knows where to resume, auto-commit every N iterations so progress is saved to git, ping a heartbeat URL so external monitors notice if you die, and make every step idempotent so retries don\'t double-charge or duplicate work. The 24-hour mindset: assume you\'ll be interrupted, design for resumption.',
         examples: [
           {
@@ -3370,7 +3371,7 @@ class InMemoryUserRepo implements UserRepo { /* test impl */ }
       // ===================================================
       halloffame: {
         icon: '🏆',
-        title: 'Hall of Fame',
+        title: 'Popular',
         description: 'Battle-tested patterns from real-world Claude Code workflows. CLAUDE.md templates that 10x team productivity, overnight migration workflows that ship 30k LOC, self-healing test suites, fastest-PR records, and legendary recipes. Each entry tells a story: what was tried, what worked, why it matters. Steal the patterns, adapt them to your codebase.',
         examples: [
           {
@@ -3741,7 +3742,7 @@ Re-run lighthouse after each batch. Stop at 100/100.
       // ===================================================
       markdown: {
         icon: '📝',
-        title: 'Markdown Essentials',
+        title: 'Markdowns',
         description: 'Markdown is Claude\'s first language. A good CLAUDE.md primes every session — tech stack, conventions, constraints, and the 3 mistakes to avoid. ADRs capture why decisions were made. Runbooks turn incidents into 10-minute fixes. Onboarding docs take new engineers from zero to first PR. Every line of Markdown you write earns its keep by saving repeated explanation across hundreds of sessions.',
         examples: [
           {
@@ -4247,7 +4248,7 @@ If not resolved in 10 min → page on-call lead.`
       // ===================================================
       security: {
         icon: '🔐',
-        title: 'Secure Code',
+        title: 'Security',
         description: 'Security patterns Claude should always apply: parameterized queries to prevent SQL injection, input validation at the boundary with schema validators, bcrypt for passwords (never plain text), short-lived JWTs with refresh tokens, CSRF protection with SameSite cookies, server-side authorization (never trust the client), CSP headers, and audit logs for sensitive actions. Defense in depth.',
         examples: [
           {
