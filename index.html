@@ -497,9 +497,6 @@ h1 {
 }
 
 .category-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
   margin-bottom: 24px;
   padding: 20px 24px;
   background: linear-gradient(135deg, var(--card-bg) 0%, rgba(30,30,30,0.6) 100%);
@@ -508,23 +505,34 @@ h1 {
   box-shadow: var(--shadow);
 }
 
-.cat-icon { font-size: 2.5rem; }
+.cat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.title-count {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
 
 .cat-info h2 {
   font-family: 'Permanent Marker', cursive;
   font-size: 1.6rem;
   color: var(--yellow);
-  margin-bottom: 4px;
+  margin: 0;
 }
 
 .cat-info p {
   font-size: 0.85rem;
   color: var(--text-muted);
   line-height: 1.5;
+  margin: 0;
+  max-width: none;
 }
 
 .count-badge {
-  margin-left: auto;
   background: var(--yellow);
   color: var(--dark);
   font-weight: 700;
@@ -5095,12 +5103,13 @@ function renderContent() {
 
   const header = `
     <div class="category-header">
-      <div class="cat-icon">${cat.icon}</div>
       <div class="cat-info">
-        <h2>${cat.title}</h2>
+        <div class="title-count">
+          <h2>${cat.title}</h2>
+          <div class="count-badge">${examples.length} examples</div>
+        </div>
         <p>${cat.description}</p>
       </div>
-      <div class="count-badge">${examples.length} examples</div>
     </div>`;
 
   const noResults = examples.length === 0
