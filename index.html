@@ -596,6 +596,49 @@ h1 {
 .diff-overengineer { background: rgba(241,90,34,0.2); color: #FFAB76; border: 1px solid #F15A22; }
 .diff-mistakes { background: rgba(139,0,0,0.3); color: #EF9A9A; border: 1px solid #cc0000; }
 
+/* ===== Claude prompt block ===== */
+.prompt-block {
+  position: relative;
+  margin-bottom: 14px;
+  padding: 12px 14px 12px 16px;
+  background: rgba(112,200,240,0.07);
+  border-left: 3px solid var(--sky);
+  border-radius: 0 8px 8px 0;
+}
+.prompt-block-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--sky);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.prompt-text {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding-right: 70px;
+}
+.prompt-copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.65rem;
+  padding: 3px 10px;
+  border: 1.5px solid var(--sky);
+  background: transparent;
+  color: var(--sky);
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.prompt-copy-btn:hover { background: var(--sky); color: #111; }
+
 .card-body {
   padding: 12px 16px;
 }
@@ -804,6 +847,7 @@ const CATEGORIES = {
             title: 'Basic /loop — poll every 10 minutes',
             difficulty: 'essential',
             why: 'The built-in /loop skill runs a slash command on an interval. Set it and forget it — Claude wakes up, checks state, acts, sleeps.',
+            prompt: '/loop 10m /status-check',
             lang: 'bash',
             code: `/loop 10m /status-check
 # Runs /status-check every 10 minutes until you stop it`
@@ -812,6 +856,7 @@ const CATEGORIES = {
             title: 'Loop until tests pass',
             difficulty: 'essential',
             why: 'Instead of babysitting CI yourself, tell Claude to keep iterating until tests go green. The loop stops when you hit the exit condition.',
+            prompt: '/loop 2m until tests pass: run npm test, fix the first failing test if needed, then stop',
             lang: 'bash',
             code: `/loop 2m until tests pass: run npm test, if failing fix the first error then stop`
           },
@@ -819,6 +864,7 @@ const CATEGORIES = {
             title: 'Exponential backoff loop',
             difficulty: 'advanced',
             why: 'Avoid hammering APIs or services. Backoff prevents rate-limit errors that cause the entire workflow to fail.',
+            prompt: 'Add exponential backoff retry to this command — double the wait each attempt (2s, 4s, 8s, 16s) and stop on first success.',
             lang: 'bash',
             code: `# CLAUDE.md snippet — teach Claude this pattern:
 # Retry with exponential backoff
@@ -833,6 +879,7 @@ done`
             title: 'CI babysitting loop',
             difficulty: 'essential',
             why: 'Subscribe to PR events and let Claude monitor CI. When a check fails, Claude diagnoses and pushes a fix automatically.',
+            prompt: '/loop 5m check CI on PR #42 — if red, read the failure log and push a fix',
             lang: 'bash',
             code: `/loop 5m check CI on PR #42 — if red, read the failure log and push a fix`
           },
@@ -840,6 +887,7 @@ done`
             title: 'Deploy monitoring loop',
             difficulty: 'advanced',
             why: 'After a deploy, you want real-time signal. This loop pings a health endpoint and alerts on degradation without you watching a dashboard.',
+            prompt: '/loop 1m curl https://api.myapp.com/health | jq .status — if status is not "ok", open a GitHub issue with the response body',
             lang: 'bash',
             code: `/loop 1m curl https://api.myapp.com/health | jq .status
 # If status != "ok", create a GitHub issue with the response body`
@@ -848,6 +896,7 @@ done`
             title: 'Rate-limited loop (stay under API quotas)',
             difficulty: 'advanced',
             why: 'When processing many items, a naive loop exhausts rate limits. Add a sleep between batches to stay in quota.',
+            prompt: 'Process these 100 files in batches of 10, pausing 60 seconds between batches so we stay under the API rate limit.',
             lang: 'bash',
             code: `# Process 100 files, 10 at a time, with a pause between batches
 for batch in $(seq 0 10 99); do
@@ -859,6 +908,7 @@ done`
             title: 'Loop with state file',
             difficulty: 'advanced',
             why: 'Loops that restart from the beginning waste tokens. A state file lets you resume from where you left off — essential for 24-hour runs.',
+            prompt: 'Keep a .loop-state.json checkpoint file so this loop can resume from where it left off if restarted. Track last processed item and any errors.',
             lang: 'bash',
             code: `# Claude reads/writes .loop-state.json each iteration
 # {\"last_processed\": 42, \"errors\": [], \"started\": \"2024-01-15\"}
@@ -870,6 +920,7 @@ LAST=$(echo $STATE | jq .last_processed // 0)
             title: 'Slack webhook alert from loop',
             difficulty: 'advanced',
             why: 'A loop that fails silently is worse than no loop. Wire in a Slack webhook so you get a ping on your phone when something goes wrong.',
+            prompt: 'Send a Slack message to $SLACK_WEBHOOK_URL if any step in this loop fails. Include the error and which step failed.',
             lang: 'bash',
             code: `# In your hook or loop body:
 curl -X POST $SLACK_WEBHOOK_URL \
@@ -880,6 +931,7 @@ curl -X POST $SLACK_WEBHOOK_URL \
             title: 'Nested loop — outer retry, inner task',
             difficulty: 'expert',
             why: 'Some workflows need two levels: retry the whole task on transient failure, but step through sub-tasks in order. Nesting gives you both.',
+            prompt: 'Retry the entire workflow up to 3 times on failure. Inside each attempt, run each step (lint → test → build → deploy) in sequence and stop the inner loop on any failure.',
             lang: 'bash',
             code: `for attempt in 1 2 3; do
   success=true
@@ -895,6 +947,7 @@ done`
             title: 'Cron-style scheduling',
             difficulty: 'advanced',
             why: 'GitHub Actions cron is overkill for quick tasks. Run a loop on a cloud VM or GitHub Codespace that wakes Claude at a fixed schedule.',
+            prompt: 'Run /daily-report every day at 9am using a loop that sleeps until the next scheduled time. Use a state file to survive restarts.',
             lang: 'yaml',
             code: `# .github/workflows/nightly.yml
 on:
@@ -911,6 +964,7 @@ jobs:
             title: 'Loop with cost guard',
             difficulty: 'expert',
             why: 'Runaway loops burn money. Track cumulative token spend in a state file and kill the loop if it crosses a threshold.',
+            prompt: 'Add a cost guard to this loop: track how many Claude API calls we\'ve made and stop automatically if we exceed the budget limit.',
             lang: 'javascript',
             code: `// In your loop body, check accumulated cost
 const state = JSON.parse(fs.readFileSync('.loop-state.json', 'utf8'));
@@ -925,6 +979,7 @@ fs.writeFileSync('.loop-state.json', JSON.stringify(state));`
             title: 'Loop with git auto-commit checkpoint',
             difficulty: 'advanced',
             why: 'Long loops should commit progress so a crash does not lose work. Each iteration is a checkpoint you can roll back to.',
+            prompt: 'After each successful iteration, commit the progress to git with a message like "checkpoint: processed item N". This lets us recover safely if the loop crashes.',
             lang: 'bash',
             code: `/loop 15m do the next batch of migration tasks, then git add -A && git commit -m "loop checkpoint $(date +%H:%M)"`
           },
@@ -932,6 +987,7 @@ fs.writeFileSync('.loop-state.json', JSON.stringify(state));`
             title: 'Watch a directory for new files',
             difficulty: 'essential',
             why: 'A directory watcher trigger gives you near-instant reactivity without polling overhead. Great for ETL drop zones and upload processors.',
+            prompt: 'Watch the /inbox directory for new files. When one appears, process it and move it to /processed. Run continuously.',
             lang: 'bash',
             code: `inotifywait -m -e close_write ./uploads/ |
 while read dir event file; do
@@ -942,6 +998,7 @@ done`
             title: 'Convergence loop — until no more changes',
             difficulty: 'advanced',
             why: 'Some operations need to run repeatedly until the system stabilizes (e.g. import resolution, formatter passes). Stop when the diff is empty.',
+            prompt: 'Keep running this refactor script until it produces no more changes. Stop when two consecutive runs produce identical output.',
             lang: 'bash',
             code: `while true; do
   BEFORE=$(git diff | sha256sum)
@@ -955,6 +1012,7 @@ echo "Converged after iterations"`
             title: 'Loop with progress bar in terminal',
             difficulty: 'advanced',
             why: 'For long migrations, a visible progress bar tells you the loop is alive. Pipe progress to a state file and tail it.',
+            prompt: 'Show a simple progress indicator in the terminal as this loop runs — print the current item number and total so I can see progress.',
             lang: 'python',
             code: `import time
 TOTAL = 200
@@ -969,6 +1027,7 @@ print()  # newline at end`
             title: 'Pause/resume control file',
             difficulty: 'advanced',
             why: 'Sometimes you want to pause a running loop without killing it. A control file checked each iteration gives you graceful flow control.',
+            prompt: 'Add pause/resume support to this loop using a control file. If .pause exists, wait before the next iteration; delete the file to resume.',
             lang: 'bash',
             code: `while true; do
   if [ -f .pause ]; then
@@ -983,6 +1042,7 @@ done`
             title: 'Loop with metric reporting',
             difficulty: 'expert',
             why: 'Long-running loops should emit metrics to a time-series DB or log. Lets you debug latency spikes and throughput issues after the fact.',
+            prompt: 'After each iteration, append a metrics line (timestamp, items processed, errors) to loop-metrics.log so I can track performance over time.',
             lang: 'python',
             code: `import time, statsd
 metrics = statsd.StatsClient('localhost', 8125)
@@ -997,6 +1057,7 @@ for batch in batches:
             title: 'Time-window loop — only run during business hours',
             difficulty: 'advanced',
             why: 'Some workloads should only run when humans can respond. Wrap your loop in a time check to avoid alerts at 3am.',
+            prompt: 'Run this task only during business hours (9am–6pm weekdays). Outside that window, sleep until the next window opens.',
             lang: 'bash',
             code: `while true; do
   HOUR=$(date +%H)
@@ -1012,6 +1073,7 @@ done`
             title: 'Loop with confirmation gate',
             difficulty: 'expert',
             why: 'When loops touch production resources, sometimes you want a human in the loop. A confirmation gate every N iterations adds an oversight check.',
+            prompt: 'Before each destructive action in this loop, pause and ask for my confirmation. Show what would happen and wait for "yes" before proceeding.',
             lang: 'bash',
             code: `COUNT=0
 while true; do
@@ -1027,6 +1089,7 @@ done`
             title: 'Loop until target metric reached',
             difficulty: 'advanced',
             why: 'Loops should have a meaningful exit condition. "Until X%" or "until Y$" is better than a fixed iteration count for goal-oriented work.',
+            prompt: '/loop 5m run npm run coverage -- --silent; if coverage is below 90%, add tests for the next uncovered function, then stop and report',
             lang: 'bash',
             code: `TARGET=90
 while true; do
@@ -1042,6 +1105,7 @@ done`
             title: 'Cascading loop — outer schedule, inner work',
             difficulty: 'expert',
             why: 'Schedule one expensive operation hourly, light operations every minute. The cascade pattern saves API calls while keeping latency low.',
+            prompt: 'Run a daily cleanup job that processes all pending items in sequence. Outer loop = once per day, inner loop = each pending item.',
             lang: 'bash',
             code: `MINUTE=0
 while true; do
@@ -1057,6 +1121,7 @@ done`
             title: 'Loop with dead-man switch',
             difficulty: 'expert',
             why: 'If the loop stops emitting heartbeats, an external monitor should know within 60s. Cron + dead-man switch catches silent failures.',
+            prompt: 'Add a heartbeat file (.heartbeat) that gets touched on each iteration. Set up a separate monitor that alerts me if the heartbeat is more than 2 minutes old.',
             lang: 'bash',
             code: `while true; do
   # Each iteration writes a fresh heartbeat
@@ -1077,6 +1142,7 @@ done`
             title: 'Stream processing loop with backpressure',
             difficulty: 'expert',
             why: 'When the producer is faster than the consumer, you need backpressure. A bounded queue + sleep when full prevents memory exhaustion.',
+            prompt: 'Process this stream of messages but slow down when the queue depth exceeds 1000 items. Implement backpressure so we don\'t overwhelm the downstream service.',
             lang: 'python',
             code: `import queue, time
 q = queue.Queue(maxsize=100)
@@ -1109,6 +1175,7 @@ for item in stream:
             title: 'Block dangerous shell commands (PreToolUse)',
             difficulty: 'essential',
             why: 'A PreToolUse hook on Bash runs before every shell command. Return exit code 2 to block the command and tell Claude why.',
+            prompt: 'Add a PreToolUse hook that intercepts every Bash tool call and blocks commands matching dangerous patterns like "rm -rf /", "DROP TABLE", or "--force". Show me the settings.json config.',
             lang: 'json',
             code: `// .claude/settings.json
 {
@@ -1127,6 +1194,7 @@ for item in stream:
             title: 'Safety check script',
             difficulty: 'essential',
             why: 'The script reads the proposed command from stdin as JSON and exits 2 (block) if it sees danger words like "rm -rf" or "DROP TABLE".',
+            prompt: 'Write a safety-check.sh script that reads a proposed bash command from stdin (as hook JSON) and exits 2 to block if it contains any dangerous patterns.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 # safety-check.sh — reads hook payload from stdin
@@ -1146,6 +1214,7 @@ exit 0`
             title: 'Auto-format on every file edit (PostToolUse)',
             difficulty: 'essential',
             why: 'PostToolUse fires after Claude edits a file. Plug in Prettier or Black so every save is always formatted — no more "forgot to format" commits.',
+            prompt: 'Add a PostToolUse hook that runs Prettier on every file I edit or write. Wire it into .claude/settings.json.',
             lang: 'json',
             code: `{
   "hooks": {
@@ -1163,6 +1232,7 @@ exit 0`
             title: 'Run tests on every Stop',
             difficulty: 'essential',
             why: 'The Stop hook fires when Claude finishes a turn. Use it to auto-run your test suite and feed the result back so Claude can self-correct.',
+            prompt: 'Add a Stop hook that automatically runs npm test when you finish a task. If tests fail, show me the failure output.',
             lang: 'json',
             code: `{
   "hooks": {
@@ -1179,6 +1249,7 @@ exit 0`
             title: 'Slack notification when Claude stops',
             difficulty: 'advanced',
             why: 'Walk away from long tasks. A Stop hook pings your Slack so you know when Claude has finished — or failed.',
+            prompt: 'Add a Stop hook that posts a Slack message to my webhook when you finish working. Include what you just did.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 # notify-stop.sh
@@ -1193,6 +1264,7 @@ exit 0`
             title: 'Audit log — record every tool call',
             difficulty: 'advanced',
             why: 'In security-sensitive repos, you want a full audit trail of what Claude touched. A PostToolUse hook appends to a log file.',
+            prompt: 'Add hooks that log every tool call — tool name, inputs, and timestamp — to ~/.claude/tool-log.jsonl so I can audit what Claude does.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 # audit-log.sh — runs on every PostToolUse
@@ -1206,6 +1278,7 @@ exit 0`
             title: 'Git pre-commit via hook',
             difficulty: 'advanced',
             why: 'Hook into every Write/Edit to stage and lint the changed file immediately. By the time Claude says "done," the commit is clean.',
+            prompt: 'Add a PreToolUse hook that intercepts git commit calls and runs the pre-commit hooks first. Block the commit if they fail.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 FILE=$(cat | jq -r '.tool_input.file_path // ""')
@@ -1218,6 +1291,7 @@ exit 0`
             title: 'Environment validation on session start',
             difficulty: 'advanced',
             why: 'Missing env vars cause confusing mid-task failures. A session-start hook validates the environment before Claude does anything.',
+            prompt: 'Add a SessionStart hook that checks all required environment variables (DATABASE_URL, API_KEY, NODE_ENV) are set. Print a clear error and exit if any are missing.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 # session-start-check.sh
@@ -1235,6 +1309,7 @@ exit 0`
             title: 'Cost tracking hook',
             difficulty: 'expert',
             why: 'Each API response includes usage metadata. A PostToolUse hook accumulates the spend so you can budget per-project.',
+            prompt: 'Add hooks to track API usage costs per session and append them to ~/.claude/cost-log.csv.',
             lang: 'python',
             code: `#!/usr/bin/env python3
 import sys, json, os
@@ -1252,6 +1327,7 @@ sys.exit(0)`
             title: 'Desktop notification (macOS/Linux)',
             difficulty: 'essential',
             why: 'The Notification hook fires when Claude needs your input. Wire it to system notifications so you don\'t miss a blocked prompt.',
+            prompt: 'Add a Notification hook that shows a desktop notification whenever Claude sends me a notification event.',
             lang: 'bash',
             code: `# macOS
 osascript -e 'display notification "Claude needs your input" with title "Claude Code"'
@@ -1263,6 +1339,7 @@ notify-send "Claude Code" "Claude needs your input"`
             title: 'Sound alert hook',
             difficulty: 'essential',
             why: 'Audible alerts for when Claude finishes a long task — no screen-watching required.',
+            prompt: 'Add a Stop hook that plays a sound when you finish a task — use afplay on Mac or paplay on Linux.',
             lang: 'bash',
             code: `# macOS — plays system sound on Stop
 afplay /System/Library/Sounds/Hero.aiff
@@ -1274,6 +1351,7 @@ paplay /usr/share/sounds/freedesktop/stereo/complete.oga`
             title: 'Block writes outside project root',
             difficulty: 'expert',
             why: 'Prevent runaway agents from writing files outside the project. A PreToolUse hook checks the target path and blocks anything outside CWD.',
+            prompt: 'Add a PreToolUse hook on Edit and Write that blocks any file modification outside the current project directory.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 INPUT=$(cat)
@@ -1289,6 +1367,7 @@ exit 0`
             title: 'Cost ceiling — kill session at $X spent',
             difficulty: 'expert',
             why: 'A PostToolUse hook tracks cumulative cost. When it crosses your ceiling, exit 2 to stop the session. Prevents runaway loops from burning through your budget.',
+            prompt: 'Add a hook that monitors cost and sends an exit signal to stop the session if we spend more than $5.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 COST_FILE=.claude/cost.txt
@@ -1304,6 +1383,7 @@ exit 0`
             title: 'Diff size limit — block massive edits',
             difficulty: 'advanced',
             why: 'An agent that wants to rewrite 5000 lines in one go is usually wrong. Block edits that exceed a size threshold and force smaller commits.',
+            prompt: 'Add a PostToolUse hook that warns me if a single edit changes more than 200 lines. Ask me to confirm before continuing.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 INPUT=$(cat)
@@ -1321,6 +1401,7 @@ exit 0`
             title: 'Auto-generate test on source file edit',
             difficulty: 'advanced',
             why: 'PostToolUse hook on Write/Edit: when a file in src/ changes, scaffold a matching test file if none exists. Keeps coverage growing.',
+            prompt: 'Add a PostToolUse hook that automatically runs the test generator for any source file I edit in src/.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 FILE=$(cat | jq -r '.tool_input.file_path')
@@ -1340,6 +1421,7 @@ exit 0`
             title: 'Type-check on stop',
             difficulty: 'essential',
             why: 'A Stop hook that runs tsc --noEmit catches type errors before Claude says "done." Better feedback than discovering them in CI later.',
+            prompt: 'Add a Stop hook that runs tsc --noEmit when you stop. Report any type errors you find.',
             lang: 'json',
             code: `{
   "hooks": {
@@ -1353,6 +1435,7 @@ exit 0`
             title: 'Database migration safety gate',
             difficulty: 'expert',
             why: 'Block any tool call that mentions DROP TABLE, TRUNCATE, or ALTER COLUMN without first reading a migration plan. Forces deliberate destructive ops.',
+            prompt: 'Add a PreToolUse hook that intercepts any SQL command containing DROP or DELETE FROM and requires my explicit confirmation.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 INPUT=$(cat)
@@ -1371,6 +1454,7 @@ exit 0`
             title: 'Approval gate for production commands',
             difficulty: 'expert',
             why: 'PreToolUse hook that pops up a confirm dialog for anything touching production. Prevents accidental kubectl apply in the wrong context.',
+            prompt: 'Add a PreToolUse hook that pauses and asks for my approval before running any command that targets production.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 CMD=$(cat | jq -r '.tool_input.command // ""')
@@ -1387,6 +1471,7 @@ exit 0`
             title: 'Auto-tag commits by file changed',
             difficulty: 'advanced',
             why: 'A Stop hook reads the staged diff and prepends a conventional-commits prefix based on what changed. Consistent commit history with zero effort.',
+            prompt: 'Add a PostToolUse hook on git commit that automatically adds tags (feat:, fix:, docs:) based on which files were changed.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 DIFF=$(git diff --cached --name-only 2>/dev/null)
@@ -1403,6 +1488,7 @@ exit 0`
             title: 'PR template enforcement',
             difficulty: 'advanced',
             why: 'A PreToolUse hook on Bash blocks `gh pr create` calls that lack a body. Forces every PR to include description, test plan, and links.',
+            prompt: 'Add a PreToolUse hook that checks PR descriptions contain the required sections (Summary, Test plan, Breaking changes) before allowing a PR creation.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 CMD=$(cat | jq -r '.tool_input.command')
@@ -1416,6 +1502,7 @@ exit 0`
             title: 'License compliance check',
             difficulty: 'expert',
             why: 'PostToolUse on package.json edits: scan new dependencies for GPL/AGPL licenses. Prevents accidental copyleft contamination.',
+            prompt: 'Add a PreToolUse hook that checks npm install commands and blocks packages with non-compliant licenses.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 FILE=$(cat | jq -r '.tool_input.file_path')
@@ -1430,6 +1517,7 @@ exit 0`
             title: 'Secret scanner before commit',
             difficulty: 'advanced',
             why: 'Run trufflehog or gitleaks via a Stop hook to catch secrets that slipped into edits. Saves you from a public-repo leak.',
+            prompt: 'Add a PreToolUse hook on git commit that runs gitleaks or similar to scan for accidentally included secrets.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 if command -v gitleaks &>/dev/null; then
@@ -1442,6 +1530,7 @@ exit 0`
             title: 'Time-of-day restriction',
             difficulty: 'advanced',
             why: 'Block production deploys outside business hours. A PreToolUse hook checks the clock and refuses deploy commands at 2am.',
+            prompt: 'Add a PreToolUse hook that blocks any destructive operations (DROP, DELETE, git push --force) outside of business hours.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 CMD=$(cat | jq -r '.tool_input.command // ""')
@@ -1469,6 +1558,7 @@ exit 0`
             title: 'Monitor a background command',
             difficulty: 'essential',
             why: 'Monitor streams stdout from a background process as notifications. Claude acts on each line — perfect for log-driven workflows.',
+            prompt: 'Run `npm run build` in the background, monitor its output, and let me know if you see any ERRORs. Create a GitHub issue if the build fails.',
             lang: 'bash',
             code: `# In Claude's instructions:
 # "Run \`npm run build\` in the background and monitor its output.
@@ -1479,6 +1569,7 @@ exit 0`
             title: 'Tail production logs',
             difficulty: 'essential',
             why: 'Stream live logs to Claude so it can spot anomalies, parse errors, or trigger alerts — without you watching a terminal.',
+            prompt: 'Tail /var/log/app/production.log in the background and alert me if you see ERROR or CRITICAL. Show the full log line when you alert.',
             lang: 'bash',
             code: `# Claude runs this in background + monitors:
 tail -f /var/log/app/production.log | grep -E "ERROR|WARN|CRITICAL"
@@ -1488,6 +1579,7 @@ tail -f /var/log/app/production.log | grep -E "ERROR|WARN|CRITICAL"
             title: 'Health check with auto-recovery',
             difficulty: 'advanced',
             why: 'Monitor a health endpoint. When it goes unhealthy, trigger a restart — the whole loop is autonomous.',
+            prompt: '/loop 30s curl the /health endpoint; if status is not 200, restart the service with systemctl restart myapp and notify me',
             lang: 'bash',
             code: `# Monitor script (runs in background):
 while true; do
@@ -1504,6 +1596,7 @@ done`
             title: 'CI build monitor',
             difficulty: 'advanced',
             why: 'Start your build and let Claude watch it. The moment a test fails, Claude gets the failure message and starts diagnosing.',
+            prompt: '/loop 2m check CI status on PR #42; if any check failed, read the log output and push a fix',
             lang: 'bash',
             code: `# Claude runs npm run build in background, monitors output
 # Trigger: "monitor the build and fix any TypeScript errors you see"
@@ -1515,6 +1608,7 @@ npm run build 2>&1 | tee build.log
             title: 'Database slow query monitor',
             difficulty: 'advanced',
             why: 'Slow queries compound in production. Monitor the Postgres slow query log and let Claude generate index recommendations.',
+            prompt: '/loop 1m check pg_stat_activity for queries running longer than 5 seconds; log them to slow-queries.log and alert me if they stack up',
             lang: 'sql',
             code: `-- Enable slow query logging in postgres.conf:
 -- log_min_duration_statement = 1000  (1 second)
@@ -1526,6 +1620,7 @@ npm run build 2>&1 | tee build.log
             title: 'API response time monitor',
             difficulty: 'advanced',
             why: 'Catch API degradation before users notice. Stream latency measurements and alert when p95 exceeds your SLO.',
+            prompt: '/loop 1m curl /api/health and record response time; alert me if latency exceeds 2 seconds on two consecutive checks',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 # latency-monitor.sh
@@ -1541,6 +1636,7 @@ done`
             title: 'File system watcher',
             difficulty: 'essential',
             why: 'Watch a directory for new files and process each one automatically. Great for ETL pipelines or upload processors.',
+            prompt: 'Watch the /uploads directory for new files. When one arrives, validate it and move it to /processed or /rejected.',
             lang: 'bash',
             code: `# Linux: inotifywait (inotify-tools)
 inotifywait -m -e close_write uploads/ |
@@ -1553,6 +1649,7 @@ done
             title: 'Multi-service health dashboard in terminal',
             difficulty: 'expert',
             why: 'Run parallel monitors for multiple services. Claude aggregates and reports status across all of them.',
+            prompt: 'Monitor the health of all 5 services (api, auth, worker, db, cache) in parallel and show me a live status dashboard.',
             lang: 'bash',
             code: `# services.txt
 # api    https://api.myapp.com/health
@@ -1570,6 +1667,7 @@ done < services.txt`
             title: 'Memory/CPU alert monitor',
             difficulty: 'advanced',
             why: 'Catch memory leaks before the OOM killer strikes. Stream system metrics and alert when thresholds are crossed.',
+            prompt: '/loop 1m log memory and CPU usage; alert me if memory exceeds 90% or CPU stays above 95% for two consecutive checks',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 while true; do
@@ -1585,6 +1683,7 @@ done`
             title: 'Error rate monitor with rolling window',
             difficulty: 'expert',
             why: 'A spike in error rate over 60 seconds is more meaningful than a single error. A rolling window gives you rate, not noise.',
+            prompt: '/loop 1m count ERROR lines in the last 60 seconds of logs; alert me if rate exceeds 10 errors per minute',
             lang: 'python',
             code: `from collections import deque
 import time, re
@@ -1608,6 +1707,7 @@ for line in iter(sys.stdin.readline, ''):
             title: 'Watch test output and auto-fix failures',
             difficulty: 'expert',
             why: 'The ultimate TDD loop. Run tests in watch mode; Claude monitors output and fixes each failure as it appears.',
+            prompt: '/loop 3m run npm test; if any test fails, read the failure output and try to fix the root cause',
             lang: 'bash',
             code: `# Tell Claude:
 # "Run jest --watch in background, monitor output.
@@ -1622,6 +1722,7 @@ npx jest --watch --json 2>&1`
             title: 'Disk space monitor + auto-cleanup',
             difficulty: 'advanced',
             why: 'When disk fills, services crash. Monitor disk usage and trigger cleanup (logs, caches, old artifacts) before hitting the wall.',
+            prompt: '/loop 10m check disk usage with df -h; if any partition exceeds 90%, delete logs older than 7 days and alert me',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 while true; do
@@ -1640,6 +1741,7 @@ done`
             title: 'SSL certificate expiry watcher',
             difficulty: 'essential',
             why: 'A cert expiring on a weekend takes down production. Check every domain you serve and alert 14 days before expiry.',
+            prompt: '/loop 24h check SSL expiry for api.myapp.com; alert me if the certificate expires in less than 30 days',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 for domain in app.example.com api.example.com www.example.com; do
@@ -1654,6 +1756,7 @@ done`
             title: 'Process hang detector',
             difficulty: 'advanced',
             why: 'A process that hangs (not crashes) is harder to detect. Watch its CPU; if 0% for too long but still alive, restart it.',
+            prompt: '/loop 1m check if the worker process is responding; if it hasn\'t logged anything in 5 minutes, restart it and alert me',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 PID=$(pgrep -f myapp)
@@ -1672,6 +1775,7 @@ done`
             title: 'DNS resolution monitor',
             difficulty: 'advanced',
             why: 'Slow or failing DNS cascades into mysterious outages. Monitor resolution time for your critical hostnames separately from the service itself.',
+            prompt: '/loop 5m resolve api.myapp.com and record latency; alert if resolution takes more than 500ms',
             lang: 'bash',
             code: `while true; do
   for host in api.myapp.com db.internal mailgun.org; do
@@ -1686,6 +1790,7 @@ done`
             title: 'Database replication lag',
             difficulty: 'expert',
             why: 'Read replicas drifting behind primary cause stale reads. Postgres exposes lag in pg_stat_replication — monitor it and alert on >10s lag.',
+            prompt: '/loop 30s check PostgreSQL replication lag; alert me if lag exceeds 60 seconds',
             lang: 'sql',
             code: `-- Run this from primary, every 30s
 SELECT client_addr,
@@ -1698,6 +1803,7 @@ FROM pg_stat_replication;
             title: 'Queue depth monitor',
             difficulty: 'advanced',
             why: 'A growing queue means consumers can\'t keep up. Watch depth + add workers automatically when it crosses a threshold.',
+            prompt: '/loop 30s check the Redis job queue depth; if it exceeds 1000 items, alert me and consider scaling up workers',
             lang: 'bash',
             code: `while true; do
   DEPTH=$(redis-cli LLEN jobs:pending)
@@ -1715,6 +1821,7 @@ done`
             title: 'Container memory leak detection',
             difficulty: 'expert',
             why: 'Memory that grows linearly over hours is a leak. Sample container RSS every 5min, compute slope, alert if positive and large.',
+            prompt: '/loop 5m check Docker container memory usage; alert me if any container is growing more than 10MB per check',
             lang: 'python',
             code: `import subprocess, time
 samples = []
@@ -1735,6 +1842,7 @@ while True:
             title: 'CDN cache hit rate',
             difficulty: 'advanced',
             why: 'A dropping cache hit rate means your origin is taking more load. Tail access logs, compute hit ratio, alert on drops.',
+            prompt: '/loop 1h check CDN cache hit rate from the dashboard API; alert me if it drops below 80%',
             lang: 'bash',
             code: `tail -F /var/log/nginx/access.log |
 awk '{
@@ -1751,6 +1859,7 @@ awk '{
             title: 'Kubernetes pod restart detector',
             difficulty: 'advanced',
             why: 'A pod restarting more than 3 times in 10 minutes is usually crashlooping. Watch the event stream and alert before users notice.',
+            prompt: '/loop 2m run kubectl get pods and check restart counts; alert me if any pod has restarted more than 3 times in the last hour',
             lang: 'bash',
             code: `kubectl get pods -A -w -o json |
 jq -r 'select(.object.status.containerStatuses[]?.restartCount > 3) |
@@ -1760,6 +1869,7 @@ jq -r 'select(.object.status.containerStatuses[]?.restartCount > 3) |
             title: 'Webhook delivery monitor',
             difficulty: 'advanced',
             why: 'When you send webhooks to customers, failed deliveries are a customer-visible bug. Monitor delivery success rate per recipient and retry on failure.',
+            prompt: '/loop 5m check the webhook delivery log; alert me if more than 5% of webhooks have failed in the last hour',
             lang: 'python',
             code: `import requests
 from collections import defaultdict
@@ -1783,6 +1893,7 @@ def deliver(url, payload):
             title: 'User experience monitor (synthetic)',
             difficulty: 'expert',
             why: 'Real-user metrics lag; synthetic monitoring catches issues before users do. Replay critical user journeys every minute and alert on regressions.',
+            prompt: '/loop 5m run a synthetic login flow against staging; if any step fails or takes more than 3 seconds, alert me',
             lang: 'javascript',
             code: `// playwright synthetic monitor
 const { chromium } = require('playwright');
@@ -1817,6 +1928,7 @@ setInterval(check, 60_000);`
             title: 'Spawn a subagent for isolated research',
             difficulty: 'essential',
             why: 'Subagents protect the main context window. Research that would consume 50k tokens stays isolated — the parent gets a clean 200-word summary.',
+            prompt: 'Search src/ for all authentication-related files and patterns. Give me a summary of what you find — don\'t change anything.',
             lang: 'javascript',
             code: `// In your Claude Code agent:
 Agent({
@@ -1829,6 +1941,7 @@ Agent({
             title: 'Parallel agents for 3x speed',
             difficulty: 'advanced',
             why: 'Independent tasks sent to separate agents run concurrently. A 30-minute sequential workflow becomes 10 minutes.',
+            prompt: 'Run lint check, type check, and test suite all at once. Report which (if any) are failing.',
             lang: 'javascript',
             code: `// Send BOTH in one message — they run in parallel
 Agent({ description: "Lint check", prompt: "Run eslint on src/ and report errors" });
@@ -1840,6 +1953,7 @@ Agent({ description: "Test suite", prompt: "Run npm test and report failures" })
             title: 'Explore agent for code search',
             difficulty: 'essential',
             why: 'The Explore agent is read-only and fast. Use it to find where things live before you start editing — avoids wasted diffs.',
+            prompt: 'Find all files in src/ that reference "stripe" or "payment". List them with line numbers — don\'t change anything.',
             lang: 'javascript',
             code: `Agent({
   subagent_type: "Explore",
@@ -1851,6 +1965,7 @@ Agent({ description: "Test suite", prompt: "Run npm test and report failures" })
             title: 'Plan agent before implementing',
             difficulty: 'advanced',
             why: 'The Plan agent designs architecture without writing code. Get a blueprint first — then implement against a clear spec.',
+            prompt: 'Before writing any code, use the Plan agent to design the implementation for [feature]. Show me the plan and wait for my approval.',
             lang: 'javascript',
             code: `Agent({
   subagent_type: "Plan",
@@ -1862,6 +1977,7 @@ Agent({ description: "Test suite", prompt: "Run npm test and report failures" })
             title: 'Worktree isolation for risky experiments',
             difficulty: 'expert',
             why: 'Worktree mode gives the agent a fresh git branch to work in. If it breaks everything, you just delete the worktree — main is untouched.',
+            prompt: 'Run this experimental refactor in an isolated worktree so it doesn\'t affect my current branch. Report back when ready to review.',
             lang: 'javascript',
             code: `Agent({
   description: "Experiment with new DB schema",
@@ -1873,6 +1989,7 @@ Agent({ description: "Test suite", prompt: "Run npm test and report failures" })
             title: 'Background agent while you work',
             difficulty: 'advanced',
             why: 'Background agents let Claude do something non-blocking while you continue a conversation. You get notified when it finishes.',
+            prompt: 'Run the dependency audit in the background while I continue with the main task. Alert me when it finishes.',
             lang: 'javascript',
             code: `Agent({
   description: "Generate test coverage",
@@ -1885,6 +2002,7 @@ Agent({ description: "Test suite", prompt: "Run npm test and report failures" })
             title: 'Sequential agent chain (handoff pattern)',
             difficulty: 'expert',
             why: 'Each agent receives the output of the previous one as its input. Specialist chains produce better quality than one generalist doing everything.',
+            prompt: 'Run these in sequence: first have the Plan agent design the feature, then pass the plan to an implementation agent, then run a code review agent on the result.',
             lang: 'javascript',
             code: `// Step 1: Plan
 const plan = await Agent({ subagent_type: "Plan", prompt: "Plan the API redesign" });
@@ -1897,6 +2015,7 @@ const review = await Agent({ subagent_type: "code-reviewer", prompt: \`Review: \
             title: 'Multi-repo agent orchestration',
             difficulty: 'expert',
             why: 'When a change spans multiple repos, spawn one agent per repo. Each agent handles its slice; the orchestrator merges the results.',
+            prompt: 'Check all three repos (frontend, backend, mobile) for the same version of shared-types. If any are out of sync, update them.',
             lang: 'javascript',
             code: `// Orchestrator:
 const [apiResult, frontendResult, docsResult] = await Promise.all([
@@ -1910,6 +2029,7 @@ const [apiResult, frontendResult, docsResult] = await Promise.all([
             title: 'Domain-specialist agents',
             difficulty: 'advanced',
             why: 'Specialized prompts make better decisions than generic ones. A "security agent" with security-specific instructions outperforms a general agent reviewing code.',
+            prompt: 'Route this task to the right specialist: use the security-review agent for anything touching auth, the Explore agent for codebase search.',
             lang: 'javascript',
             code: `Agent({
   subagent_type: "security-review",
@@ -1921,6 +2041,7 @@ const [apiResult, frontendResult, docsResult] = await Promise.all([
             title: 'Self-healing agent with error recovery',
             difficulty: 'expert',
             why: 'An agent that catches its own errors and retries with a different strategy — without human intervention — is the foundation of autonomous workflows.',
+            prompt: 'Try to implement this migration. If your first attempt fails tests, analyze what went wrong and try a different approach. Up to 3 attempts.',
             lang: 'javascript',
             code: `async function resilientAgent(task, maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
@@ -1937,6 +2058,7 @@ const [apiResult, frontendResult, docsResult] = await Promise.all([
             title: 'Claude as judge — evaluate other agents',
             difficulty: 'expert',
             why: 'Run two implementations in parallel, then spawn a judge agent to pick the better one. Competition improves output quality.',
+            prompt: 'Run two different implementations of this algorithm and evaluate which one is better for readability, performance, and test coverage.',
             lang: 'javascript',
             code: `const [a, b] = await Promise.all([
   Agent({ prompt: "Implement the cache layer using Redis" }),
@@ -1967,6 +2089,7 @@ Data: \${JSON.stringify(results)}\`
             title: 'Code review agent — one-shot PR analysis',
             difficulty: 'advanced',
             why: 'Spawn a code-reviewer agent on every PR. It reads the diff, runs static analysis, and posts review comments — without your screen time.',
+            prompt: 'Review all changes on the current branch vs main. Give me a detailed review covering bugs, security, test gaps, and style.',
             lang: 'javascript',
             code: `Agent({
   subagent_type: "code-reviewer",
@@ -1978,6 +2101,7 @@ Data: \${JSON.stringify(results)}\`
             title: 'Git-bisect agent — find the breaking commit',
             difficulty: 'expert',
             why: 'Hand off bisection to an agent. It checks out commits, runs the failing test, and reports the first bad commit — without you babysitting.',
+            prompt: 'Use git bisect to find which commit broke the tests. Run the test suite at each bisect step and report the first bad commit.',
             lang: 'javascript',
             code: `Agent({
   description: "Bisect the test regression",
@@ -1993,6 +2117,7 @@ Report the offending commit hash.\`
             title: 'Dependency upgrade agent',
             difficulty: 'advanced',
             why: 'Upgrading dependencies is high-toil, low-skill work — perfect for an agent. It bumps versions, runs tests, fixes breaking changes, and commits per package.',
+            prompt: 'Upgrade all npm dependencies to their latest versions. Run tests after each upgrade and roll back any that break things.',
             lang: 'javascript',
             code: `Agent({
   description: "Upgrade outdated deps",
@@ -2009,6 +2134,7 @@ Process up to 20 packages. Report which succeeded and which failed.\`
             title: 'Translation agent — i18n at scale',
             difficulty: 'advanced',
             why: 'Translating a string catalog by hand is tedious. An agent reads en.json and produces consistent translations for 20 locales in parallel.',
+            prompt: 'Translate locales/en.json into French, German, Spanish, and Japanese. Keep all interpolation tokens like {{count}} unchanged.',
             lang: 'javascript',
             code: `const locales = ['fr', 'de', 'es', 'pt', 'it', 'nl', 'ja', 'ko', 'zh-CN', 'zh-TW'];
 await Promise.all(locales.map(loc =>
@@ -2022,6 +2148,7 @@ await Promise.all(locales.map(loc =>
             title: 'Performance analyzer agent',
             difficulty: 'expert',
             why: 'Profile data is huge and noisy. An agent reads a flamegraph or profile JSON and gives you the 5 hot paths in plain English.',
+            prompt: 'Profile the API under load and find the 3 slowest endpoints. For each one, explain why it\'s slow and propose a fix.',
             lang: 'javascript',
             code: `Agent({
   description: "Analyze profile",
@@ -2035,6 +2162,7 @@ Output a markdown table sorted by potential impact.\`
             title: 'Style migration agent — CSS to Tailwind',
             difficulty: 'advanced',
             why: 'Migrating styles is mechanical but error-prone. An agent walks the component tree, replaces classes consistently, and verifies visual parity.',
+            prompt: 'Convert all the CSS files in src/styles/ to Tailwind utility classes. Keep the visual output identical.',
             lang: 'javascript',
             code: `Agent({
   description: "Migrate CSS module → Tailwind",
@@ -2051,6 +2179,7 @@ Do not change layout or colors — verify with the screenshot diff tool.\`
             title: 'Bug-bash automation agent',
             difficulty: 'expert',
             why: 'Run the same fuzz test against every API endpoint, parallelized. An agent per endpoint reports anomalies in <10 minutes total.',
+            prompt: 'Read the open bug list and triage each one: reproduce it, identify the root cause, and either fix it or add a detailed reproduction case.',
             lang: 'javascript',
             code: `const endpoints = await loadOpenApiSpec();
 await Promise.all(endpoints.map(ep =>
@@ -2066,6 +2195,7 @@ Report any 500 responses with the request that caused them.\`
             title: 'Doc-writer agent — JSDoc from code',
             difficulty: 'essential',
             why: 'Documentation written after the fact is always stale. An agent reads each exported function and writes a JSDoc block — consistent, repeatable.',
+            prompt: 'Add JSDoc comments to all exported functions in src/api/ that are currently undocumented.',
             lang: 'javascript',
             code: `Agent({
   description: "Generate JSDoc for utils",
@@ -2080,6 +2210,7 @@ Do not modify the function body.\`
             title: 'PR triager — auto-label and route',
             difficulty: 'advanced',
             why: 'New PRs sit unrouted in busy repos. A triage agent reads the diff and applies labels, requests reviewers based on CODEOWNERS.',
+            prompt: 'Look at all open PRs and apply appropriate labels (bug, feature, docs, breaking-change) and request review from the right team member.',
             lang: 'javascript',
             code: `Agent({
   description: "Triage new PRs",
@@ -2095,6 +2226,7 @@ For each:
             title: 'Migration agent — one-time big task',
             difficulty: 'expert',
             why: 'Some changes are too big for an interactive session. A long-running agent with checkpoints handles overnight migrations safely.',
+            prompt: 'Migrate all class components in src/ to functional components with hooks. Do one file at a time and run tests after each.',
             lang: 'javascript',
             code: `Agent({
   description: "Migrate API v1 -> v2",
@@ -2112,6 +2244,7 @@ For each:
             title: 'Screenshot diff agent — visual regression',
             difficulty: 'expert',
             why: 'Visual regressions slip past unit tests. An agent runs Playwright, captures screenshots before/after, and reports pixel diffs.',
+            prompt: 'Take screenshots of all the key UI pages before and after this CSS change and flag any visual regressions.',
             lang: 'javascript',
             code: `Agent({
   description: "Visual regression test",
@@ -2125,6 +2258,7 @@ Output a table: page | severity | description.\`
             title: 'Accessibility audit agent',
             difficulty: 'advanced',
             why: 'An a11y audit agent runs axe, lighthouse, and pa11y in parallel — then synthesizes the findings into a ranked action list.',
+            prompt: 'Audit all pages for WCAG 2.1 AA compliance. For each violation, show the element, rule violated, and how to fix it.',
             lang: 'javascript',
             code: `const [axe, lh, pa11y] = await Promise.all([
   Agent({ prompt: "Run npx @axe-core/cli on the staging URL" }),
@@ -2152,6 +2286,7 @@ Output top 10 fixes with file:line references.\`
             title: 'Enable automatic context compaction',
             difficulty: 'essential',
             why: 'When context fills up, Claude Code automatically summarizes earlier turns. This extends sessions indefinitely without losing important state.',
+            prompt: 'Enable automatic context compaction in settings so long sessions don\'t run out of context mid-task.',
             lang: 'bash',
             code: `# In claude settings or flag:
 claude --context-window 200k
@@ -2163,6 +2298,7 @@ claude --context-window 200k
             title: 'Read only what you need — avoid file dumps',
             difficulty: 'essential',
             why: 'Reading entire files "just in case" is the #1 token killer. Give Claude grep/search tools so it fetches only relevant sections.',
+            prompt: 'Don\'t read the entire file — use offset and limit to read only the relevant section around line 200.',
             lang: 'bash',
             code: `# Bad: "Read all files in src/"
 # Good: Instruct Claude to:
@@ -2174,6 +2310,7 @@ grep -n "function authenticate" src/**/*.ts
             title: 'Chunk large files for processing',
             difficulty: 'advanced',
             why: 'A 5,000-line file cannot be processed in one shot. Split it into logical chunks (by function or 500-line windows) and process each separately.',
+            prompt: 'Process bigfile.ts in chunks of 200 lines. Summarize what you learn before moving to the next chunk.',
             lang: 'python',
             code: `def chunk_file(path, chunk_size=500):
     with open(path) as f:
@@ -2191,6 +2328,7 @@ for start, chunk in chunk_file('large_file.py'):
             title: 'Use .claudeignore to exclude noise',
             difficulty: 'essential',
             why: 'node_modules, .git, build artifacts — these consume tokens when Claude searches for files. Exclude them upfront.',
+            prompt: 'Create a .claudeignore file that excludes node_modules/, dist/, .git/, and *.lock files from glob searches.',
             lang: 'bash',
             code: `# .claudeignore (same syntax as .gitignore)
 node_modules/
@@ -2207,6 +2345,7 @@ coverage/
             title: 'Batch similar operations',
             difficulty: 'advanced',
             why: 'Ten separate "rename this variable" requests cost 10x the setup overhead. Batch them into one: "rename all of these in one pass."',
+            prompt: 'Group all the file edits for this refactor into one message instead of making individual edits one by one.',
             lang: 'bash',
             code: `# Bad: 10 separate Claude calls
 # "rename userId to user_id in auth.ts"
@@ -2221,6 +2360,7 @@ coverage/
             title: 'Progressive context building',
             difficulty: 'advanced',
             why: 'Start with a high-level summary; drill in only when needed. Like a surgeon who reads the chart before opening — not after.',
+            prompt: 'Start with just the file headers and exports, then read implementation details only for the specific functions I need to change.',
             lang: 'bash',
             code: `# Step 1: summarize the codebase structure (cheap)
 find src -name "*.ts" | head -30
@@ -2232,6 +2372,7 @@ find src -name "*.ts" | head -30
             title: 'Cache-friendly prompting',
             difficulty: 'expert',
             why: 'Anthropic\'s prompt cache stores the first ~90% of your prompt for reuse. Front-load stable content (system prompt, codebase context) and keep dynamic content at the end.',
+            prompt: 'Structure these repeated requests so the system prompt stays identical — put variable content at the end to maximize cache hits.',
             lang: 'javascript',
             code: `// Cache-friendly structure:
 {
@@ -2248,6 +2389,7 @@ find src -name "*.ts" | head -30
             title: 'Rate limit handling with backoff',
             difficulty: 'advanced',
             why: 'When you hit the API rate limit, a naive retry hammers the endpoint. Exponential backoff is the correct response.',
+            prompt: 'If you hit a rate limit, wait and retry with exponential backoff instead of failing immediately.',
             lang: 'python',
             code: `import anthropic, time, random
 
@@ -2265,6 +2407,7 @@ def call_with_backoff(client, **kwargs):
             title: 'Token counting before submission',
             difficulty: 'advanced',
             why: 'Count tokens before sending a request to avoid hitting context limits mid-turn. The count_tokens API is free.',
+            prompt: 'Estimate the token count of this request before sending it. Warn me if it\'s going to be expensive.',
             lang: 'python',
             code: `import anthropic
 client = anthropic.Anthropic()
@@ -2280,6 +2423,7 @@ print(f"Input tokens: {response.input_tokens}")
             title: 'Streaming for long outputs',
             difficulty: 'advanced',
             why: 'For outputs >4k tokens, streaming lets you process and display results as they arrive — no waiting for the full response.',
+            prompt: 'Stream the output as you generate it instead of buffering it all and sending at once.',
             lang: 'python',
             code: `import anthropic
 client = anthropic.Anthropic()
@@ -2296,6 +2440,7 @@ with client.messages.stream(
             title: 'Avoid re-reading files Claude just wrote',
             difficulty: 'essential',
             why: 'After Claude writes a file, you do not need to read it back to verify. The write either succeeded or errored — trust the tool result.',
+            prompt: 'Don\'t re-read files you just edited — trust the write succeeded unless you get an error.',
             lang: 'bash',
             code: `# Bad pattern in prompts:
 # "Write auth.ts, then read it back to confirm it looks right"
@@ -2309,6 +2454,7 @@ with client.messages.stream(
             title: 'Use glob patterns for targeted searches',
             difficulty: 'essential',
             why: 'grep\'s -l flag returns only filenames; add line numbers only when you need context. Grep across 1,000 files costs tokens — filter first.',
+            prompt: 'Search for the pattern only in src/**/*.ts files, not the entire repository.',
             lang: 'bash',
             code: `# Find which files have the pattern (filenames only = cheap)
 grep -rl "useAuthContext" src/
@@ -2320,6 +2466,7 @@ grep -rl "useAuthContext" src/
             title: 'Read with offset and limit',
             difficulty: 'essential',
             why: 'The Read tool takes offset and limit parameters. For a 5000-line file, reading lines 1200-1280 costs 80 lines, not 5000. The biggest single optimization most users miss.',
+            prompt: 'Read only lines 150–250 of the file — don\'t read the whole thing.',
             lang: 'javascript',
             code: `// Bad — reads the whole file
 Read({ file_path: "src/big-file.ts" });
@@ -2331,6 +2478,7 @@ Read({ file_path: "src/big-file.ts", offset: 1200, limit: 80 });`
             title: 'Reset context after a major task',
             difficulty: 'essential',
             why: 'A 100k-token session researching one bug doesn\'t need to remember everything when you pivot. /clear (or a new session) gives Claude a fresh, cheap context.',
+            prompt: '/clear\nNow let\'s start the next task with a fresh context.',
             lang: 'bash',
             code: `/clear         # Reset conversation, keep CLAUDE.md
 # Or start a new session entirely for a different task.
@@ -2340,6 +2488,7 @@ Read({ file_path: "src/big-file.ts", offset: 1200, limit: 80 });`
             title: 'Use sub-agents to compartmentalize',
             difficulty: 'advanced',
             why: 'Heavy research belongs in a sub-agent so the 50k tokens stay there. The parent gets only a 200-word summary — pure leverage.',
+            prompt: 'Use an Explore subagent to do this search so the results don\'t flood the main context window.',
             lang: 'javascript',
             code: `// Bad: ask the main agent to read 30 files
 // Good: spawn an Explore sub-agent, get a summary
@@ -2367,6 +2516,7 @@ client.messages.create({
             title: 'Pick the cheapest capable model',
             difficulty: 'essential',
             why: 'Haiku is 1/12th the cost of Opus and handles classification, simple edits, and JSON extraction perfectly. Reserve Opus for hard reasoning.',
+            prompt: 'Use the Haiku model for this batch processing task — it\'s faster and cheaper for straightforward transformations.',
             lang: 'javascript',
             code: `// Classification, JSON extraction, simple regex work
 const cheap = { model: 'claude-haiku-4-5-20251001' };
@@ -2381,6 +2531,7 @@ const heavy = { model: 'claude-opus-4-7' };`
             title: 'Truncate tool result before re-using',
             difficulty: 'advanced',
             why: 'A 200-line grep result that you only need the first 5 lines from is wasting 195 lines of context. Slice it before storing or summarizing.',
+            prompt: 'When you get a long tool result, summarize the key points before including it in your next request.',
             lang: 'bash',
             code: `# Truncate at the shell, not in Claude's context
 grep -rn "pattern" src/ | head -10
@@ -2392,6 +2543,7 @@ grep -rn "TODO" src/ | awk -F: '{print $1}' | sort -u`
             title: 'Avoid Read-then-Edit-then-Read pattern',
             difficulty: 'essential',
             why: 'Reading a file you just edited to verify is redundant: Edit errors loudly if it fails. Don\'t pay the token cost of a verification pass.',
+            prompt: 'Edit the file directly based on what you already read — don\'t re-read it between the read and the edit.',
             lang: 'bash',
             code: `# BAD pattern (in prompts):
 # "Edit auth.ts then read it back to confirm"
@@ -2404,6 +2556,7 @@ grep -rn "TODO" src/ | awk -F: '{print $1}' | sort -u`
             title: 'Strict system prompts to limit verbosity',
             difficulty: 'essential',
             why: 'A 4-paragraph answer when you wanted a yes/no is wasted output tokens. Tell Claude up-front: "answer in one sentence" or "table format only."',
+            prompt: 'Keep responses concise. One sentence per update. Don\'t narrate your thought process.',
             lang: 'bash',
             code: `# In your prompt or CLAUDE.md:
 # "Default response style:
@@ -2416,6 +2569,7 @@ grep -rn "TODO" src/ | awk -F: '{print $1}' | sort -u`
             title: 'Bound retries — fail-fast over fail-slow',
             difficulty: 'advanced',
             why: 'A retry loop that runs 50 times costs 50× the tokens. Set a max retry count of 3-5 and fail loudly. Better to surface the bug than mask it.',
+            prompt: 'Retry this operation at most 3 times with 2-second delays. After 3 failures, stop and report the error — don\'t keep trying.',
             lang: 'python',
             code: `MAX = 3
 for attempt in range(MAX):
@@ -2432,6 +2586,7 @@ for attempt in range(MAX):
             title: 'Trim tool result lists with --max-count',
             difficulty: 'essential',
             why: 'grep -m 5 returns 5 hits and stops. Faster to run, cheaper to send, easier for Claude to reason about than 500 hits.',
+            prompt: 'Use --max-count=50 in grep and find commands to avoid getting thousands of results.',
             lang: 'bash',
             code: `# Cap results upfront:
 grep -rln -m 5 "pattern" src/
@@ -2446,6 +2601,7 @@ find . -name "*.ts" | head -20`
             title: 'Compact long conversations',
             difficulty: 'advanced',
             why: 'Claude Code\'s /compact summarizes earlier turns into a condensed bullet list. Trade some context fidelity for ~80% token savings on long sessions.',
+            prompt: 'This conversation is getting long. Summarize the key decisions and state in 5 bullet points, then continue.',
             lang: 'bash',
             code: `/compact
 
@@ -2468,6 +2624,7 @@ find . -name "*.ts" | head -20`
             title: 'Auto-commit every N minutes',
             difficulty: 'essential',
             why: 'A 24-hour run that crashes at hour 23 loses nothing if you auto-commit every 15 minutes. Git is your crash recovery system.',
+            prompt: 'Every 10 minutes, commit any changes with a checkpoint message. This lets me safely interrupt and resume.',
             lang: 'bash',
             code: `# Add to your loop body or a cron:
 git add -A
@@ -2479,6 +2636,7 @@ git push origin HEAD`
             title: 'Checkpoint pattern with JSON state',
             difficulty: 'advanced',
             why: 'Store progress in a JSON file so the workflow can resume from the last checkpoint after a crash or container restart.',
+            prompt: 'After each step, save the current state to .checkpoint.json so we can resume from exactly where we left off if interrupted.',
             lang: 'javascript',
             code: `const CHECKPOINT_FILE = '.claude/checkpoint.json';
 
@@ -2498,6 +2656,7 @@ function loadCheckpoint() {
             title: 'Idempotent operations — safe to retry',
             difficulty: 'advanced',
             why: 'A workflow that restarts from a checkpoint must not double-process items. Design every step to be idempotent — running it twice has the same effect as once.',
+            prompt: 'Make every operation idempotent — if we run the same step twice, it should produce the same result without creating duplicates.',
             lang: 'python',
             code: `def process_file(path, state):
     # Check if already processed
@@ -2517,6 +2676,7 @@ function loadCheckpoint() {
             title: 'Health ping to keep session alive',
             difficulty: 'essential',
             why: 'Cloud environments idle-timeout inactive sessions. A periodic no-op keeps the connection alive during slow processing steps.',
+            prompt: 'Every 5 minutes, write a heartbeat timestamp to .heartbeat so external monitors know the session is still alive.',
             lang: 'bash',
             code: `# In a background thread or separate process:
 while true; do
@@ -2532,6 +2692,7 @@ trap "kill $PING_PID" EXIT`
             title: 'Error recovery — log, skip, continue',
             difficulty: 'advanced',
             why: 'A 24-hour run that stops on the first error is useless. Log errors, skip the bad item, and continue processing the rest.',
+            prompt: 'If any individual item fails, log the error to failures.log and continue with the next item instead of stopping.',
             lang: 'python',
             code: `import logging
 logging.basicConfig(filename='workflow.log', level=logging.ERROR)
@@ -2551,6 +2712,7 @@ for item in items:
             title: 'Push to GitHub on every checkpoint',
             difficulty: 'essential',
             why: 'Remote storage is more durable than local. Push every checkpoint so a container death does not lose your progress.',
+            prompt: 'After every checkpoint commit, push to the remote branch so progress is safe even if this session crashes.',
             lang: 'bash',
             code: `checkpoint() {
   local msg="$1"
@@ -2568,6 +2730,7 @@ checkpoint "migration phase 1 complete"`
             title: 'Resume from last commit on restart',
             difficulty: 'advanced',
             why: 'When a session restarts, read the last commit message or a state file to know exactly where to pick up.',
+            prompt: 'Check the last commit message to find where we left off, then continue from that point without re-doing completed work.',
             lang: 'bash',
             code: `# Read last checkpoint from git log:
 LAST_COMMIT=$(git log --oneline -1)
@@ -2586,6 +2749,7 @@ fi`
             title: 'Notify on completion (email / Slack)',
             difficulty: 'advanced',
             why: 'For overnight runs, you want a message when the job finishes — success or failure. Don\'t wake up to silence and wonder.',
+            prompt: 'When this long-running job finishes, send a Slack message to $SLACK_WEBHOOK_URL with a summary of what was done.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 # notify.sh — call at the end of your workflow
@@ -2605,6 +2769,7 @@ echo "$RESULT" | mail -s "Workflow complete" you@example.com`
             title: 'Rate-limit your workflow to avoid quota exhaustion',
             difficulty: 'advanced',
             why: 'A 24-hour run that burns all API tokens in hour 3 leaves you dark for 21 hours. Budget tokens per hour and throttle if ahead of pace.',
+            prompt: 'Add a sleep between iterations so we stay under the API rate limit. Process one batch per minute.',
             lang: 'javascript',
             code: `const HOURLY_TOKEN_BUDGET = 100_000;
 let tokensThisHour = 0;
@@ -2629,6 +2794,7 @@ async function throttledCall(prompt) {
             title: 'Use tmux or screen for persistence',
             difficulty: 'essential',
             why: 'SSH sessions die. Run Claude inside tmux so the workflow survives a network drop — detach and reattach from anywhere.',
+            prompt: 'Run this in a tmux session so it survives disconnections. Create the session with: tmux new-session -s my-job',
             lang: 'bash',
             code: `# Start a named session:
 tmux new-session -d -s claude-run
@@ -2644,6 +2810,7 @@ tmux attach-session -t claude-run`
             title: 'Graceful shutdown with cleanup',
             difficulty: 'expert',
             why: 'SIGTERM is sent before container shutdown. Catch it and do a final checkpoint so you can resume cleanly.',
+            prompt: 'Handle SIGTERM by finishing the current item cleanly, saving state, and exiting — don\'t die mid-operation.',
             lang: 'python',
             code: `import signal, sys
 
@@ -2660,6 +2827,7 @@ signal.signal(signal.SIGINT, shutdown_handler)`
             title: 'Log rotation — prevent disk fill',
             difficulty: 'advanced',
             why: 'A 24h workflow can write gigabytes of logs. Rotate every 100MB or every 6h so disk stays healthy and old logs are easy to gzip.',
+            prompt: 'Rotate the output log file when it exceeds 100MB. Keep the last 5 rotated logs and delete older ones.',
             lang: 'bash',
             code: `# logrotate config /etc/logrotate.d/myloop
 /var/log/myloop/*.log {
@@ -2677,6 +2845,7 @@ signal.signal(signal.SIGINT, shutdown_handler)`
             title: 'Database connection pool sizing',
             difficulty: 'advanced',
             why: 'A 24h workflow that opens 10000 connections will starve other services. Reuse one pool; set max_connections sensibly.',
+            prompt: 'Tune the connection pool size based on the number of parallel workers and the database\'s max_connections setting.',
             lang: 'python',
             code: `from psycopg2 import pool
 conn_pool = pool.SimpleConnectionPool(
@@ -2694,6 +2863,7 @@ def with_conn(fn):
             title: 'File handle cleanup',
             difficulty: 'essential',
             why: 'Long loops leak file handles. Use context managers / with statements / try-finally so every file is closed even on exception.',
+            prompt: 'Make sure every file handle is explicitly closed after use. Don\'t rely on garbage collection for long-running processes.',
             lang: 'python',
             code: `# BAD: handle leaks on exception
 def process(path):
@@ -2710,6 +2880,7 @@ def process(path):
             title: 'Memory leak prevention — clear local state',
             difficulty: 'advanced',
             why: 'A loop accumulating large lists across iterations will OOM eventually. Reset large data structures each iteration; rely on garbage collection.',
+            prompt: 'Clear accumulated results from memory after writing each batch to disk. Don\'t let the in-memory list grow unbounded.',
             lang: 'python',
             code: `# BAD: grows unboundedly
 seen = []
@@ -2724,6 +2895,7 @@ seen = deque(maxlen=1000)  # auto-evicts old`
             title: 'Network resilience — retry transient failures',
             difficulty: 'advanced',
             why: '24h is enough time to hit every cloud outage and network blip. Wrap network calls in retry-with-backoff so blips don\'t kill the workflow.',
+            prompt: 'Retry network requests up to 3 times with exponential backoff on connection errors. Don\'t retry on 4xx responses.',
             lang: 'python',
             code: `import requests, time
 from requests.adapters import HTTPAdapter, Retry
@@ -2740,6 +2912,7 @@ r = s.get('https://api.example.com/data')`
             title: 'Per-iteration timeout',
             difficulty: 'advanced',
             why: 'One stuck iteration shouldn\'t hang the whole loop. Wrap work in a timeout so the loop always makes progress.',
+            prompt: 'Set a 30-second timeout on each iteration. If any single step takes longer, log it as a timeout and move to the next item.',
             lang: 'python',
             code: `import signal
 class Timeout(Exception): pass
@@ -2759,6 +2932,7 @@ for item in items:
             title: 'Heartbeat to external monitor',
             difficulty: 'essential',
             why: 'healthchecks.io and similar services alert you if a ping doesn\'t arrive on schedule. Free dead-man\'s switch with zero infra cost.',
+            prompt: 'Ping the healthchecks.io URL after each successful iteration so the external monitor knows we\'re still running.',
             lang: 'bash',
             code: `# At the start of each iteration:
 curl -fsS --retry 3 https://hc-ping.com/UUID > /dev/null
@@ -2772,6 +2946,7 @@ curl https://hc-ping.com/UUID`
             title: 'Bounded queue — backpressure',
             difficulty: 'advanced',
             why: 'A producer-faster-than-consumer setup will exhaust memory in hours. A bounded queue forces the producer to wait — natural backpressure.',
+            prompt: 'Use a bounded queue with a max depth of 100. When the queue is full, pause producing new items until consumers catch up.',
             lang: 'python',
             code: `from queue import Queue
 q = Queue(maxsize=500)
@@ -2790,6 +2965,7 @@ def consumer():
             title: 'Crash dump on uncaught exception',
             difficulty: 'expert',
             why: 'When the workflow finally crashes at hour 23, you need everything to debug. Write the full traceback, state file, and last 1000 log lines to a tarball.',
+            prompt: 'On any unhandled exception, write a crash dump to crash.json (including state and last 100 log lines) before exiting.',
             lang: 'python',
             code: `import sys, traceback, tarfile
 
@@ -2818,6 +2994,7 @@ sys.excepthook = crash_dump`
             title: 'What is a skill?',
             difficulty: 'essential',
             why: 'A skill is a markdown file in .claude/commands/ that Claude treats as a reusable slash command. Call it with /my-skill. No code required.',
+            prompt: 'Create a simple custom skill called /status that shows the current branch, last commit, and test status.',
             lang: 'bash',
             code: `# Create a skill:
 mkdir -p .claude/commands
@@ -2835,6 +3012,7 @@ EOF
             title: 'Skill with $ARGUMENTS placeholder',
             difficulty: 'essential',
             why: '$ARGUMENTS passes whatever you type after the slash command into the skill template. Makes skills parameterizable.',
+            prompt: 'Create a /deploy $ARGUMENTS skill that deploys to the environment specified in the argument (e.g., /deploy staging or /deploy production).',
             lang: 'markdown',
             code: `# .claude/commands/review-pr.md
 Review pull request $ARGUMENTS on GitHub.
@@ -2849,6 +3027,7 @@ Review pull request $ARGUMENTS on GitHub.
             title: 'Built-in skills to know',
             difficulty: 'essential',
             why: 'Claude Code ships with built-in skills. Knowing them saves you from reinventing the wheel.',
+            prompt: 'Show me all the built-in Claude Code skills I can use right now.',
             lang: 'bash',
             code: `/init          # Generate CLAUDE.md for the project
 /review        # Review current branch changes
@@ -2861,6 +3040,7 @@ Review pull request $ARGUMENTS on GitHub.
             title: 'Chain skills together',
             difficulty: 'advanced',
             why: 'Skills can invoke other skills. Build pipelines from composable steps — each skill does one thing well.',
+            prompt: 'Create a /ship skill that runs /review, then /test, then /deploy in sequence — stopping if any step fails.',
             lang: 'markdown',
             code: `# .claude/commands/ship.md
 Run the full shipping pipeline:
@@ -2877,6 +3057,7 @@ Stop and report if any step fails.`
             title: 'Skill for generating release notes',
             difficulty: 'advanced',
             why: 'Consistent release notes from git log — no more "forgot to update CHANGELOG." The skill does it every time.',
+            prompt: 'Create a /release-notes skill that reads git commits since the last tag and generates a human-readable changelog.',
             lang: 'markdown',
             code: `# .claude/commands/changelog.md
 Generate release notes for version $ARGUMENTS.
@@ -2891,6 +3072,7 @@ Generate release notes for version $ARGUMENTS.
             title: 'Skill for database migration',
             difficulty: 'advanced',
             why: 'Database migrations follow a pattern. Encode that pattern in a skill so junior devs can\'t skip steps.',
+            prompt: 'Create a /db-migrate skill that runs pending migrations, verifies the schema, and rolls back if anything looks wrong.',
             lang: 'markdown',
             code: `# .claude/commands/migrate.md
 Create a safe database migration for: $ARGUMENTS
@@ -2908,6 +3090,7 @@ Steps:
             title: 'Skill for onboarding new engineers',
             difficulty: 'advanced',
             why: 'Document your setup steps once in a skill. Every new hire gets identical, working, up-to-date setup instructions.',
+            prompt: 'Create an /onboard $ARGUMENTS skill that creates accounts, sets up access, and sends a welcome email to a new engineer.',
             lang: 'markdown',
             code: `# .claude/commands/onboard.md
 Set up this project for a new developer.
@@ -2925,6 +3108,7 @@ Set up this project for a new developer.
             title: 'Global skills (user-level)',
             difficulty: 'essential',
             why: 'Project skills live in .claude/commands/. User skills in ~/.claude/commands/ work across every project.',
+            prompt: 'Create a global /standup skill that checks my recent commits and PRs and drafts a standup update.',
             lang: 'bash',
             code: `# Global skill — available everywhere:
 mkdir -p ~/.claude/commands
@@ -2941,6 +3125,7 @@ EOF
             title: 'Skill for code review comments',
             difficulty: 'advanced',
             why: 'Encode your team\'s code review standards in a skill. Every review follows the same checklist.',
+            prompt: 'Create a /review-pr skill that reads all changed files on the current branch and posts a detailed code review.',
             lang: 'markdown',
             code: `# .claude/commands/review.md
 Review the changes on the current branch against $ARGUMENTS (default: main).
@@ -2959,6 +3144,7 @@ Output: summary + inline comments on changed lines`
             title: 'Skill with environment awareness',
             difficulty: 'expert',
             why: 'Skills can read environment variables to behave differently in dev vs. CI vs. production. One skill, three environments.',
+            prompt: 'Create a /config skill that shows the current environment configuration and which env vars are set or missing.',
             lang: 'markdown',
             code: `# .claude/commands/deploy.md
 Deploy the application. $ARGUMENTS overrides the environment.
@@ -2974,6 +3160,7 @@ Always run health check after deploy.`
             title: 'Skill testing',
             difficulty: 'advanced',
             why: 'Skills that work in dev might fail in CI due to missing tools. Write a simple test: invoke the skill in a clean env and assert it completes.',
+            prompt: 'Create a /test-skills script that tests each skill in .claude/commands/ and reports which ones work correctly.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 # test-skills.sh
@@ -2989,6 +3176,7 @@ done`
             title: 'Git workflow skill',
             difficulty: 'essential',
             why: 'Encode your team\'s git etiquette in a skill: branch naming, commit format, pre-push checks. Every contributor follows the same flow.',
+            prompt: 'Create a /pr skill that creates a PR from the current branch with a generated title and description.',
             lang: 'markdown',
             code: `# .claude/commands/branch.md
 Start a new branch for: $ARGUMENTS
@@ -3005,6 +3193,7 @@ Start a new branch for: $ARGUMENTS
             title: 'Incident response skill',
             difficulty: 'advanced',
             why: 'When prod is down, you don\'t want to look up runbooks. A /incident skill captures the diagnostic playbook in one place.',
+            prompt: 'Create an /incident severity=$ARGUMENTS skill that creates a ticket, alerts the on-call engineer, and starts an incident log.',
             lang: 'markdown',
             code: `# .claude/commands/incident.md
 Diagnose production incident: $ARGUMENTS
@@ -3021,6 +3210,7 @@ Diagnose production incident: $ARGUMENTS
             title: 'Skill for terraform plan + review',
             difficulty: 'advanced',
             why: 'Terraform plans are noisy. A skill that runs plan, summarizes the deltas, and flags destructive changes saves you from "what is even changing here?"',
+            prompt: 'Create a /tf-plan $ARGUMENTS skill that runs terraform plan for the given environment and summarizes the changes.',
             lang: 'markdown',
             code: `# .claude/commands/tf-plan.md
 Run terraform plan and review for: $ARGUMENTS
@@ -3037,6 +3227,7 @@ Run terraform plan and review for: $ARGUMENTS
             title: 'Skill for K8s deploy',
             difficulty: 'advanced',
             why: 'Kubernetes deploy is a chain of commands. A skill bundles them with safety checks: dry-run, diff, apply, wait, rollback on failure.',
+            prompt: 'Create a /k8s-deploy $ARGUMENTS skill that deploys to Kubernetes and waits for the rollout to succeed.',
             lang: 'markdown',
             code: `# .claude/commands/k8s-deploy.md
 Deploy to $ARGUMENTS environment
@@ -3053,6 +3244,7 @@ Deploy to $ARGUMENTS environment
             title: 'Skill for ER diagram from migrations',
             difficulty: 'advanced',
             why: 'ER diagrams drift from reality. A skill that generates a Mermaid diagram from your migrations gives you accurate, version-controlled docs.',
+            prompt: 'Create an /er-diagram skill that reads all migration files and generates a text-based entity-relationship diagram.',
             lang: 'markdown',
             code: `# .claude/commands/erd.md
 Generate Mermaid ER diagram from db/migrations/.
@@ -3070,6 +3262,7 @@ Generate Mermaid ER diagram from db/migrations/.
             title: 'Skill for API client generation',
             difficulty: 'expert',
             why: 'Hand-written API clients drift from the server. A skill that reads OpenAPI and emits a typed TypeScript client keeps them in sync.',
+            prompt: 'Create a /gen-client $ARGUMENTS skill that reads the OpenAPI spec and generates a TypeScript client library.',
             lang: 'markdown',
             code: `# .claude/commands/gen-client.md
 Generate TypeScript API client from openapi.yaml.
@@ -3086,6 +3279,7 @@ Generate TypeScript API client from openapi.yaml.
             title: 'Skill for performance profile',
             difficulty: 'expert',
             why: 'Profiling has many steps and is easy to skip. A skill makes it one command: profile, capture, analyze, suggest fixes.',
+            prompt: 'Create a /perf $ARGUMENTS skill that runs the specified endpoint under load and reports latency percentiles.',
             lang: 'markdown',
             code: `# .claude/commands/profile.md
 Profile $ARGUMENTS (default: main user flow).
@@ -3101,6 +3295,7 @@ Profile $ARGUMENTS (default: main user flow).
             title: 'Skill for monorepo navigation',
             difficulty: 'advanced',
             why: 'Finding things in a 100-package monorepo wastes time. A skill that maps a feature name to its packages saves the lookup every session.',
+            prompt: 'Create a /workspace $ARGUMENTS skill that switches context to the specified monorepo package and primes CLAUDE.md.',
             lang: 'markdown',
             code: `# .claude/commands/where.md
 Find code related to: $ARGUMENTS
@@ -3116,6 +3311,7 @@ Find code related to: $ARGUMENTS
             title: 'Skill for changelog generation',
             difficulty: 'essential',
             why: 'Changelogs after every release are toil; a skill removes the toil. Reads git log, groups by conventional-commits type, writes pretty markdown.',
+            prompt: 'Create a /changelog skill that generates a changelog entry from the commits on the current branch since main.',
             lang: 'markdown',
             code: `# .claude/commands/release-notes.md
 Generate release notes for $ARGUMENTS (e.g. v1.4.0).
@@ -3131,6 +3327,7 @@ Generate release notes for $ARGUMENTS (e.g. v1.4.0).
             title: 'Skill for screenshot diff (visual regression)',
             difficulty: 'expert',
             why: 'Visual regressions slip through unit tests. A skill that runs Playwright snapshots and reports pixel diffs catches them automatically.',
+            prompt: 'Create a /screenshot-diff skill that takes screenshots before and after my changes and highlights visual regressions.',
             lang: 'markdown',
             code: `# .claude/commands/visual-diff.md
 Run visual regression test against $ARGUMENTS (default: production).
@@ -3146,6 +3343,7 @@ Run visual regression test against $ARGUMENTS (default: production).
             title: 'Skill for cost report',
             difficulty: 'advanced',
             why: 'Cloud bills get out of hand quickly. A monthly skill that pulls AWS/GCP usage and ranks the top cost drivers keeps spend visible.',
+            prompt: 'Create a /cost-report skill that reads ~/.claude/cost-log.csv and shows this week\'s API cost breakdown.',
             lang: 'markdown',
             code: `# .claude/commands/costs.md
 Generate cost report for last $ARGUMENTS days.
@@ -3174,6 +3372,7 @@ Generate cost report for last $ARGUMENTS days.
             title: 'Pipeline pattern',
             difficulty: 'advanced',
             why: 'Chain transformations: each stage receives the output of the previous. Each stage is independently testable and replaceable.',
+            prompt: 'Implement a processing pipeline for this data where each stage receives the previous stage\'s output: validate → transform → enrich → save.',
             lang: 'javascript',
             code: `const pipeline = [
   async (input) => ({ ...input, parsed: parse(input.raw) }),
@@ -3190,6 +3389,7 @@ async function runPipeline(initial) {
             title: 'Observer pattern via hooks',
             difficulty: 'advanced',
             why: 'Claude\'s PostToolUse hook is a built-in observer bus. Subscribe to any tool event without modifying the tool code.',
+            prompt: 'Every time I write a file, automatically run formatting, update imports, and run related tests — all independently without me having to ask.',
             lang: 'bash',
             code: `# Observers on file-write events:
 # Observer 1: auto-format
@@ -3203,6 +3403,7 @@ async function runPipeline(initial) {
             title: 'Circuit breaker — stop on repeated failure',
             difficulty: 'expert',
             why: 'Without a circuit breaker, a broken downstream service causes infinite retries and bill explosion. Open the circuit after N failures, reset after a timeout.',
+            prompt: 'Add a circuit breaker to these API calls. After 3 consecutive failures, stop trying for 30 seconds before retrying.',
             lang: 'javascript',
             code: `class CircuitBreaker {
   constructor(threshold = 3, timeout = 30000) {
@@ -3234,6 +3435,7 @@ async function runPipeline(initial) {
             title: 'Strategy pattern — swap models by task',
             difficulty: 'advanced',
             why: 'Use Haiku for cheap classification, Sonnet for code, Opus for complex reasoning. The strategy pattern makes this pluggable.',
+            prompt: 'Implement a strategy pattern that uses Haiku for simple classification tasks and Opus for complex reasoning, selected at runtime.',
             lang: 'javascript',
             code: `const strategies = {
   classify: { model: 'claude-haiku-4-5-20251001', max_tokens: 100 },
@@ -3250,6 +3452,7 @@ async function claude(prompt, task = 'code') {
             title: 'Factory pattern — create specialized agents',
             difficulty: 'expert',
             why: 'A factory builds the right agent configuration for a task type. Keeps agent creation DRY and ensures consistent system prompts.',
+            prompt: 'Create a factory function that returns the right specialist agent (security, performance, docs) based on the task type.',
             lang: 'javascript',
             code: `function agentFactory(type, context) {
   const configs = {
@@ -3264,6 +3467,7 @@ async function claude(prompt, task = 'code') {
             title: 'Saga pattern for distributed workflows',
             difficulty: 'expert',
             why: 'When a multi-step workflow fails mid-way, a saga defines compensating actions to undo completed steps — like a distributed transaction.',
+            prompt: 'Implement a saga for this multi-service workflow. If any step fails, run the compensating actions to undo previous steps.',
             lang: 'javascript',
             code: `const saga = [
   { do: createUser,    undo: deleteUser },
@@ -3289,6 +3493,7 @@ async function runSaga(data) {
             title: 'Template method — enforce workflow structure',
             difficulty: 'advanced',
             why: 'Define the skeleton of an algorithm in a base class; let subclasses fill in the steps. Ensures every PR review follows the same structure.',
+            prompt: 'Create a base workflow class that enforces the structure (validate → execute → verify) but lets subclasses customize each step.',
             lang: 'python',
             code: `class PRReviewer:
     def review(self, pr):
@@ -3306,6 +3511,7 @@ class PythonPRReviewer(PRReviewer):
             title: 'Event sourcing — log every action',
             difficulty: 'expert',
             why: 'Instead of updating state in place, append events to a log. You can replay the log to reconstruct any past state — invaluable for debugging autonomous agents.',
+            prompt: 'Store every state change as an immutable event in an append-only log. Rebuild current state by replaying events from the log.',
             lang: 'python',
             code: `import json, time
 
@@ -3325,6 +3531,7 @@ append_event('COMMIT', {'sha': 'abc123', 'message': 'fix: auth token expiry'})`
             title: 'Retry with jitter — avoid thundering herd',
             difficulty: 'advanced',
             why: 'Multiple agents retrying at the same time cause synchronized spikes. Add random jitter to spread retries out.',
+            prompt: 'Add retry with exponential backoff and random jitter so all the clients don\'t retry at exactly the same time.',
             lang: 'javascript',
             code: `async function retryWithJitter(fn, maxAttempts = 4) {
   for (let i = 0; i < maxAttempts; i++) {
@@ -3342,6 +3549,7 @@ append_event('COMMIT', {'sha': 'abc123', 'message': 'fix: auth token expiry'})`
             title: 'Bulkhead pattern — isolate failures',
             difficulty: 'expert',
             why: 'If one agent pool (e.g., test runners) fails, it should not starve other pools (e.g., file writers). Bulkheads prevent cascading failures.',
+            prompt: 'Isolate calls to this third-party service behind a bulkhead so if it starts timing out, it doesn\'t affect the rest of the system.',
             lang: 'javascript',
             code: `// Separate concurrency limits per pool
 const pools = {
@@ -3360,6 +3568,7 @@ async function readFile(path) {
             title: 'Dead letter queue — handle unprocessable items',
             difficulty: 'expert',
             why: 'Some items will always fail processing. Instead of blocking the queue, move them to a dead letter file for later human review.',
+            prompt: 'Add a dead letter queue for messages that fail processing 3 times. Inspect and retry them manually.',
             lang: 'python',
             code: `DLQ_FILE = '.claude/dead-letter-queue.jsonl'
 
@@ -3379,6 +3588,7 @@ def process_with_dlq(items):
             title: 'CQRS — separate reads from writes',
             difficulty: 'expert',
             why: 'Read operations (Explore agents) have different throughput needs than write operations. Separate them to optimize each path independently.',
+            prompt: 'Separate the read model from the write model. Use the write model for mutations, the read model for queries.',
             lang: 'javascript',
             code: `// Command side — writes, always serialized
 async function writeCommand(cmd) {
@@ -3397,6 +3607,7 @@ async function readQuery(query) {
             title: 'State machine pattern',
             difficulty: 'advanced',
             why: 'Hand-rolled state transitions become a tangle of if-statements. A state machine makes valid transitions explicit and invalid ones impossible.',
+            prompt: 'Implement a state machine for this order workflow. Define all valid states and transitions. Throw on invalid transitions.',
             lang: 'typescript',
             code: `type State = 'idle' | 'running' | 'success' | 'failed';
 const transitions: Record<State, State[]> = {
@@ -3415,6 +3626,7 @@ function next(from: State, to: State): State {
             title: 'Decorator pattern — extend without modifying',
             difficulty: 'advanced',
             why: 'When you can\'t modify a function but need to add behavior (logging, caching, auth check), wrap it with a decorator. Composable, testable, removable.',
+            prompt: 'Add logging, timing, and error handling to this function using a decorator — don\'t modify the function itself.',
             lang: 'typescript',
             code: `function withCache<T>(fn: (k: string) => Promise<T>, ttl = 60_000) {
   const cache = new Map<string, { val: T; exp: number }>();
@@ -3432,6 +3644,7 @@ const cachedFetchUser = withCache(fetchUser);`
             title: 'Adapter pattern — bridge incompatible interfaces',
             difficulty: 'advanced',
             why: 'When you replace one provider with another (Stripe → Paddle), an adapter keeps your call sites unchanged. The swap is invisible to the rest of the codebase.',
+            prompt: 'Create an adapter that makes our internal API compatible with the third-party SDK\'s expected interface.',
             lang: 'typescript',
             code: `interface PaymentProvider {
   charge(amountCents: number, customerId: string): Promise<string>;
@@ -3448,6 +3661,7 @@ class PaddleAdapter implements PaymentProvider { /* same interface, different SD
             title: 'Throttle and debounce',
             difficulty: 'essential',
             why: 'Throttle limits how often a function CAN run (1/sec). Debounce delays execution until activity stops (typing finished). Use throttle for scroll, debounce for search input.',
+            prompt: 'Add throttle (max once per second) to this API call and debounce (wait 300ms after last input) to the search handler.',
             lang: 'typescript',
             code: `function throttle<F extends Function>(fn: F, ms: number): F {
   let last = 0;
@@ -3468,6 +3682,7 @@ function debounce<F extends Function>(fn: F, ms: number): F {
             title: 'Idempotency keys — make retries safe',
             difficulty: 'expert',
             why: 'A retry on a non-idempotent endpoint can charge the customer twice. Require an Idempotency-Key header; cache responses by key for 24h.',
+            prompt: 'Add an idempotency key to this payment API call so retries don\'t create duplicate charges.',
             lang: 'typescript',
             code: `app.post('/charge', async (req, res) => {
   const key = req.header('Idempotency-Key');
@@ -3483,6 +3698,7 @@ function debounce<F extends Function>(fn: F, ms: number): F {
             title: 'Backpressure with reservoir sampling',
             difficulty: 'expert',
             why: 'When event rate exceeds processing rate, sampling preserves a representative set. Reservoir sampling gives uniform random selection in one pass.',
+            prompt: 'When the queue is overwhelmed, use reservoir sampling to keep a representative sample of items instead of dropping everything.',
             lang: 'python',
             code: `import random
 def reservoir(stream, k):
@@ -3500,6 +3716,7 @@ def reservoir(stream, k):
             title: 'Mediator — decouple components',
             difficulty: 'advanced',
             why: 'Many-to-many communication becomes a mesh. A mediator (event bus) lets components broadcast without knowing each other directly.',
+            prompt: 'Create a mediator that handles communication between these components so they don\'t reference each other directly.',
             lang: 'typescript',
             code: `class EventBus {
   private handlers = new Map<string, Function[]>();
@@ -3519,6 +3736,7 @@ bus.on('user.created', logAnalytics);`
             title: 'Memento — snapshot/restore',
             difficulty: 'advanced',
             why: 'Undo/redo and rollback require capturing state. The memento pattern serializes state to a token you can use to restore later.',
+            prompt: 'Add snapshot and restore to this editor state so users can undo and redo changes.',
             lang: 'typescript',
             code: `interface Memento<T> { state: T; ts: number; }
 class History<T> {
@@ -3534,6 +3752,7 @@ class History<T> {
             title: 'Visitor — operate on a tree without changing nodes',
             difficulty: 'expert',
             why: 'When you need many operations on the same data structure (AST, file tree), Visitor lets you add operations without modifying node classes.',
+            prompt: 'Implement a visitor that traverses this AST and collects all identifier names without modifying any nodes.',
             lang: 'typescript',
             code: `interface ASTVisitor {
   visitFunctionDecl(n: FunctionDecl): void;
@@ -3551,6 +3770,7 @@ ast.accept(v);`
             title: 'Repository pattern — abstract data access',
             difficulty: 'advanced',
             why: 'When you might swap Postgres for DynamoDB, a Repository layer means changing one file instead of grep-and-replace across the app.',
+            prompt: 'Create a repository interface for users so the business logic doesn\'t talk to the database directly. Write a Postgres implementation.',
             lang: 'typescript',
             code: `interface UserRepo {
   byId(id: string): Promise<User | null>;
@@ -3565,6 +3785,7 @@ class InMemoryUserRepo implements UserRepo { /* test impl */ }
             title: 'Specification pattern — composable filters',
             difficulty: 'expert',
             why: 'Hard-coded query filters become a tangle. A Specification is a predicate you can combine with and/or/not — composable, testable, reusable.',
+            prompt: 'Build a specification pattern for filtering products so I can compose rules like: inStock AND (priceBelow(100) OR onSale()).',
             lang: 'typescript',
             code: `type Spec<T> = (t: T) => boolean;
 const and = <T>(a: Spec<T>, b: Spec<T>): Spec<T> => t => a(t) && b(t);
@@ -3603,6 +3824,7 @@ Start with the Auth domain."
             title: 'Gary Tan\'s gstack pattern',
             difficulty: 'expert',
             why: 'Garry Tan\'s productivity stack: Claude Code for all engineering, with every change immediately validated by tests and deployed to a preview. Zero manual steps.',
+            prompt: 'Implement Gary Tan\'s gstack pattern: run multiple Claude sessions in parallel on independent parts of the codebase.',
             lang: 'bash',
             code: `# The gstack loop:
 # 1. Describe feature in plain English
@@ -3617,6 +3839,7 @@ Start with the Auth domain."
             title: 'The self-healing test suite',
             difficulty: 'expert',
             why: 'Loop + Monitor + Stop hook. Claude writes code, tests fail, Claude fixes code, repeat. Ran for 6 hours unattended, went from 40% to 94% coverage.',
+            prompt: '/loop 5m run tests; if any fail, read the failure and fix it; stop when everything is green',
             lang: 'bash',
             code: `/loop 2m run npm test — fix all failing tests before proceeding to the next loop.
 If all tests pass, add a test for the next untested function in coverage report.
@@ -3626,6 +3849,7 @@ Keep going until coverage > 90%.`
             title: 'Best CLAUDE.md ever (template)',
             difficulty: 'advanced',
             why: 'The CLAUDE.md that ships with every project. 200 words that save 200,000 tokens per session by establishing context once.',
+            prompt: 'Write the best possible CLAUDE.md for this project. Make every line earn its place.',
             lang: 'markdown',
             code: `# Project: MyApp
 Stack: Next.js 14, TypeScript, Postgres, Prisma, Tailwind
@@ -3655,6 +3879,7 @@ Building the billing module (Stripe integration). See BILLING.md.`
             title: 'The 10x code review',
             difficulty: 'advanced',
             why: 'Three agents in parallel: security, correctness, performance. One synthesis agent picks the top 5 issues. Better than any single reviewer.',
+            prompt: 'Review this PR as if you were the most demanding senior engineer on the team. Be specific, be tough, cite line numbers.',
             lang: 'javascript',
             code: `const [sec, perf, qual] = await Promise.all([
   Agent({ subagent_type: 'security-review', prompt: 'Review this PR for OWASP Top 10' }),
@@ -3673,6 +3898,7 @@ Quality: \${qual.result}\`
             title: 'Fastest PR ever: idea to merged in 11 minutes',
             difficulty: 'expert',
             why: 'Workflow: describe → implement → tests → PR → CI → merged. Human involvement: the feature description and clicking "Merge."',
+            prompt: 'Implement [feature], write tests, create PR with description, and mark it ready for review — let\'s do it fast.',
             lang: 'bash',
             code: `# t=0: claude "Add email verification to user signup. JWT tokens, 24h expiry, resend endpoint."
 # t=2: Claude reads auth module, plans approach
@@ -3688,6 +3914,7 @@ echo "11 minutes, 0 context switches, 1 human decision"`
             title: 'The nuclear option: full repo migration',
             difficulty: 'expert',
             why: 'JavaScript → TypeScript, class components → hooks, CommonJS → ESM — all in one overnight run. Worktree isolation kept main safe.',
+            prompt: 'Migrate the entire codebase from JavaScript to TypeScript strict mode. Do one file at a time, keep tests green.',
             lang: 'bash',
             code: `# Prompt for the overnight run:
 claude --isolation worktree "
@@ -3705,6 +3932,7 @@ Start with leaf components (no dependencies), work toward the root.
             title: 'Most tokens saved: 50:1 ratio achieved',
             difficulty: 'expert',
             why: 'A team replaced a multishot prompt workflow (2M tokens/day) with an agentic loop (40k tokens/day). Same output. 50x cheaper.',
+            prompt: 'Summarize what you\'ve read about this codebase in a compact CLAUDE.md so future sessions don\'t need to re-read everything.',
             lang: 'javascript',
             code: `// Old multishot: send full codebase + full conversation every turn
 // 10 turns × 200k context = 2,000,000 tokens
@@ -3723,6 +3951,7 @@ Start with leaf components (no dependencies), work toward the root.
             title: 'The unbreakable deploy hook',
             difficulty: 'expert',
             why: 'This combination blocks bad deploys automatically: no failing tests, no security issues, no hardcoded secrets, no unreviewed migrations.',
+            prompt: 'Add a deploy hook that runs all checks (tests, lint, security scan, migration check) and blocks deploy if anything fails.',
             lang: 'bash',
             code: `#!/usr/bin/env bash
 # pre-deploy.sh — runs as a PreToolUse hook on any deploy command
@@ -3745,6 +3974,7 @@ echo "✅ All checks passed"`
             title: 'The legendary CLAUDE.md that writes itself',
             difficulty: 'expert',
             why: 'A skill that keeps CLAUDE.md current automatically — invoked by a PostToolUse hook when certain files change.',
+            prompt: 'Explore the entire codebase and write a comprehensive CLAUDE.md that a new engineer could use to understand the project in 5 minutes.',
             lang: 'markdown',
             code: `# .claude/commands/update-claude-md.md
 Update CLAUDE.md to reflect current codebase state.
@@ -3761,6 +3991,7 @@ Update CLAUDE.md to reflect current codebase state.
             title: 'Zero-downtime database migration',
             difficulty: 'expert',
             why: 'The textbook migration: deploy code that writes both schemas, backfill in the background, then deploy code that reads only the new schema. Two PRs, zero downtime.',
+            prompt: 'Write a zero-downtime migration plan for adding this column. Include: add nullable column, backfill, add constraint, remove old column.',
             lang: 'sql',
             code: `-- Phase 1: additive only
 ALTER TABLE users ADD COLUMN email_lower TEXT;
@@ -3777,6 +4008,7 @@ WHERE email_lower IS NULL AND id BETWEEN $1 AND $2;
             title: 'Test coverage 20% → 92% in a weekend',
             difficulty: 'expert',
             why: 'Coverage report → uncovered functions → loop that writes tests for each. One sentence prompt, two days of background work, transformation complete.',
+            prompt: 'Write tests for all the critical business logic in src/. Focus on the code that would hurt most if it broke.',
             lang: 'bash',
             code: `# The prompt that did it:
 claude --background "
@@ -3793,6 +4025,7 @@ Target 90%+ coverage on src/ only (not generated files).
             title: 'Bundle size cut by 60% overnight',
             difficulty: 'expert',
             why: 'Webpack-bundle-analyzer + Claude = automatic tree-shaking, lazy-loading, and dependency pruning. Real teams report 50-70% reductions.',
+            prompt: 'Analyze the bundle and identify the 5 biggest opportunities to reduce size. Implement the top 3.',
             lang: 'bash',
             code: `claude "Analyze webpack-bundle-analyzer report (open after npm run analyze).
 For each top-10 contributor:
@@ -3806,6 +4039,7 @@ Commit each optimization separately so we can revert any regression."`
             title: 'i18n auto-translation for 12 locales',
             difficulty: 'advanced',
             why: 'Translating an app to 12 languages used to mean hiring 12 translators. Now one agent spawns 12 sub-agents in parallel; the whole catalog ships in under an hour.',
+            prompt: 'Translate locales/en.json into all 12 target languages in parallel. Keep formatting tokens intact.',
             lang: 'javascript',
             code: `const LOCALES = ['fr','de','es','pt','it','nl','sv','ja','ko','zh-CN','zh-TW','ar'];
 await Promise.all(LOCALES.map(l =>
@@ -3821,6 +4055,7 @@ Run npx i18n-validate to verify all keys present.\`
             title: 'The babysitter — green CI in your sleep',
             difficulty: 'advanced',
             why: 'Subscribe to PR events, give Claude one instruction, walk away. Every failed check triggers a diagnostic, fix, push cycle. Wake up to green CI.',
+            prompt: '/loop 5m check CI on all open PRs; if any check is red, read the log and push a fix',
             lang: 'bash',
             code: `# In the PR comment thread:
 # "@claude babysit this PR — keep CI green and respond to review comments
@@ -3834,6 +4069,7 @@ Run npx i18n-validate to verify all keys present.\`
             title: 'JavaScript → TypeScript migration of 30k LOC',
             difficulty: 'expert',
             why: 'The migration that used to take a team a quarter, an agent finishes overnight. Leaf-up traversal ensures dependent files always typecheck.',
+            prompt: 'Convert all .js files in src/ to .ts with proper types. Do 5 files per session, track progress in migration-log.md.',
             lang: 'bash',
             code: `claude --isolation worktree --background "
 Migrate this React app from JavaScript to TypeScript.
@@ -3850,6 +4086,7 @@ Target: tsc clean with strict mode."`
             title: 'The 30-second new-engineer setup',
             difficulty: 'essential',
             why: 'A /onboard skill that runs every setup step, installs dependencies, copies env files, seeds the DB, and verifies everything works. One command, ready to go.',
+            prompt: 'A new engineer just joined. Create a script that sets up their entire development environment in one command.',
             lang: 'markdown',
             code: `# .claude/commands/onboard.md
 Set up this project from scratch for a new developer.
@@ -3867,6 +4104,7 @@ Print: "Ready! Visit http://localhost:3000 and start with src/app/page.tsx"`
             title: 'Auto-PR labeling + reviewer routing',
             difficulty: 'advanced',
             why: 'New PRs sit unlabeled until a maintainer notices. An agent reads each diff, applies area labels, size labels, and requests the right reviewers from CODEOWNERS.',
+            prompt: 'Look at all open PRs, apply the right labels, and request review from the appropriate team members based on the files changed.',
             lang: 'javascript',
             code: `// GitHub Action: .github/workflows/triage.yml
 // Runs on pull_request opened
@@ -3884,6 +4122,7 @@ Agent({
             title: 'The crash-resistant 72h workflow',
             difficulty: 'expert',
             why: 'Three full days, 300k tokens, two container restarts, zero lost work. Checkpoint state + auto-resume + git push on every iteration = unbreakable.',
+            prompt: 'Set up this long-running workflow with checkpointing, auto-restart, and Slack alerts so it runs safely for 72 hours.',
             lang: 'bash',
             code: `# Workflow stays alive across container restarts:
 # 1. Each iteration writes .checkpoint.json
@@ -3898,6 +4137,7 @@ Agent({
             title: 'Documentation generation for entire SDK',
             difficulty: 'advanced',
             why: 'Hand-written SDK docs are always stale. An agent parses the source, writes JSDoc, generates type tables, and builds an Astro site — in one run.',
+            prompt: 'Generate comprehensive API documentation for the entire SDK from the TypeScript types and JSDoc comments.',
             lang: 'javascript',
             code: `Agent({
   description: "Generate SDK docs",
@@ -3914,6 +4154,7 @@ Agent({
             title: 'The accessibility 100/100 sprint',
             difficulty: 'advanced',
             why: 'Going from a Lighthouse a11y score of 60 to 100 used to be a multi-week project. With agents running in parallel on each component, it\'s a long weekend.',
+            prompt: 'Audit the app for accessibility issues and fix everything needed to achieve 100/100 on Lighthouse accessibility.',
             lang: 'bash',
             code: `claude "
 Run lighthouse audit on every route in src/app/.
@@ -3941,6 +4182,7 @@ Re-run lighthouse after each batch. Stop at 100/100.
             title: 'Minimal CLAUDE.md that works hardest',
             difficulty: 'essential',
             why: 'CLAUDE.md is loaded into every Claude session. Every word is context. Less is more — focus on what Claude can\'t infer from code.',
+            prompt: 'Write a minimal CLAUDE.md for this project — cover tech stack, code style, and the 3 most important constraints. Under 200 lines.',
             lang: 'markdown',
             code: `# MyProject
 Node 20, TypeScript 5, PostgreSQL 15, React 18
@@ -3965,6 +4207,7 @@ Feature: user dashboard (see GitHub issue #47)`
             title: 'Architecture Decision Record (ADR)',
             difficulty: 'advanced',
             why: 'ADRs explain WHY a technical decision was made. Future Claude sessions read them and don\'t undo decisions that were made deliberately.',
+            prompt: 'Write an ADR for our decision to use PostgreSQL. Include context, options considered, decision made, and consequences.',
             lang: 'markdown',
             code: `# ADR-0042: Use Postgres for session storage
 
@@ -3986,6 +4229,7 @@ Use Postgres via connect-pg-simple.
             title: 'API endpoint documentation template',
             difficulty: 'essential',
             why: 'Structured API docs mean Claude can implement clients and tests without asking clarifying questions.',
+            prompt: 'Document the POST /users endpoint. Include purpose, request body schema, example request/response, error codes, and auth requirements.',
             lang: 'markdown',
             code: `## POST /api/users
 
@@ -4012,6 +4256,7 @@ Creates a new user account.
             title: 'PR template that gets good reviews',
             difficulty: 'essential',
             why: 'A consistent PR template prevents Claude (and humans) from creating "WIP" PRs with no context.',
+            prompt: 'Write a PR description for these changes that will get thorough, useful review comments from my team.',
             lang: 'markdown',
             code: `<!-- .github/pull_request_template.md -->
 ## What
@@ -4035,6 +4280,7 @@ Creates a new user account.
             title: 'Runbook for common incidents',
             difficulty: 'advanced',
             why: 'A runbook that Claude can follow autonomously turns a 3am page into an automated fix. Every incident that repeats should have a runbook.',
+            prompt: 'Write a runbook for our most common incident: database connection pool exhaustion. Include detection, triage, resolution, and prevention.',
             lang: 'markdown',
             code: `# Runbook: High Error Rate
 
@@ -4058,6 +4304,7 @@ Not resolved in 15 minutes → page @oncall`
             title: 'Changelog format Claude can generate',
             difficulty: 'essential',
             why: 'Keep-a-Changelog format is parseable by Claude. A structured format means automated changelog generation works reliably.',
+            prompt: 'Generate a changelog entry in Keep a Changelog format for all commits since v2.1.0. Group by Added, Changed, Fixed, Removed.',
             lang: 'markdown',
             code: `# Changelog
 
@@ -4082,6 +4329,7 @@ Not resolved in 15 minutes → page @oncall`
             title: 'CONTRIBUTING.md that actually helps',
             difficulty: 'essential',
             why: 'A CONTRIBUTING.md with concrete commands prevents "how do I run the tests?" questions. Saves Claude (and humans) from asking.',
+            prompt: 'Write a CONTRIBUTING.md that covers: how to set up the dev environment, code style, testing requirements, and PR process.',
             lang: 'markdown',
             code: `# Contributing
 
@@ -4107,6 +4355,7 @@ Prettier + ESLint auto-fix: \`npm run fix\``
             title: 'Security policy for Claude-generated code',
             difficulty: 'advanced',
             why: 'Tell Claude explicitly what security policies apply. Without this, Claude may default to patterns that work but aren\'t compliant with your requirements.',
+            prompt: 'Add a section to CLAUDE.md that lists the security rules Claude must always follow in this project.',
             lang: 'markdown',
             code: `# Security Policy (CLAUDE.md section)
 
@@ -4127,6 +4376,7 @@ Prettier + ESLint auto-fix: \`npm run fix\``
             title: 'Architecture overview for new sessions',
             difficulty: 'advanced',
             why: 'A 100-word architecture overview at the top of CLAUDE.md means every session starts with the mental model fully loaded.',
+            prompt: 'Write a "system architecture" section for CLAUDE.md that a fresh Claude session can read to understand the project topology.',
             lang: 'markdown',
             code: `## Architecture
 
@@ -4147,6 +4397,7 @@ Frontend (Next.js App Router) → API Routes (tRPC) → Service Layer → Postgr
             title: 'Test documentation pattern',
             difficulty: 'essential',
             why: 'When Claude reads test files, well-named tests with good descriptions act as living documentation of expected behavior.',
+            prompt: 'Add a TESTING.md that explains what tests exist, how to run them, what coverage we require, and how to write good tests for this project.',
             lang: 'typescript',
             code: `// Good test docs — Claude understands the system from tests alone
 describe('UserService', () => {
@@ -4162,6 +4413,7 @@ describe('UserService', () => {
             title: 'Environment variables reference',
             difficulty: 'essential',
             why: 'Document every env var in CLAUDE.md or .env.example. Claude can\'t read your .env — this is its source of truth.',
+            prompt: 'Create an .env.example file that documents every environment variable with its purpose, type, and example value.',
             lang: 'bash',
             code: `# .env.example — source of truth for all env vars
 DATABASE_URL=postgresql://user:pass@localhost:5432/mydb
@@ -4177,6 +4429,7 @@ SENTRY_DSN=https://...`
             title: 'Glossary file for domain terms',
             difficulty: 'essential',
             why: 'When your domain has special vocabulary (Mortgage, Premium, Tranche), a GLOSSARY.md prevents Claude from confusing them with the generic English meaning.',
+            prompt: 'Create a GLOSSARY.md with definitions for all domain-specific terms used in the codebase — things that might confuse a new engineer.',
             lang: 'markdown',
             code: `# Glossary
 
@@ -4191,6 +4444,7 @@ SENTRY_DSN=https://...`
             title: 'Naming convention guide',
             difficulty: 'essential',
             why: 'Conventions you don\'t document, Claude will violate. Spell out: files in kebab-case, types in PascalCase, hooks start with use, etc.',
+            prompt: 'Write a CONVENTIONS.md that documents our naming conventions for files, functions, variables, database columns, and API endpoints.',
             lang: 'markdown',
             code: `# Naming conventions
 
@@ -4208,6 +4462,7 @@ SENTRY_DSN=https://...`
             title: 'Code review checklist',
             difficulty: 'essential',
             why: 'A consistent checklist beats institutional memory. Put it where Claude (and humans) will read it on every PR.',
+            prompt: 'Create a CODE-REVIEW-CHECKLIST.md with the things we always check: correctness, tests, security, performance, naming, and docs.',
             lang: 'markdown',
             code: `# Code Review Checklist
 
@@ -4225,6 +4480,7 @@ SENTRY_DSN=https://...`
             title: 'Architecture vision (north star)',
             difficulty: 'advanced',
             why: 'Tactical decisions should align with strategic direction. A 1-page vision file keeps Claude (and you) from over-engineering or under-investing.',
+            prompt: 'Write a VISION.md that describes where this architecture is heading and what principles guide our technical decisions.',
             lang: 'markdown',
             code: `# Architecture vision (1-page)
 
@@ -4246,6 +4502,7 @@ A B2B SaaS handling sensitive PII. Reliability > velocity.
             title: 'Incident report template',
             difficulty: 'advanced',
             why: 'Postmortems require structure to be useful. A template guarantees consistent format and the right level of detail (timeline, impact, root cause, action items).',
+            prompt: 'Create an INCIDENT-TEMPLATE.md with sections for: timeline, root cause, impact, resolution, and follow-up actions.',
             lang: 'markdown',
             code: `# Incident: <title>
 
@@ -4273,6 +4530,7 @@ Specific technical cause.
             title: 'Onboarding doc — first day to first PR',
             difficulty: 'essential',
             why: 'Most onboarding docs assume things. List the literal commands a new dev runs, in order, with success criteria for each step.',
+            prompt: 'Write an ONBOARDING.md that takes a new engineer from zero to their first merged PR. Be specific about every step.',
             lang: 'markdown',
             code: `# Day 1: Setup
 
@@ -4294,6 +4552,7 @@ Open a draft PR fixing a "good first issue" labeled bug.`
             title: 'API style guide',
             difficulty: 'advanced',
             why: 'Inconsistent APIs are annoying to use. Codify URL structure, status codes, pagination, error format. Claude implements consistently.',
+            prompt: 'Write an API-STYLE-GUIDE.md covering: REST conventions, response format, error format, pagination, versioning, and naming.',
             lang: 'markdown',
             code: `# API Style Guide
 
@@ -4321,6 +4580,7 @@ Open a draft PR fixing a "good first issue" labeled bug.`
             title: 'Decision matrix template',
             difficulty: 'advanced',
             why: 'When choosing between options, a structured comparison beats arguing in Slack. Forces explicit trade-offs and creates a record.',
+            prompt: 'Create a DECISION-MATRIX template for evaluating technology choices. Include criteria, weights, and scoring guidance.',
             lang: 'markdown',
             code: `# Decision: <topic>
 
@@ -4340,6 +4600,7 @@ Open a draft PR fixing a "good first issue" labeled bug.`
             title: 'Error message style guide',
             difficulty: 'advanced',
             why: 'User-facing error messages are part of UX. Consistent voice and actionable wording prevent dozens of subtle inconsistencies.',
+            prompt: 'Write an ERROR-MESSAGES.md that defines how we write user-facing error messages: tone, format, what to include, what to omit.',
             lang: 'markdown',
             code: `# Error message style
 
@@ -4362,6 +4623,7 @@ BAD:  "An error occurred. Please try again."`
             title: 'PR description template (for Claude)',
             difficulty: 'essential',
             why: 'A template forces Claude (and humans) to articulate what/why/test. Vague PRs become useful PRs.',
+            prompt: 'Add a section to CLAUDE.md teaching Claude how to write PR descriptions for this project: required sections and what to include.',
             lang: 'markdown',
             code: `<!-- .github/pull_request_template.md -->
 ## What
@@ -4389,6 +4651,7 @@ BAD:  "An error occurred. Please try again."`
             title: 'Runbook for failure modes',
             difficulty: 'expert',
             why: 'Every recurring incident should have a runbook. Symptom → diagnosis → mitigation → escalation. Lets Claude (or oncall) react fast.',
+            prompt: 'Write runbooks for our top 5 failure modes. For each: how to detect it, immediate mitigation, root cause fix, and prevention.',
             lang: 'markdown',
             code: `# Runbook: High API error rate
 
@@ -4425,6 +4688,7 @@ If not resolved in 10 min → page on-call lead.`
             title: 'Parameterized queries — prevent SQL injection',
             difficulty: 'essential',
             why: 'SQL injection is still the #1 vulnerability. NEVER concatenate user input into SQL strings. Always use parameterized queries.',
+            prompt: 'Review this database code and replace any string-interpolated queries with parameterized queries. Show me the before and after.',
             lang: 'typescript',
             code: `// ❌ NEVER — SQL injection vulnerability
 const user = await db.query(\`SELECT * FROM users WHERE email = '\${email}'\`);
@@ -4439,6 +4703,7 @@ const user = await prisma.user.findUnique({ where: { email } });`
             title: 'Input validation at the boundary',
             difficulty: 'essential',
             why: 'Validate ALL external input at the API boundary with a schema validator. Never trust user-supplied data anywhere downstream.',
+            prompt: 'Add input validation to this API endpoint using Zod. Validate all fields and return clear error messages for invalid input.',
             lang: 'typescript',
             code: `import { z } from 'zod';
 
@@ -4459,6 +4724,7 @@ export async function POST(req: Request) {
             title: 'Secrets management — never in code',
             difficulty: 'essential',
             why: 'Hardcoded secrets get committed to git and live there forever in history. Use environment variables; scan for leaks before every commit.',
+            prompt: 'Find any hardcoded secrets or API keys in this codebase and replace them with environment variable references. Add a .env.example file.',
             lang: 'bash',
             code: `# ✅ Read from environment
 const apiKey = process.env.STRIPE_SECRET_KEY;
@@ -4475,6 +4741,7 @@ git secrets --register-aws  # also checks for generic API keys`
             title: 'Password hashing with bcrypt',
             difficulty: 'essential',
             why: 'Passwords must never be stored in plain text or with weak hashing (MD5, SHA1). Use bcrypt with a cost factor of at least 12.',
+            prompt: 'Replace our current password storage with bcrypt hashing (cost factor 12). Make sure we\'re not storing plain text anywhere.',
             lang: 'typescript',
             code: `import bcrypt from 'bcrypt';
 
@@ -4493,6 +4760,7 @@ async function verifyPassword(plain: string, hash: string): Promise<boolean> {
             title: 'Authorization check — verify ownership',
             difficulty: 'advanced',
             why: 'The most common auth mistake: checking that a user is logged in, but not checking that they own the resource they\'re accessing.',
+            prompt: 'Add ownership checks to all routes that access user data. Users should never be able to access other users\' resources.',
             lang: 'typescript',
             code: `// ❌ BROKEN — checks auth but not ownership
 async function getDocument(userId: string, docId: string) {
@@ -4511,6 +4779,7 @@ async function getDocument(userId: string, docId: string) {
             title: 'Rate limiting — protect auth endpoints',
             difficulty: 'advanced',
             why: 'Without rate limiting, attackers can try millions of passwords. Limit auth endpoints to ~10 attempts per minute per IP.',
+            prompt: 'Add rate limiting to login and password reset. Block an IP after 10 failed attempts in 15 minutes.',
             lang: 'typescript',
             code: `import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
@@ -4531,6 +4800,7 @@ export async function POST(req: Request) {
             title: 'XSS prevention — sanitize before rendering',
             difficulty: 'advanced',
             why: 'Cross-site scripting lets attackers inject JavaScript that runs in other users\' browsers. Sanitize any user-generated content before rendering.',
+            prompt: 'Review all places where user content is rendered in HTML. Make sure every output is properly HTML-escaped.',
             lang: 'typescript',
             code: `import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
@@ -4551,6 +4821,7 @@ function sanitizeHtml(dirty: string): string {
             title: 'CSRF protection for state-changing endpoints',
             difficulty: 'advanced',
             why: 'CSRF lets attacker sites make authenticated requests on behalf of your users. Origin/referer checks or CSRF tokens prevent this.',
+            prompt: 'Add CSRF protection to all POST/PUT/DELETE endpoints using the double-submit cookie pattern.',
             lang: 'typescript',
             code: `// Simple origin check middleware:
 export function csrfGuard(req: Request) {
@@ -4568,6 +4839,7 @@ export function csrfGuard(req: Request) {
             title: 'Security headers — protect every response',
             difficulty: 'advanced',
             why: 'Security headers are free protection against clickjacking, MIME sniffing, and protocol downgrade. Add them to every HTTP response.',
+            prompt: 'Add security headers to all responses using Helmet: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.',
             lang: 'typescript',
             code: `// next.config.js
 const securityHeaders = [
@@ -4583,6 +4855,7 @@ const securityHeaders = [
             title: 'Audit logging — track sensitive actions',
             difficulty: 'expert',
             why: 'Audit logs let you answer "who did what when" after a security incident. Log every sensitive action — not as part of error handling, but as a matter of course.',
+            prompt: 'Add audit logging for all sensitive actions: login, logout, password change, admin operations, and data exports.',
             lang: 'typescript',
             code: `interface AuditEvent {
   userId: string;
@@ -4606,6 +4879,7 @@ async function audit(event: AuditEvent) {
             title: 'Dependency scanning in CI',
             difficulty: 'advanced',
             why: 'Vulnerable dependencies are one of the most common attack vectors. Scan in CI so vulnerabilities can\'t be merged undetected.',
+            prompt: 'Add npm audit --audit-level=high to our CI pipeline. Fail the build if any high-severity vulnerabilities are found.',
             lang: 'yaml',
             code: `# .github/workflows/security.yml
 name: Security Scan
@@ -4624,6 +4898,7 @@ jobs:
             title: 'Never log PII or secrets',
             difficulty: 'essential',
             why: 'Logs are often less secured than databases. Logging an email, password, or token means that data leaks to everyone with log access.',
+            prompt: 'Audit our logging statements and remove or redact any that log emails, passwords, tokens, or other PII.',
             lang: 'typescript',
             code: `// NEVER log these
 console.log('User logged in:', { email, password });
@@ -4644,6 +4919,7 @@ function scrub(obj: Record<string, unknown>) {
             title: 'JWT — short expiry + refresh tokens',
             difficulty: 'advanced',
             why: 'A 1-year JWT is a permanent leak waiting to happen. Use 15-min access tokens + revocable refresh tokens stored in HttpOnly cookies.',
+            prompt: 'Review our JWT implementation and shorten access token expiry to 15 minutes. Add a refresh token flow.',
             lang: 'typescript',
             code: `// Access token: short-lived, JWT
 const accessToken = jwt.sign({ uid }, ACCESS_SECRET, { expiresIn: '15m' });
@@ -4661,6 +4937,7 @@ res.cookie('rt', refreshToken, {
             title: 'OAuth — verify state and PKCE',
             difficulty: 'expert',
             why: 'CSRF and code interception attacks against OAuth are real. Always verify the state parameter; for public clients, always use PKCE.',
+            prompt: 'Implement PKCE for our OAuth authorization flow. Generate code verifier/challenge and verify on token exchange.',
             lang: 'typescript',
             code: `// Before redirect
 const state = crypto.randomBytes(16).toString('hex');
@@ -4677,6 +4954,7 @@ if (req.query.state !== session.oauth.state) throw new Error('CSRF');
             title: 'SameSite cookies — CSRF for free',
             difficulty: 'essential',
             why: 'Set SameSite=Lax (or Strict) and modern browsers block cross-site CSRF automatically. Free defense in depth on top of CSRF tokens.',
+            prompt: 'Set SameSite=Strict on all auth cookies. This prevents CSRF attacks without needing a separate token.',
             lang: 'typescript',
             code: `// Express:
 res.cookie('session', sid, {
@@ -4693,6 +4971,7 @@ res.cookie('session', sid, {
             title: 'Subresource Integrity for third-party JS',
             difficulty: 'advanced',
             why: 'When you load a third-party script tag, you give them the keys to your domain. SRI ensures the script content matches a hash you control.',
+            prompt: 'Add SRI hashes to all third-party script and stylesheet tags. Show me how to generate the hash for each one.',
             lang: 'html',
             code: `<!-- Without SRI: vendor compromise = your site compromise -->
 <script src="https://cdn.vendor.com/sdk.js"><\/script>
@@ -4708,6 +4987,7 @@ res.cookie('session', sid, {
             title: 'File upload — validate type and size, scan',
             difficulty: 'advanced',
             why: 'User uploads are an attack surface. Validate MIME type (and magic bytes), cap size, store outside the web root, and scan for malware.',
+            prompt: 'Add server-side validation to our file upload endpoint: check MIME type against magic bytes, enforce 5MB limit, and store outside the webroot.',
             lang: 'typescript',
             code: `import { fileTypeFromBuffer } from 'file-type';
 
@@ -4726,6 +5006,7 @@ async function validate(buf: Buffer) {
             title: 'Content Security Policy — block injected scripts',
             difficulty: 'expert',
             why: 'CSP is your last line of defense against XSS. A strict policy disallows inline scripts and limits where scripts can load from.',
+            prompt: 'Write a Content Security Policy that disallows inline scripts and restricts script sources to our own domain and CDN. Include the HTTP header.',
             lang: 'typescript',
             code: `// Strict CSP
 const csp = [
@@ -4743,6 +5024,7 @@ res.setHeader('Content-Security-Policy', csp);`
             title: 'Defense in depth — layered controls',
             difficulty: 'expert',
             why: 'Don\'t rely on one control. Auth, authz, rate limit, input validation, output encoding, logging, monitoring — every layer catches what the others miss.',
+            prompt: 'Add rate limiting, input validation, parameterized queries, and authorization checks to this endpoint — all four layers.',
             lang: 'typescript',
             code: `// One endpoint, many checks:
 app.post('/admin/users/:id/promote',
@@ -4761,6 +5043,7 @@ app.post('/admin/users/:id/promote',
             title: 'Server-side authorization — never trust the client',
             difficulty: 'essential',
             why: 'Hiding the admin UI is not security; the client can call the API directly. Authorization decisions belong on the server, every request.',
+            prompt: 'Audit all API endpoints and verify every one checks authorization server-side. Remove any client-supplied role or permission values.',
             lang: 'typescript',
             code: `// Bad: client hides admin button
 { user.isAdmin && <AdminPanel /> }
@@ -4777,6 +5060,7 @@ app.delete('/users/:id', authMiddleware, async (req, res) => {
             title: 'Encryption at rest — let the DB do it',
             difficulty: 'advanced',
             why: 'Disk theft, backup leaks, snapshot exposure — encryption at rest catches them all. Don\'t roll your own; enable provider encryption.',
+            prompt: 'Enable column-level encryption for the PII fields (email, phone, ssn) using pgcrypto or the DB\'s native encryption.',
             lang: 'yaml',
             code: `# AWS RDS — storage encryption (cannot be changed after creation)
 ResourceTypes:
@@ -4791,6 +5075,7 @@ ResourceTypes:
             title: 'Tenant isolation — query scoping by tenantId',
             difficulty: 'expert',
             why: 'B2B SaaS leaks happen when a query forgets the tenant filter. Repository layer adds tenant scope automatically; never trust application code to remember.',
+            prompt: 'Add tenant isolation to all database queries. Every query must include a WHERE tenantId = :currentTenantId clause.',
             lang: 'typescript',
             code: `class TenantScopedRepo<T> {
   constructor(private db: DB, private tenantId: string) {}
@@ -4807,6 +5092,7 @@ ResourceTypes:
             title: 'Audit log — immutable, append-only, searchable',
             difficulty: 'expert',
             why: 'After an incident, you need to know who did what when. An immutable audit log (no UPDATE, no DELETE) is your investigation tool.',
+            prompt: 'Create an append-only audit log table that tracks all data changes. Make it impossible to update or delete entries.',
             lang: 'sql',
             code: `CREATE TABLE audit_log (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -4839,6 +5125,7 @@ CREATE INDEX ON audit_log (actor_id, ts DESC);`
             title: 'Prime context before a big task',
             difficulty: 'essential',
             why: 'Claude performs better when it understands the project before you ask it to change things. Read key files first, then issue the task.',
+            prompt: '"Read src/server.ts, src/routes/index.ts, and package.json, then add JWT-based user authentication using the existing Express middleware pattern"',
             lang: 'bash',
             code: `# Bad: jump straight to the ask
 "Add user authentication"
@@ -4850,6 +5137,7 @@ CREATE INDEX ON audit_log (actor_id, ts DESC);`
             title: 'Use one-shot examples for formatting',
             difficulty: 'essential',
             why: 'When you want output in a specific format, show one example rather than describing it. Claude matches patterns better than it follows prose descriptions.',
+            prompt: '"Write a changelog entry for this PR. Match this exact format:\n### Fixed\n- **auth:** Session tokens now expire after 24h ([#142](link))\n\nPR diff: <paste diff here>"',
             lang: 'bash',
             code: `# Instead of: "Write a changelog entry in our style"
 # Say:
@@ -4863,6 +5151,7 @@ PR diff: <paste diff here>"`
             title: 'Break large tasks into numbered steps',
             difficulty: 'essential',
             why: 'Monolithic prompts produce monolithic (often wrong) output. Numbered steps let Claude checkpoint and let you inspect each stage.',
+            prompt: '"Do this in 3 steps:\n1. Read all files under src/models/ and list the schema fields\n2. Identify any field that stores PII\n3. For each PII field, add a comment // PII: <reason>"',
             lang: 'bash',
             code: `"Do this in 3 steps:
 1. Read all files under src/models/ and list the schema fields
@@ -4875,6 +5164,7 @@ PR diff: <paste diff here>"`
             title: 'Constrain the scope explicitly',
             difficulty: 'essential',
             why: 'Claude defaults to being helpful, which means it may refactor, add tests, or rename things you didn\'t ask for. Tell it exactly what not to touch.',
+            prompt: '"Fix the bug on line 47 of src/parser.ts. Do NOT refactor surrounding code. Do NOT add comments. Only fix the off-by-one error."',
             lang: 'bash',
             code: `"Fix the bug on line 47 of src/parser.ts.
 Do NOT refactor surrounding code.
@@ -4886,6 +5176,7 @@ Only fix the off-by-one error in the slice call."`
             title: 'Ask for a plan before code',
             difficulty: 'essential',
             why: 'For non-trivial tasks, get the plan approved before any code is written. Catching a wrong approach costs 0 tokens; catching it after 500 lines of code costs a lot more.',
+            prompt: '"Before writing any code, describe your plan for migrating the users table. Include what SQL you\'ll run, whether it requires downtime, and risks. Wait for my approval."',
             lang: 'bash',
             code: `"Before writing any code, describe your plan for migrating the users table to add a soft-delete column. Include: what SQL you'll run, whether it requires downtime, and any risks. Wait for my approval."
 
@@ -4895,6 +5186,7 @@ Only fix the off-by-one error in the slice call."`
             title: 'Reference files by path, not by description',
             difficulty: 'essential',
             why: 'Vague references like "the auth file" force Claude to guess. Exact paths are unambiguous and prevent it from editing the wrong file.',
+            prompt: '"In src/middleware/auth.ts, in the verifyToken function, add a console.error call when verification fails, including req.ip and the error message"',
             lang: 'bash',
             code: `# Vague (Claude may pick the wrong file)
 "Update the authentication handler to log failed attempts"
@@ -4906,6 +5198,7 @@ Only fix the off-by-one error in the slice call."`
             title: 'Use /clear between unrelated tasks',
             difficulty: 'essential',
             why: 'Context from a previous task leaks into the next one and can cause Claude to make assumptions based on stale information. Clear it.',
+            prompt: '/clear',
             lang: 'bash',
             code: `/clear
 # Then start fresh:
@@ -4915,6 +5208,7 @@ Only fix the off-by-one error in the slice call."`
             title: 'Tell Claude what success looks like',
             difficulty: 'advanced',
             why: 'Ambiguous tasks produce ambiguous results. Defining done gives Claude a target to aim for and makes it easy to verify the output.',
+            prompt: '"Refactor DataProcessor. You\'re done when: all methods are under 20 lines, no method has more than 3 parameters, and npm test passes."',
             lang: 'bash',
             code: `"Refactor the DataProcessor class. You're done when:
 1. All methods are under 20 lines
@@ -4926,6 +5220,7 @@ Only fix the off-by-one error in the slice call."`
             title: 'Chain prompts for research → action',
             difficulty: 'advanced',
             why: 'Research prompts are cheap; action prompts are expensive to undo. Separate them so you can review findings before committing to changes.',
+            prompt: '"Find all direct fetch() calls (not using httpClient). List file and line numbers only — do not change anything yet."',
             lang: 'bash',
             code: `# Step 1 — research only
 "Find all places in the codebase where we call fetch() directly instead of using our httpClient wrapper. List the file and line number. Do not change anything."
@@ -4938,6 +5233,7 @@ Only fix the off-by-one error in the slice call."`
             title: 'Specify the output target explicitly',
             difficulty: 'advanced',
             why: 'Claude may create a new file when you wanted it to edit an existing one, or vice versa. State the target file upfront.',
+            prompt: '"Add unit tests for src/parser.ts to the EXISTING file src/__tests__/parser.test.ts. Do not create new files."',
             lang: 'bash',
             code: `# Instead of: "Write unit tests for the parser"
 "Add unit tests for src/parser.ts to the EXISTING file src/__tests__/parser.test.ts.
@@ -4948,6 +5244,7 @@ Do not create new files."`
             title: 'Use temperature hints in the prompt',
             difficulty: 'expert',
             why: 'You can\'t set temperature directly in Claude Code, but you can ask for conservative vs creative output and Claude will adjust its style accordingly.',
+            prompt: '"Give me the most conventional, boring implementation of a rate limiter. No cleverness, just the simplest thing that works."',
             lang: 'bash',
             code: `# For reliable, predictable output:
 "Give me the most conventional, boring implementation of a rate limiter. No cleverness, no abstractions, just the simplest thing that works."
@@ -4959,6 +5256,7 @@ Do not create new files."`
             title: 'Debrief after a complex session',
             difficulty: 'advanced',
             why: 'At the end of a long session, ask Claude to summarize what it changed and why. This creates a natural commit message and surfaces anything it silently did.',
+            prompt: '"Before we finish: summarize every file you modified, what you changed, and why. Format it as a bullet list I can paste into the PR description."',
             lang: 'bash',
             code: `"Before we finish: summarize every file you modified, what you changed, and why. Format it as a bullet list I can paste into the PR description."`
           },
@@ -4977,6 +5275,7 @@ Do not create new files."`
             title: 'Test-first: write the test, then the implementation',
             difficulty: 'essential',
             why: 'TDD with Claude is fast. Write the failing test in natural language, let Claude write it, verify it fails, then ask Claude to make it pass.',
+            prompt: '"Write a failing test for a function called parseISO8601Duration that takes \'PT1H30M\' and returns { hours: 1, minutes: 30, seconds: 0 }. Don\'t write the implementation yet."',
             lang: 'bash',
             code: `"Write a failing test for a function called parseISO8601Duration that:
 - Takes a string like 'PT1H30M'
@@ -4988,6 +5287,7 @@ Use Jest. Don't write the implementation yet."`
             title: 'Generate tests from a function signature',
             difficulty: 'essential',
             why: 'Claude can infer edge cases from a type signature that humans miss. Give it the function and ask for comprehensive coverage.',
+            prompt: '"Read src/utils/pricing.ts and write Jest tests for calculateDiscount covering: happy path, zero quantity, negative price, max threshold, and each discount tier boundary."',
             lang: 'bash',
             code: `"Read src/utils/pricing.ts. For the calculateDiscount function, write Jest tests covering:
 - Happy path
@@ -5001,6 +5301,7 @@ Use Jest. Don't write the implementation yet."`
             title: 'Find untested branches and fill them',
             difficulty: 'essential',
             why: 'Instead of chasing a coverage number, ask Claude to read the code and identify which branches have no tests. More targeted than a coverage report.',
+            prompt: '"Read src/auth/session.ts and src/__tests__/session.test.ts. List every if/else branch or throw with no test. Then write the missing tests."',
             lang: 'bash',
             code: `"Read src/auth/session.ts and src/__tests__/session.test.ts.
 List every if/else branch or throw statement in session.ts that has no corresponding test.
@@ -5010,6 +5311,7 @@ Then write the missing tests. Don't modify session.ts."`
             title: 'Run tests, read failures, fix, repeat',
             difficulty: 'essential',
             why: 'The fastest way to fix a broken test suite. Give Claude the test runner command and let it iterate.',
+            prompt: '/loop 2m run npm test -- --bail; if any test fails, read the failure and fix only the first failing test, then stop',
             lang: 'bash',
             code: `/loop 2m run npm test -- --bail; if any test fails, read the failure output and fix only the first failing test, then stop`
           },
@@ -5017,6 +5319,7 @@ Then write the missing tests. Don't modify session.ts."`
             title: 'Write a property-based test',
             difficulty: 'advanced',
             why: 'Property tests find edge cases that example tests miss. They\'re especially powerful for parsers, formatters, and data transformations.',
+            prompt: '"Write a fast-check property test for our JSON serializer that verifies round-trip fidelity for arbitrary objects."',
             lang: 'typescript',
             code: `// Ask Claude: "Write a fast-check property test for our JSON serializer
 // that verifies round-trip fidelity for arbitrary objects"
@@ -5035,6 +5338,7 @@ test('round-trip fidelity', () => {
             title: 'Debug a flaky test',
             difficulty: 'advanced',
             why: 'Flaky tests are expensive to chase manually. Claude can read the test, the implementation, and the failure logs to identify race conditions or shared state.',
+            prompt: '"This test fails ~1 in 10 runs. Read src/__tests__/queue.test.ts and src/queue.ts. The failure says \'Expected 3, received 2\'. Find the race condition and fix it without changing the assertions."',
             lang: 'bash',
             code: `"This test fails roughly 1 in 10 runs. Read the test at src/__tests__/queue.test.ts and the implementation at src/queue.ts. The failure message is:
   'Expected 3, received 2'
@@ -5044,6 +5348,7 @@ Identify why it's flaky and fix it without changing the test assertions."`
             title: 'Generate test fixtures from real data shapes',
             difficulty: 'essential',
             why: 'Realistic fixtures expose bugs that toy data doesn\'t. Ask Claude to create fixtures that match your actual API response shapes.',
+            prompt: '"Read src/types/stripe.ts and create src/__fixtures__/stripe.ts with 3 realistic fixtures: successful charge, failed charge (card_declined), and disputed charge. Use realistic values."',
             lang: 'bash',
             code: `"Read the API response type in src/types/stripe.ts.
 Create a src/__fixtures__/stripe.ts file with 3 realistic test fixtures:
@@ -5056,6 +5361,7 @@ All fields must have realistic values, not 'test' or 'foo'."`
             title: 'Snapshot test for a UI component',
             difficulty: 'essential',
             why: 'Snapshot tests catch unintended rendering changes. Claude can write them faster than you can, and update them when intentional changes happen.',
+            prompt: '"Write React Testing Library snapshot tests for UserCard — one for a verified user and one for an unverified user."',
             lang: 'typescript',
             code: `// Ask: "Write a React Testing Library snapshot test for the UserCard component.
 // Include one snapshot for a verified user and one for an unverified user."
@@ -5071,6 +5377,7 @@ it('renders verified user', () => {
             title: 'Contract test between two services',
             difficulty: 'expert',
             why: 'Integration tests are brittle. Contract tests verify that producer and consumer agree on the API shape, without needing both services running.',
+            prompt: '"Write a Pact contract test between the frontend and /users endpoint. The consumer expects: { id: string, email: string, role: \'admin\' | \'user\' }."',
             lang: 'typescript',
             code: `// Ask Claude: "Write a Pact contract test between our frontend and the /users endpoint.
 // The consumer expects: { id: string, email: string, role: 'admin' | 'user' }"
@@ -5096,6 +5403,7 @@ describe('GET /users/:id', () => {
             title: 'Ask Claude to review your tests for gaps',
             difficulty: 'advanced',
             why: 'Claude can act as a test reviewer — pointing out missing assertions, weak matchers, and tests that would pass even if the implementation was wrong.',
+            prompt: '"Review src/__tests__/billing.test.ts as a skeptical QA engineer. For each test: would it catch a real bug? Is any assertion too weak? What scenario is missing?"',
             lang: 'bash',
             code: `"Review the tests in src/__tests__/billing.test.ts as a skeptical QA engineer.
 For each test, tell me:
@@ -5108,6 +5416,7 @@ Do not rewrite the tests — just report your findings."`
             title: 'Generate load test scenarios',
             difficulty: 'expert',
             why: 'Load tests are often written once and never updated. Claude can generate realistic k6 or artillery scripts from your API spec.',
+            prompt: '"Write a k6 load test for the checkout API. Ramp from 10 to 200 VUs over 2 minutes, hold for 3 minutes. Mix: 70% browse, 20% add-to-cart, 10% checkout."',
             lang: 'javascript',
             code: `// Ask: "Write a k6 load test for our checkout API.
 // Ramp from 10 to 200 VUs over 2 minutes, hold for 3 minutes.
@@ -5133,6 +5442,7 @@ export default function () {
             title: 'Mutation testing — kill surviving mutants',
             difficulty: 'expert',
             why: 'Mutation testing reveals tests that pass even when the code is wrong. Claude can read Stryker output and write the targeted tests that kill survivors.',
+            prompt: '"These mutations survived Stryker:\n- Line 42: changed > to >= in discount threshold\n- Line 87: removed null guard before user.email\n\nWrite a targeted test that kills each one."',
             lang: 'bash',
             code: `# Run Stryker first:
 npx stryker run
@@ -5168,6 +5478,19 @@ function hl(code, lang) {
 
 function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escText(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function getPrompt(ex) {
+  if (ex.prompt) return ex.prompt;
+  // Code that IS already a natural-language Claude prompt
+  if (ex.lang === 'bash' || ex.lang === 'text') {
+    const t = ex.code.trim();
+    const firstLine = t.split('\n')[0];
+    if (/^["\/]/.test(firstLine) && t.length < 400 && !/^#!/.test(t)) return t;
+  }
+  // Derive from title + first sentence of why
+  const sentence = ex.why.split(/(?<=[.!?])\s/)[0].trim();
+  return `${ex.title}.\n${sentence}`;
+}
 
 // ── Render category pills ──────────────────────────────────────────────────
 function renderCategoryPills() {
@@ -5222,6 +5545,11 @@ function renderContent() {
         <div class="diff-badge diff-${ex.difficulty}">${DIFF_LABELS[ex.difficulty] || ex.difficulty}</div>
       </div>
       <div class="card-body">
+        <div class="prompt-block">
+          <span class="prompt-block-label">💬 What you'd type to Claude</span>
+          <div class="prompt-text">${escText(getPrompt(ex))}</div>
+          <button class="copy-btn prompt-copy-btn" data-code="${escAttr(getPrompt(ex))}">COPY PROMPT</button>
+        </div>
         <div class="why-block"><strong>Why this matters</strong><span>${ex.why}</span></div>
         <div class="code-block" style="position:relative">
           <div class="code-lang-tag">${ex.lang || 'bash'}</div>
