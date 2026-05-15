@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 <style>
 :root {
   --yellow: #FED90F;
@@ -24,14 +24,14 @@
   --green: #4A9E2F;
   --green-pale: #E8F5E0;
   --skin: #FFD5B4;
-  --dark: #0D0D1A;
-  --dark2: #1A1A2E;
-  --dark3: #252540;
-  --card-bg: #1E1E3A;
-  --card-border: #2E2E5A;
-  --text: #F0F0FF;
-  --text-muted: #A0A0C0;
-  --code-bg: #0A0A1A;
+  --dark: #111111;
+  --dark2: #1C1C1C;
+  --dark3: #2A2A2A;
+  --card-bg: #1E1E1E;
+  --card-border: #333333;
+  --text: #EFEFEF;
+  --text-muted: #9A9A9A;
+  --code-bg: #0A0A0A;
   --radius: 14px;
   --shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
@@ -131,7 +131,7 @@ h1 {
 
 /* ===== TOKEN SAVINGS BANNER ===== */
 .token-banner {
-  background: linear-gradient(135deg, var(--dark2) 0%, #1a1a3e 100%);
+  background: linear-gradient(135deg, var(--dark2) 0%, #222222 100%);
   border-top: 3px solid var(--yellow);
   border-bottom: 3px solid var(--donut-pink);
   padding: 20px 24px;
@@ -191,7 +191,7 @@ h1 {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(13,13,26,0.97);
+  background: rgba(17,17,17,0.97);
   backdrop-filter: blur(12px);
   border-bottom: 2px solid var(--card-border);
   padding: 12px 16px 10px;
@@ -229,7 +229,7 @@ h1 {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 14px;
+  padding: 8px 16px;
   border-radius: 999px;
   border: 1.5px solid var(--card-border);
   background: var(--dark2);
@@ -298,7 +298,7 @@ h1 {
   gap: 14px;
   margin-bottom: 24px;
   padding: 20px 24px;
-  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(30,30,60,0.6) 100%);
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(30,30,30,0.6) 100%);
   border-radius: var(--radius);
   border-left: 4px solid var(--yellow);
   box-shadow: var(--shadow);
@@ -332,7 +332,7 @@ h1 {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 16px;
 }
 
@@ -658,51 +658,9 @@ h1 {
 </div>
 
 <script>
-function app() {
-  return {
-    activeCategory: 'loops',
-    activeDifficulty: 'all',
-    searchQuery: '',
-
-    diffLabel(d) {
-      return { simple:'Simple', advanced:'Advanced', expert:'Expert', overengineer:'Over-Engineer', mistakes:'⚠ Avoid' }[d] || d;
-    },
-
-    highlight(code, lang) {
-      try {
-        return hljs.highlight(code.trim(), { language: lang }).value;
-      } catch(e) {
-        return hljs.highlightAuto(code.trim()).value;
-      }
-    },
-
-    async copyCode(code, evt) {
-      await navigator.clipboard.writeText(code.trim());
-      evt.target.textContent = 'COPIED!';
-      setTimeout(() => evt.target.textContent = 'COPY', 1500);
-    },
-
-    get categoryList() {
-      return Object.entries(this.categories).map(([id, c]) => ({ id, ...c }));
-    },
-
-    get currentCategory() {
-      return this.categories[this.activeCategory] || null;
-    },
-
-    get filteredExamples() {
-      const cat = this.currentCategory;
-      if (!cat) return [];
-      let ex = cat.examples;
-      if (this.activeDifficulty !== 'all') ex = ex.filter(e => e.difficulty === this.activeDifficulty);
-      if (this.searchQuery.trim()) {
-        const q = this.searchQuery.toLowerCase();
-        ex = ex.filter(e => e.title.toLowerCase().includes(q) || e.why.toLowerCase().includes(q) || e.code.toLowerCase().includes(q));
-      }
-      return ex;
-    },
-
-    categories: {
+// CATEGORIES is a plain global — NOT reactive.
+// Alpine only proxies the 3 scalar state values in app(), keeping startup fast on mobile.
+const CATEGORIES = {
 
       // ===================================================
       // 1. LOOPS
@@ -2825,7 +2783,51 @@ function scrub(obj: Record<string, unknown>) {
         ]
       },
 
-    } // end categories
+}; // end CATEGORIES
+
+function app() {
+  return {
+    activeCategory: 'loops',
+    activeDifficulty: 'all',
+    searchQuery: '',
+
+    diffLabel(d) {
+      return { simple:'Simple', advanced:'Advanced', expert:'Expert', overengineer:'Over-Engineer', mistakes:'⚠ Avoid' }[d] || d;
+    },
+
+    highlight(code, lang) {
+      try {
+        return hljs.highlight(code.trim(), { language: lang }).value;
+      } catch(e) {
+        return hljs.highlightAuto(code.trim()).value;
+      }
+    },
+
+    async copyCode(code, evt) {
+      await navigator.clipboard.writeText(code.trim());
+      evt.target.textContent = 'COPIED!';
+      setTimeout(() => evt.target.textContent = 'COPY', 1500);
+    },
+
+    get categoryList() {
+      return Object.entries(CATEGORIES).map(([id, c]) => ({ id, ...c }));
+    },
+
+    get currentCategory() {
+      return CATEGORIES[this.activeCategory] || null;
+    },
+
+    get filteredExamples() {
+      const cat = CATEGORIES[this.activeCategory] || null;
+      if (!cat) return [];
+      let ex = cat.examples;
+      if (this.activeDifficulty !== 'all') ex = ex.filter(e => e.difficulty === this.activeDifficulty);
+      if (this.searchQuery.trim()) {
+        const q = this.searchQuery.toLowerCase();
+        ex = ex.filter(e => e.title.toLowerCase().includes(q) || e.why.toLowerCase().includes(q) || e.code.toLowerCase().includes(q));
+      }
+      return ex;
+    },
   }
 }
 
