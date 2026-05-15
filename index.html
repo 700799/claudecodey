@@ -129,65 +129,6 @@ h1 {
   opacity: 0.95;
 }
 
-/* ===== TOKEN SAVINGS BANNER ===== */
-.token-banner {
-  background: var(--dark2);
-  border-bottom: 1px solid var(--card-border);
-  padding: 8px 16px;
-}
-
-.token-inner-compact {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.token-chip {
-  background: var(--yellow);
-  color: var(--dark);
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 2px 10px;
-  border-radius: 999px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.token-summary {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  flex: 1;
-  min-width: 0;
-}
-
-.token-toggle {
-  background: none;
-  border: 1px solid var(--card-border);
-  color: var(--text-muted);
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 2px 10px;
-  border-radius: 999px;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: border-color 0.15s, color 0.15s;
-}
-.token-toggle:hover { border-color: var(--yellow); color: var(--yellow); }
-
-.token-detail {
-  max-width: 1200px;
-  margin: 6px auto 0;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  line-height: 1.6;
-  padding-top: 6px;
-  border-top: 1px solid var(--card-border);
-}
-.token-detail strong { color: var(--yellow); }
-
 /* ===== STICKY NAV ===== */
 .sticky-nav {
   position: sticky;
@@ -552,18 +493,6 @@ h1 {
   </div>
 </div>
 <div class="grass-strip"></div>
-
-<!-- ===== TOKEN SAVINGS BANNER ===== -->
-<div class="token-banner" x-data="{ open: false }">
-  <div class="token-inner-compact">
-    <span class="token-chip">30x token savings</span>
-    <span class="token-summary">Agentic workflows vs. multishot prompts — agents pull targeted context; multishot resends everything every turn.</span>
-    <button class="token-toggle" @click="open = !open" x-text="open ? 'Less' : 'More'"></button>
-  </div>
-  <div class="token-detail" x-show="open" x-collapse>
-    <p>A 10-turn multishot workflow costs ~55k tokens (1k+2k+…+10k) because each turn resends the full history. An agentic loop doing the same work costs ~2k tokens — it reads only what it needs. Real codebases routinely show <strong>30:1 savings</strong>: the difference between a $5 bill and a $150 one.</p>
-  </div>
-</div>
 
 <!-- ===== STICKY NAV ===== -->
 <div class="sticky-nav">
