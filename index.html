@@ -190,6 +190,19 @@ h1 {
   background: rgba(254,217,15,0.08);
 }
 
+.pill-count {
+  display: inline-block;
+  background: rgba(255,255,255,0.1);
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.pill.active-cat .pill-count {
+  background: rgba(0,0,0,0.2);
+}
+
 .pill.active-cat {
   background: var(--yellow);
   border-color: var(--yellow);
@@ -505,8 +518,6 @@ h1 {
         <button class="pill" data-diff="simple">Simple</button>
         <button class="pill" data-diff="advanced">Advanced</button>
         <button class="pill" data-diff="expert">Expert</button>
-        <button class="pill" data-diff="overengineer">OK to Over-Engineer</button>
-        <button class="pill" data-diff="mistakes">Mistakes to Avoid</button>
       </div>
     </div>
     <div class="search-bar">
@@ -4565,6 +4576,326 @@ CREATE INDEX ON audit_log (actor_id, ts DESC);`
         ]
       },
 
+      // ===================================================
+      // 12. PROMPTING
+      // ===================================================
+      prompting: {
+        icon: '💬',
+        title: 'Prompting',
+        description: 'Write better prompts for Claude Code. Task decomposition, context priming, one-shot examples, and the patterns that get consistent results.',
+        examples: [
+          {
+            title: 'Prime context before a big task',
+            difficulty: 'simple',
+            why: 'Claude performs better when it understands the project before you ask it to change things. Read key files first, then issue the task.',
+            lang: 'bash',
+            code: `# Bad: jump straight to the ask
+"Add user authentication"
+
+# Good: give context first
+"Read src/server.ts, src/routes/index.ts, and package.json, then add JWT-based user authentication using the existing Express middleware pattern"`
+          },
+          {
+            title: 'Use one-shot examples for formatting',
+            difficulty: 'simple',
+            why: 'When you want output in a specific format, show one example rather than describing it. Claude matches patterns better than it follows prose descriptions.',
+            lang: 'bash',
+            code: `# Instead of: "Write a changelog entry in our style"
+# Say:
+"Write a changelog entry for this PR. Match this exact format:
+### Fixed
+- **auth:** Session tokens now expire after 24h ([#142](link))
+
+PR diff: <paste diff here>"`
+          },
+          {
+            title: 'Break large tasks into numbered steps',
+            difficulty: 'simple',
+            why: 'Monolithic prompts produce monolithic (often wrong) output. Numbered steps let Claude checkpoint and let you inspect each stage.',
+            lang: 'bash',
+            code: `"Do this in 3 steps:
+1. Read all files under src/models/ and list the schema fields
+2. Identify any field that stores PII (email, phone, address, SSN)
+3. For each PII field, add a comment // PII: <reason> and report what you changed"
+
+# Claude will output step-by-step and you can stop it after step 1 if the list looks wrong`
+          },
+          {
+            title: 'Constrain the scope explicitly',
+            difficulty: 'simple',
+            why: 'Claude defaults to being helpful, which means it may refactor, add tests, or rename things you didn\'t ask for. Tell it exactly what not to touch.',
+            lang: 'bash',
+            code: `"Fix the bug on line 47 of src/parser.ts.
+Do NOT refactor surrounding code.
+Do NOT add comments.
+Do NOT change function signatures.
+Only fix the off-by-one error in the slice call."`
+          },
+          {
+            title: 'Ask for a plan before code',
+            difficulty: 'simple',
+            why: 'For non-trivial tasks, get the plan approved before any code is written. Catching a wrong approach costs 0 tokens; catching it after 500 lines of code costs a lot more.',
+            lang: 'bash',
+            code: `"Before writing any code, describe your plan for migrating the users table to add a soft-delete column. Include: what SQL you'll run, whether it requires downtime, and any risks. Wait for my approval."
+
+# Claude will present the plan. You respond "looks good, proceed" or redirect it.`
+          },
+          {
+            title: 'Reference files by path, not by description',
+            difficulty: 'simple',
+            why: 'Vague references like "the auth file" force Claude to guess. Exact paths are unambiguous and prevent it from editing the wrong file.',
+            lang: 'bash',
+            code: `# Vague (Claude may pick the wrong file)
+"Update the authentication handler to log failed attempts"
+
+# Precise
+"In src/middleware/auth.ts, in the verifyToken function, add a console.error call when verification fails, including req.ip and the error message"`
+          },
+          {
+            title: 'Use /clear between unrelated tasks',
+            difficulty: 'simple',
+            why: 'Context from a previous task leaks into the next one and can cause Claude to make assumptions based on stale information. Clear it.',
+            lang: 'bash',
+            code: `/clear
+# Then start fresh:
+"Now help me write the database migration for the new payments table"`
+          },
+          {
+            title: 'Tell Claude what success looks like',
+            difficulty: 'advanced',
+            why: 'Ambiguous tasks produce ambiguous results. Defining done gives Claude a target to aim for and makes it easy to verify the output.',
+            lang: 'bash',
+            code: `"Refactor the DataProcessor class. You're done when:
+1. All methods are under 20 lines
+2. No method has more than 3 parameters
+3. The existing tests still pass (run npm test to verify)
+4. There are no new TODO comments"`
+          },
+          {
+            title: 'Chain prompts for research → action',
+            difficulty: 'advanced',
+            why: 'Research prompts are cheap; action prompts are expensive to undo. Separate them so you can review findings before committing to changes.',
+            lang: 'bash',
+            code: `# Step 1 — research only
+"Find all places in the codebase where we call fetch() directly instead of using our httpClient wrapper. List the file and line number. Do not change anything."
+
+# Review the list, then:
+# Step 2 — targeted action
+"Replace the direct fetch() calls in the 3 files you found with httpClient. Keep the same error handling."`
+          },
+          {
+            title: 'Specify the output target explicitly',
+            difficulty: 'advanced',
+            why: 'Claude may create a new file when you wanted it to edit an existing one, or vice versa. State the target file upfront.',
+            lang: 'bash',
+            code: `# Instead of: "Write unit tests for the parser"
+"Add unit tests for src/parser.ts to the EXISTING file src/__tests__/parser.test.ts.
+Follow the pattern of existing tests in that file.
+Do not create new files."`
+          },
+          {
+            title: 'Use temperature hints in the prompt',
+            difficulty: 'expert',
+            why: 'You can\'t set temperature directly in Claude Code, but you can ask for conservative vs creative output and Claude will adjust its style accordingly.',
+            lang: 'bash',
+            code: `# For reliable, predictable output:
+"Give me the most conventional, boring implementation of a rate limiter. No cleverness, no abstractions, just the simplest thing that works."
+
+# For creative exploration:
+"Brainstorm 5 completely different approaches to rate limiting, including unconventional ones. Don't worry about production-readiness."`
+          },
+          {
+            title: 'Debrief after a complex session',
+            difficulty: 'advanced',
+            why: 'At the end of a long session, ask Claude to summarize what it changed and why. This creates a natural commit message and surfaces anything it silently did.',
+            lang: 'bash',
+            code: `"Before we finish: summarize every file you modified, what you changed, and why. Format it as a bullet list I can paste into the PR description."`
+          },
+        ]
+      },
+
+      // ===================================================
+      // 13. TESTING
+      // ===================================================
+      testing: {
+        icon: '🧪',
+        title: 'Testing',
+        description: 'Test-driven development with Claude Code. Generate tests, improve coverage, write property tests, and use Claude to debug flaky tests.',
+        examples: [
+          {
+            title: 'Test-first: write the test, then the implementation',
+            difficulty: 'simple',
+            why: 'TDD with Claude is fast. Write the failing test in natural language, let Claude write it, verify it fails, then ask Claude to make it pass.',
+            lang: 'bash',
+            code: `"Write a failing test for a function called parseISO8601Duration that:
+- Takes a string like 'PT1H30M'
+- Returns { hours: 1, minutes: 30, seconds: 0 }
+- Throws on invalid input
+Use Jest. Don't write the implementation yet."`
+          },
+          {
+            title: 'Generate tests from a function signature',
+            difficulty: 'simple',
+            why: 'Claude can infer edge cases from a type signature that humans miss. Give it the function and ask for comprehensive coverage.',
+            lang: 'bash',
+            code: `"Read src/utils/pricing.ts. For the calculateDiscount function, write Jest tests covering:
+- Happy path
+- Zero quantity
+- Negative price
+- Quantity above max threshold
+- Non-integer quantities
+- Each discount tier boundary"`
+          },
+          {
+            title: 'Find untested branches and fill them',
+            difficulty: 'simple',
+            why: 'Instead of chasing a coverage number, ask Claude to read the code and identify which branches have no tests. More targeted than a coverage report.',
+            lang: 'bash',
+            code: `"Read src/auth/session.ts and src/__tests__/session.test.ts.
+List every if/else branch or throw statement in session.ts that has no corresponding test.
+Then write the missing tests. Don't modify session.ts."`
+          },
+          {
+            title: 'Run tests, read failures, fix, repeat',
+            difficulty: 'simple',
+            why: 'The fastest way to fix a broken test suite. Give Claude the test runner command and let it iterate.',
+            lang: 'bash',
+            code: `/loop 2m run npm test -- --bail; if any test fails, read the failure output and fix only the first failing test, then stop`
+          },
+          {
+            title: 'Write a property-based test',
+            difficulty: 'advanced',
+            why: 'Property tests find edge cases that example tests miss. They\'re especially powerful for parsers, formatters, and data transformations.',
+            lang: 'typescript',
+            code: `// Ask Claude: "Write a fast-check property test for our JSON serializer
+// that verifies round-trip fidelity for arbitrary objects"
+import fc from 'fast-check';
+import { serialize, deserialize } from '../src/serializer';
+
+test('round-trip fidelity', () => {
+  fc.assert(
+    fc.property(fc.jsonValue(), value => {
+      expect(deserialize(serialize(value))).toEqual(value);
+    })
+  );
+});`
+          },
+          {
+            title: 'Debug a flaky test',
+            difficulty: 'advanced',
+            why: 'Flaky tests are expensive to chase manually. Claude can read the test, the implementation, and the failure logs to identify race conditions or shared state.',
+            lang: 'bash',
+            code: `"This test fails roughly 1 in 10 runs. Read the test at src/__tests__/queue.test.ts and the implementation at src/queue.ts. The failure message is:
+  'Expected 3, received 2'
+Identify why it's flaky and fix it without changing the test assertions."`
+          },
+          {
+            title: 'Generate test fixtures from real data shapes',
+            difficulty: 'simple',
+            why: 'Realistic fixtures expose bugs that toy data doesn\'t. Ask Claude to create fixtures that match your actual API response shapes.',
+            lang: 'bash',
+            code: `"Read the API response type in src/types/stripe.ts.
+Create a src/__fixtures__/stripe.ts file with 3 realistic test fixtures:
+1. A successful charge
+2. A failed charge (card_declined)
+3. A disputed charge
+All fields must have realistic values, not 'test' or 'foo'."`
+          },
+          {
+            title: 'Snapshot test for a UI component',
+            difficulty: 'simple',
+            why: 'Snapshot tests catch unintended rendering changes. Claude can write them faster than you can, and update them when intentional changes happen.',
+            lang: 'typescript',
+            code: `// Ask: "Write a React Testing Library snapshot test for the UserCard component.
+// Include one snapshot for a verified user and one for an unverified user."
+import { render } from '@testing-library/react';
+import { UserCard } from '../UserCard';
+
+it('renders verified user', () => {
+  const { container } = render(<UserCard user={{ name: 'Alice', verified: true }} />);
+  expect(container).toMatchSnapshot();
+});`
+          },
+          {
+            title: 'Contract test between two services',
+            difficulty: 'expert',
+            why: 'Integration tests are brittle. Contract tests verify that producer and consumer agree on the API shape, without needing both services running.',
+            lang: 'typescript',
+            code: `// Ask Claude: "Write a Pact contract test between our frontend and the /users endpoint.
+// The consumer expects: { id: string, email: string, role: 'admin' | 'user' }"
+import { Pact } from '@pact-foundation/pact';
+
+const provider = new Pact({ consumer: 'frontend', provider: 'users-api' });
+
+describe('GET /users/:id', () => {
+  it('returns user shape', async () => {
+    await provider.addInteraction({
+      state: 'user exists',
+      uponReceiving: 'a request for a user',
+      withRequest: { method: 'GET', path: '/users/1' },
+      willRespondWith: {
+        status: 200,
+        body: { id: like('abc'), email: like('a@b.com'), role: term({ generate: 'admin', matcher: 'admin|user' }) }
+      }
+    });
+  });
+});`
+          },
+          {
+            title: 'Ask Claude to review your tests for gaps',
+            difficulty: 'advanced',
+            why: 'Claude can act as a test reviewer — pointing out missing assertions, weak matchers, and tests that would pass even if the implementation was wrong.',
+            lang: 'bash',
+            code: `"Review the tests in src/__tests__/billing.test.ts as a skeptical QA engineer.
+For each test, tell me:
+1. Would this test catch a bug in the happy path?
+2. Is any assertion so weak it would pass even if the function was broken?
+3. What scenario is NOT tested that could cause a production bug?
+Do not rewrite the tests — just report your findings."`
+          },
+          {
+            title: 'Generate load test scenarios',
+            difficulty: 'expert',
+            why: 'Load tests are often written once and never updated. Claude can generate realistic k6 or artillery scripts from your API spec.',
+            lang: 'javascript',
+            code: `// Ask: "Write a k6 load test for our checkout API.
+// Ramp from 10 to 200 VUs over 2 minutes, hold for 3 minutes.
+// Mix: 70% browse, 20% add-to-cart, 10% checkout."
+import http from 'k6/http';
+import { sleep, check } from 'k6';
+
+export const options = {
+  stages: [
+    { duration: '2m', target: 200 },
+    { duration: '3m', target: 200 },
+    { duration: '30s', target: 0 },
+  ],
+};
+
+export default function () {
+  const r = http.get('https://api.myshop.com/products');
+  check(r, { 'status 200': res => res.status === 200 });
+  sleep(Math.random() * 2);
+}`
+          },
+          {
+            title: 'Mutation testing — kill surviving mutants',
+            difficulty: 'expert',
+            why: 'Mutation testing reveals tests that pass even when the code is wrong. Claude can read Stryker output and write the targeted tests that kill survivors.',
+            lang: 'bash',
+            code: `# Run Stryker first:
+npx stryker run
+
+# Then paste surviving mutants to Claude:
+"These mutations survived (tests didn't catch them):
+- Line 42: changed > to >= in the discount threshold check
+- Line 87: removed the null guard before user.email
+
+Write specific tests that would catch each mutation. Be minimal — one test per mutant."`
+          },
+        ]
+      },
+
 }; // end CATEGORIES
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -4590,7 +4921,7 @@ function escAttr(s) { return String(s).replace(/"/g,'&quot;'); }
 function renderCategoryPills() {
   const el = document.getElementById('category-pills');
   el.innerHTML = Object.entries(CATEGORIES).map(([id, c]) =>
-    `<button class="pill${activeCategory === id ? ' active-cat' : ''}" data-cat="${id}">${c.icon} ${c.title}</button>`
+    `<button class="pill${activeCategory === id ? ' active-cat' : ''}" data-cat="${id}">${c.icon} ${c.title} <span class="pill-count">${c.examples.length}</span></button>`
   ).join('');
 }
 
@@ -4664,11 +4995,12 @@ document.addEventListener('DOMContentLoaded', () => {
     renderContent();
   });
 
-  // Difficulty pills (static HTML)
+  // Difficulty pills — clicking the active pill deselects back to "all"
   document.getElementById('difficulty-pills').addEventListener('click', e => {
     const btn = e.target.closest('[data-diff]');
     if (!btn) return;
-    activeDifficulty = btn.dataset.diff;
+    const d = btn.dataset.diff;
+    activeDifficulty = (activeDifficulty === d && d !== 'all') ? 'all' : d;
     renderDiffPills();
     renderContent();
   });
