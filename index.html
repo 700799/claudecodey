@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
 <style>
 :root {
   --yellow: #FED90F;
@@ -284,6 +284,8 @@ h1 {
 }
 .search-bar input::placeholder { color: var(--text-muted); }
 .search-icon { color: var(--text-muted); font-size: 0.85rem; }
+
+[x-cloak] { display: none !important; }
 
 /* ===== MAIN CONTENT ===== */
 .main {
@@ -574,7 +576,7 @@ h1 {
   <div class="nav-row">
     <div>
       <div class="row-label">📁 Category</div>
-      <div class="pills">
+      <div class="pills" x-cloak>
         <template x-for="cat in categoryList" :key="cat.id">
           <button
             class="pill"
@@ -2799,7 +2801,10 @@ function app() {
       try {
         return hljs.highlight(code.trim(), { language: lang }).value;
       } catch(e) {
-        return hljs.highlightAuto(code.trim()).value;
+        try { return hljs.highlightAuto(code.trim()).value; }
+        catch(e2) {
+          return code.trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
       }
     },
 
@@ -2810,7 +2815,7 @@ function app() {
     },
 
     get categoryList() {
-      return Object.entries(CATEGORIES).map(([id, c]) => ({ id, ...c }));
+      return Object.entries(CATEGORIES).map(([id, c]) => ({ id, icon: c.icon, title: c.title }));
     },
 
     get currentCategory() {
