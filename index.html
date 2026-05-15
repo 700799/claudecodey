@@ -4433,14 +4433,14 @@ res.cookie('session', sid, {
             why: 'When you load a third-party script tag, you give them the keys to your domain. SRI ensures the script content matches a hash you control.',
             lang: 'html',
             code: `<!-- Without SRI: vendor compromise = your site compromise -->
-<script src="https://cdn.vendor.com/sdk.js"></script>
+<script src="https://cdn.vendor.com/sdk.js"><\/script>
 
 <!-- With SRI: tampered script fails to load -->
 <script
   src="https://cdn.vendor.com/sdk.js"
   integrity="sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxy9rx7HNQlGYl1kPzQho1wx4JwY8wC"
   crossorigin="anonymous"
-></script>`
+><\/script>`
           },
           {
             title: 'File upload — validate type and size, scan',
