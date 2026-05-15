@@ -9,7 +9,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
 <style>
 :root {
   --yellow: #FED90F;
@@ -227,8 +226,6 @@ h1 {
 }
 .search-bar input::placeholder { color: var(--text-muted); }
 .search-icon { color: var(--text-muted); font-size: 0.85rem; }
-
-[x-cloak] { display: none !important; }
 
 /* ===== MAIN CONTENT ===== */
 .main {
@@ -478,7 +475,7 @@ h1 {
 }
 </style>
 </head>
-<body x-data="app()">
+<body>
 
 <!-- ===== HEADER ===== -->
 <div class="sky-header">
@@ -498,82 +495,29 @@ h1 {
 <div class="sticky-nav">
   <div class="nav-row">
     <div>
-      <div class="row-label">📁 Category</div>
-      <div class="pills" x-cloak>
-        <template x-for="cat in categoryList" :key="cat.id">
-          <button
-            class="pill"
-            :class="{ 'active-cat': activeCategory === cat.id }"
-            @click="activeCategory = cat.id"
-            x-text="cat.icon + ' ' + cat.title"
-          ></button>
-        </template>
-      </div>
+      <div class="row-label">Category</div>
+      <div class="pills" id="category-pills"></div>
     </div>
     <div>
-      <div class="row-label">⚡ Difficulty</div>
-      <div class="pills">
-        <button class="pill" :class="activeDifficulty==='all' ? 'active-diff-all' : ''" @click="activeDifficulty='all'">🌐 All</button>
-        <button class="pill" :class="activeDifficulty==='simple' ? 'active-diff-simple' : ''" @click="activeDifficulty='simple'">🟢 Simple</button>
-        <button class="pill" :class="activeDifficulty==='advanced' ? 'active-diff-advanced' : ''" @click="activeDifficulty='advanced'">🔵 Advanced</button>
-        <button class="pill" :class="activeDifficulty==='expert' ? 'active-diff-expert' : ''" @click="activeDifficulty='expert'">🔴 Expert</button>
-        <button class="pill" :class="activeDifficulty==='overengineer' ? 'active-diff-overengineer' : ''" @click="activeDifficulty='overengineer'">🟠 OK to Over-Engineer</button>
-        <button class="pill" :class="activeDifficulty==='mistakes' ? 'active-diff-mistakes' : ''" @click="activeDifficulty='mistakes'">💀 Mistakes to Avoid</button>
+      <div class="row-label">Difficulty</div>
+      <div class="pills" id="difficulty-pills">
+        <button class="pill active-diff-all" data-diff="all">All</button>
+        <button class="pill" data-diff="simple">Simple</button>
+        <button class="pill" data-diff="advanced">Advanced</button>
+        <button class="pill" data-diff="expert">Expert</button>
+        <button class="pill" data-diff="overengineer">OK to Over-Engineer</button>
+        <button class="pill" data-diff="mistakes">Mistakes to Avoid</button>
       </div>
     </div>
     <div class="search-bar">
-      <span class="search-icon">🔍</span>
-      <input type="text" placeholder="Search examples, patterns, commands…" x-model="searchQuery">
+      <span class="search-icon">&#x2315;</span>
+      <input type="text" id="search-input" placeholder="Search examples, patterns, commands…">
     </div>
   </div>
 </div>
 
 <!-- ===== MAIN ===== -->
-<div class="main">
-  <template x-if="currentCategory">
-    <div>
-      <div class="category-header">
-        <div class="cat-icon" x-text="currentCategory.icon"></div>
-        <div class="cat-info">
-          <h2 x-text="currentCategory.title"></h2>
-          <p x-text="currentCategory.description"></p>
-        </div>
-        <div class="count-badge" x-text="filteredExamples.length + ' examples'"></div>
-      </div>
-
-      <template x-if="filteredExamples.length === 0">
-        <div class="no-results">
-          <div class="emoji">🍩</div>
-          <h3>No examples match your filters</h3>
-          <p>Try a different difficulty level or clear your search</p>
-        </div>
-      </template>
-
-      <div class="cards-grid">
-        <template x-for="(ex, idx) in filteredExamples" :key="ex.title">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-num" x-text="String(idx+1).padStart(2,'0')"></div>
-              <div class="card-title" x-text="ex.title"></div>
-              <div class="diff-badge" :class="'diff-'+ex.difficulty" x-text="diffLabel(ex.difficulty)"></div>
-            </div>
-            <div class="card-body">
-              <div class="why-block">
-                <strong>Why this matters</strong>
-                <span x-text="ex.why"></span>
-              </div>
-              <div class="code-block" style="position:relative">
-                <div class="code-lang-tag" x-text="ex.lang || 'bash'"></div>
-                <pre><code :class="'language-'+(ex.lang||'bash')" x-html="highlight(ex.code, ex.lang||'bash')"></code></pre>
-                <button class="copy-btn" @click="copyCode(ex.code, $event)">COPY</button>
-              </div>
-            </div>
-          </div>
-        </template>
-      </div>
-    </div>
-  </template>
-</div>
+<div class="main" id="main-content"></div>
 
 <!-- ===== FOOTER ===== -->
 <div class="footer">
@@ -2709,58 +2653,132 @@ function scrub(obj: Record<string, unknown>) {
 
 }; // end CATEGORIES
 
-function app() {
-  return {
-    activeCategory: 'loops',
-    activeDifficulty: 'all',
-    searchQuery: '',
+// ── State ──────────────────────────────────────────────────────────────────
+let activeCategory  = 'loops';
+let activeDifficulty = 'all';
+let searchQuery     = '';
 
-    diffLabel(d) {
-      return { simple:'Simple', advanced:'Advanced', expert:'Expert', overengineer:'Over-Engineer', mistakes:'⚠ Avoid' }[d] || d;
-    },
+// ── Helpers ────────────────────────────────────────────────────────────────
+const DIFF_LABELS = { simple:'Simple', advanced:'Advanced', expert:'Expert', overengineer:'Over-Engineer', mistakes:'Avoid' };
+const DIFF_ACTIVE = { all:'active-diff-all', simple:'active-diff-simple', advanced:'active-diff-advanced', expert:'active-diff-expert', overengineer:'active-diff-overengineer', mistakes:'active-diff-mistakes' };
 
-    highlight(code, lang) {
-      try {
-        return hljs.highlight(code.trim(), { language: lang }).value;
-      } catch(e) {
-        try { return hljs.highlightAuto(code.trim()).value; }
-        catch(e2) {
-          return code.trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        }
-      }
-    },
-
-    async copyCode(code, evt) {
-      await navigator.clipboard.writeText(code.trim());
-      evt.target.textContent = 'COPIED!';
-      setTimeout(() => evt.target.textContent = 'COPY', 1500);
-    },
-
-    get categoryList() {
-      return Object.entries(CATEGORIES).map(([id, c]) => ({ id, icon: c.icon, title: c.title }));
-    },
-
-    get currentCategory() {
-      return CATEGORIES[this.activeCategory] || null;
-    },
-
-    get filteredExamples() {
-      const cat = CATEGORIES[this.activeCategory] || null;
-      if (!cat) return [];
-      let ex = cat.examples;
-      if (this.activeDifficulty !== 'all') ex = ex.filter(e => e.difficulty === this.activeDifficulty);
-      if (this.searchQuery.trim()) {
-        const q = this.searchQuery.toLowerCase();
-        ex = ex.filter(e => e.title.toLowerCase().includes(q) || e.why.toLowerCase().includes(q) || e.code.toLowerCase().includes(q));
-      }
-      return ex;
-    },
+function hl(code, lang) {
+  try { return hljs.highlight(code.trim(), { language: lang }).value; }
+  catch(e) {
+    try { return hljs.highlightAuto(code.trim()).value; }
+    catch(e2) { return code.trim().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   }
 }
 
-// Initialize highlight.js after Alpine mounts
-document.addEventListener('alpine:init', () => {
+function escAttr(s) { return String(s).replace(/"/g,'&quot;'); }
+
+// ── Render category pills ──────────────────────────────────────────────────
+function renderCategoryPills() {
+  const el = document.getElementById('category-pills');
+  el.innerHTML = Object.entries(CATEGORIES).map(([id, c]) =>
+    `<button class="pill${activeCategory === id ? ' active-cat' : ''}" data-cat="${id}">${c.icon} ${c.title}</button>`
+  ).join('');
+}
+
+// ── Render difficulty pills ────────────────────────────────────────────────
+function renderDiffPills() {
+  document.querySelectorAll('#difficulty-pills .pill').forEach(btn => {
+    const d = btn.dataset.diff;
+    btn.className = 'pill' + (activeDifficulty === d ? ' ' + DIFF_ACTIVE[d] : '');
+  });
+}
+
+// ── Render main content ────────────────────────────────────────────────────
+function renderContent() {
+  const main = document.getElementById('main-content');
+  const cat = CATEGORIES[activeCategory];
+  if (!cat) { main.innerHTML = ''; return; }
+
+  let examples = cat.examples;
+  if (activeDifficulty !== 'all') examples = examples.filter(e => e.difficulty === activeDifficulty);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    examples = examples.filter(e =>
+      e.title.toLowerCase().includes(q) || e.why.toLowerCase().includes(q) || e.code.toLowerCase().includes(q)
+    );
+  }
+
+  const header = `
+    <div class="category-header">
+      <div class="cat-icon">${cat.icon}</div>
+      <div class="cat-info">
+        <h2>${cat.title}</h2>
+        <p>${cat.description}</p>
+      </div>
+      <div class="count-badge">${examples.length} examples</div>
+    </div>`;
+
+  const noResults = examples.length === 0
+    ? `<div class="no-results"><h3>No examples match your filters</h3><p>Try a different difficulty level or clear your search.</p></div>`
+    : '';
+
+  const cards = examples.map((ex, idx) => `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-num">${String(idx+1).padStart(2,'0')}</div>
+        <div class="card-title">${ex.title}</div>
+        <div class="diff-badge diff-${ex.difficulty}">${DIFF_LABELS[ex.difficulty] || ex.difficulty}</div>
+      </div>
+      <div class="card-body">
+        <div class="why-block"><strong>Why this matters</strong><span>${ex.why}</span></div>
+        <div class="code-block" style="position:relative">
+          <div class="code-lang-tag">${ex.lang || 'bash'}</div>
+          <pre><code class="language-${ex.lang||'bash'}">${hl(ex.code, ex.lang||'bash')}</code></pre>
+          <button class="copy-btn" data-code="${escAttr(ex.code)}">COPY</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  main.innerHTML = header + noResults + `<div class="cards-grid">${cards}</div>`;
+}
+
+// ── Wire up events ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
   hljs.configure({ ignoreUnescapedHTML: true });
+
+  // Category pills (delegated — pills are dynamically rendered)
+  document.getElementById('category-pills').addEventListener('click', e => {
+    const btn = e.target.closest('[data-cat]');
+    if (!btn) return;
+    activeCategory = btn.dataset.cat;
+    renderCategoryPills();
+    renderContent();
+  });
+
+  // Difficulty pills (static HTML)
+  document.getElementById('difficulty-pills').addEventListener('click', e => {
+    const btn = e.target.closest('[data-diff]');
+    if (!btn) return;
+    activeDifficulty = btn.dataset.diff;
+    renderDiffPills();
+    renderContent();
+  });
+
+  // Search
+  document.getElementById('search-input').addEventListener('input', e => {
+    searchQuery = e.target.value;
+    renderContent();
+  });
+
+  // Copy buttons (delegated)
+  document.getElementById('main-content').addEventListener('click', e => {
+    const btn = e.target.closest('.copy-btn');
+    if (!btn) return;
+    navigator.clipboard.writeText(btn.dataset.code.trim()).then(() => {
+      btn.textContent = 'COPIED!';
+      setTimeout(() => btn.textContent = 'COPY', 1500);
+    });
+  });
+
+  // Initial render
+  renderCategoryPills();
+  renderDiffPills();
+  renderContent();
 });
 </script>
 </body>
