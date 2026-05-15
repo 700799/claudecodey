@@ -461,7 +461,6 @@ h1 {
 
 .pill.active-diff-essential { background: #4CAF50; border-color: #4CAF50; color: #fff; }
 .pill.active-diff-advanced { background: var(--sky-dark); border-color: var(--sky-dark); color: #fff; }
-.pill.active-diff-expert { background: var(--donut-pink); border-color: var(--donut-pink); color: #fff; }
 .pill.active-diff-overengineer { background: var(--orange); border-color: var(--orange); color: #fff; }
 .pill.active-diff-mistakes { background: #8B0000; border-color: #cc0000; color: #fff; }
 .pill.active-diff-all { background: var(--dark3); border-color: var(--text-muted); color: var(--text); }
@@ -596,7 +595,6 @@ h1 {
 
 .diff-essential { background: rgba(76,175,80,0.2); color: #81C784; border: 1px solid #4CAF50; }
 .diff-advanced { background: rgba(58,172,216,0.2); color: #70C8F0; border: 1px solid #3AACD8; }
-.diff-expert { background: rgba(227,79,142,0.2); color: #F48FB1; border: 1px solid #E34F8E; }
 .diff-overengineer { background: rgba(241,90,34,0.2); color: #FFAB76; border: 1px solid #F15A22; }
 .diff-mistakes { background: rgba(139,0,0,0.3); color: #EF9A9A; border: 1px solid #cc0000; }
 
@@ -815,7 +813,6 @@ h1 {
         <button class="pill active-diff-all" data-diff="all">All</button>
         <button class="pill" data-diff="essential">Essential</button>
         <button class="pill" data-diff="advanced">Advanced</button>
-        <button class="pill" data-diff="expert">Expert</button>
       </div>
     </div>
     <div class="search-bar">
@@ -1118,7 +1115,7 @@ curl -X POST $SLACK_WEBHOOK_URL \
           },
           {
             title: 'Nested loop — outer retry, inner task',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Some workflows need two levels: retry the whole task on transient failure, but step through sub-tasks in order. Nesting gives you both.',
             prompt: 'Retry the entire workflow up to 3 times on failure. Inside each attempt, run each step (lint → test → build → deploy) in sequence and stop the inner loop on any failure.',
             lang: 'bash',
@@ -1134,7 +1131,7 @@ done`
           },
 {
             title: 'Loop with cost guard',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Runaway loops burn money. Track cumulative token spend in a state file and kill the loop if it crosses a threshold.',
             prompt: 'Add a cost guard to this loop: track how many Claude API calls we\'ve made and stop automatically if we exceed the budget limit.',
             lang: 'javascript',
@@ -1212,7 +1209,7 @@ done`
           },
           {
             title: 'Loop with metric reporting',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Long-running loops should emit metrics to a time-series DB or log. Lets you debug latency spikes and throughput issues after the fact.',
             prompt: 'After each iteration, append a metrics line (timestamp, items processed, errors) to loop-metrics.log so I can track performance over time.',
             lang: 'python',
@@ -1243,7 +1240,7 @@ done`
           },
           {
             title: 'Loop with confirmation gate',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'When loops touch production resources, sometimes you want a human in the loop. A confirmation gate every N iterations adds an oversight check.',
             prompt: 'Before each destructive action in this loop, pause and ask for my confirmation. Show what would happen and wait for "yes" before proceeding.',
             lang: 'bash',
@@ -1432,7 +1429,7 @@ notify-send "Claude Code" "Claude needs your input"`
           },
 {
             title: 'Block writes outside project root',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Prevent runaway agents from writing files outside the project. A PreToolUse hook checks the target path and blocks anything outside CWD.',
             prompt: 'Add a PreToolUse hook on Edit and Write that blocks any file modification outside the current project directory.',
             lang: 'bash',
@@ -1500,7 +1497,7 @@ exit 0`
           },
           {
             title: 'Database migration safety gate',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Block any tool call that mentions DROP TABLE, TRUNCATE, or ALTER COLUMN without first reading a migration plan. Forces deliberate destructive ops.',
             prompt: 'Add a PreToolUse hook that intercepts any SQL command containing DROP or DELETE FROM and requires my explicit confirmation.',
             lang: 'bash',
@@ -1519,7 +1516,7 @@ exit 0`
           },
           {
             title: 'Approval gate for production commands',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'PreToolUse hook that pops up a confirm dialog for anything touching production. Prevents accidental kubectl apply in the wrong context.',
             prompt: 'Add a PreToolUse hook that pauses and asks for my approval before running any command that targets production.',
             lang: 'bash',
@@ -1682,7 +1679,7 @@ done
           },
           {
             title: 'Multi-service health dashboard in terminal',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Run parallel monitors for multiple services. Claude aggregates and reports status across all of them.',
             prompt: 'Monitor the health of all 5 services (api, auth, worker, db, cache) in parallel and show me a live status dashboard.',
             lang: 'bash',
@@ -1716,7 +1713,7 @@ done`
           },
           {
             title: 'Error rate monitor with rolling window',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'A spike in error rate over 60 seconds is more meaningful than a single error. A rolling window gives you rate, not noise.',
             prompt: '/loop 1m count ERROR lines in the last 60 seconds of logs; alert me if rate exceeds 10 errors per minute',
             lang: 'python',
@@ -1740,7 +1737,7 @@ for line in iter(sys.stdin.readline, ''):
           },
           {
             title: 'Watch test output and auto-fix failures',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'The ultimate TDD loop. Run tests in watch mode; Claude monitors output and fixes each failure as it appears.',
             prompt: '/loop 3m run npm test; if any test fails, read the failure output and try to fix the root cause',
             lang: 'bash',
@@ -1792,7 +1789,7 @@ done`
           },
 {
             title: 'User experience monitor (synthetic)',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Real-user metrics lag; synthetic monitoring catches issues before users do. Replay critical user journeys every minute and alert on regressions.',
             prompt: '/loop 5m run a synthetic login flow against staging; if any step fails or takes more than 3 seconds, alert me',
             lang: 'javascript',
@@ -1876,7 +1873,7 @@ Agent({ description: "Test suite", prompt: "Run npm test and report failures" })
           },
           {
             title: 'Worktree isolation for risky experiments',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Worktree mode gives the agent a fresh git branch to work in. If it breaks everything, you just delete the worktree — main is untouched.',
             prompt: 'Run this experimental refactor in an isolated worktree so it doesn\'t affect my current branch. Report back when ready to review.',
             lang: 'javascript',
@@ -1901,7 +1898,7 @@ Agent({ description: "Test suite", prompt: "Run npm test and report failures" })
           },
           {
             title: 'Sequential agent chain (handoff pattern)',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Each agent receives the output of the previous one as its input. Specialist chains produce better quality than one generalist doing everything.',
             prompt: 'Run these in sequence: first have the Plan agent design the feature, then pass the plan to an implementation agent, then run a code review agent on the result.',
             lang: 'javascript',
@@ -1914,7 +1911,7 @@ const review = await Agent({ subagent_type: "code-reviewer", prompt: \`Review: \
           },
           {
             title: 'Multi-repo agent orchestration',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'When a change spans multiple repos, spawn one agent per repo. Each agent handles its slice; the orchestrator merges the results.',
             prompt: 'Check all three repos (frontend, backend, mobile) for the same version of shared-types. If any are out of sync, update them.',
             lang: 'javascript',
@@ -1940,7 +1937,7 @@ const [apiResult, frontendResult, docsResult] = await Promise.all([
           },
           {
             title: 'Self-healing agent with error recovery',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'An agent that catches its own errors and retries with a different strategy — without human intervention — is the foundation of autonomous workflows.',
             prompt: 'Try to implement this migration. If your first attempt fails tests, analyze what went wrong and try a different approach. Up to 3 attempts.',
             lang: 'javascript',
@@ -1957,7 +1954,7 @@ const [apiResult, frontendResult, docsResult] = await Promise.all([
           },
           {
             title: 'Claude as judge — evaluate other agents',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Run two implementations in parallel, then spawn a judge agent to pick the better one. Competition improves output quality.',
             prompt: 'Run two different implementations of this algorithm and evaluate which one is better for readability, performance, and test coverage.',
             lang: 'javascript',
@@ -2000,7 +1997,7 @@ Data: \${JSON.stringify(results)}\`
           },
           {
             title: 'Git-bisect agent — find the breaking commit',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Hand off bisection to an agent. It checks out commits, runs the failing test, and reports the first bad commit — without you babysitting.',
             prompt: 'Use git bisect to find which commit broke the tests. Run the test suite at each bisect step and report the first bad commit.',
             lang: 'javascript',
@@ -2062,7 +2059,7 @@ Do not modify the function body.\`
           },
 {
             title: 'Migration agent — one-time big task',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Some changes are too big for an interactive session. A long-running agent with checkpoints handles overnight migrations safely.',
             prompt: 'Migrate all class components in src/ to functional components with hooks. Do one file at a time and run tests after each.',
             lang: 'javascript',
@@ -2194,7 +2191,7 @@ find src -name "*.ts" | head -30
           },
           {
             title: 'Cache-friendly prompting',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Anthropic\'s prompt cache stores the first ~90% of your prompt for reuse. Front-load stable content (system prompt, codebase context) and keep dynamic content at the end.',
             prompt: 'Structure these repeated requests so the system prompt stays identical — put variable content at the end to maximize cache hits.',
             lang: 'javascript',
@@ -2323,7 +2320,7 @@ Agent({
           },
           {
             title: 'Prompt caching with stable prefixes',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Anthropic caches the first ~90% of stable prompts. Front-load the unchanging bits (system prompt, codebase context); put dynamic input last. 10x cost savings on repeat calls.',
             lang: 'javascript',
             code: `// Cache-friendly structure
@@ -2600,7 +2597,7 @@ tmux attach-session -t claude-run`
           },
           {
             title: 'Graceful shutdown with cleanup',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'SIGTERM is sent before container shutdown. Catch it and do a final checkpoint so you can resume cleanly.',
             prompt: 'Handle SIGTERM by finishing the current item cleanly, saving state, and exiting — don\'t die mid-operation.',
             lang: 'python',
@@ -2755,7 +2752,7 @@ def consumer():
           },
           {
             title: 'Crash dump on uncaught exception',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'When the workflow finally crashes at hour 23, you need everything to debug. Write the full traceback, state file, and last 1000 log lines to a tarball.',
             prompt: 'On any unhandled exception, write a crash dump to crash.json (including state and last 100 log lines) before exiting.',
             lang: 'python',
@@ -2934,7 +2931,7 @@ Output: summary + inline comments on changed lines`
           },
           {
             title: 'Skill with environment awareness',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Skills can read environment variables to behave differently in dev vs. CI vs. production. One skill, three environments.',
             prompt: 'Create a /config skill that shows the current environment configuration and which env vars are set or missing.',
             lang: 'markdown',
@@ -3000,7 +2997,7 @@ Diagnose production incident: $ARGUMENTS
           },
 {
             title: 'Skill for API client generation',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Hand-written API clients drift from the server. A skill that reads OpenAPI and emits a typed TypeScript client keeps them in sync.',
             prompt: 'Create a /gen-client $ARGUMENTS skill that reads the OpenAPI spec and generates a TypeScript client library.',
             lang: 'markdown',
@@ -3075,7 +3072,7 @@ async function runPipeline(initial) {
           },
           {
             title: 'Circuit breaker — stop on repeated failure',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Without a circuit breaker, a broken downstream service causes infinite retries and bill explosion. Open the circuit after N failures, reset after a timeout.',
             prompt: 'Add a circuit breaker to these API calls. After 3 consecutive failures, stop trying for 30 seconds before retrying.',
             lang: 'javascript',
@@ -3124,7 +3121,7 @@ async function claude(prompt, task = 'code') {
           },
           {
             title: 'Factory pattern — create specialized agents',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'A factory builds the right agent configuration for a task type. Keeps agent creation DRY and ensures consistent system prompts.',
             prompt: 'Create a factory function that returns the right specialist agent (security, performance, docs) based on the task type.',
             lang: 'javascript',
@@ -3139,7 +3136,7 @@ async function claude(prompt, task = 'code') {
           },
           {
             title: 'Saga pattern for distributed workflows',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'When a multi-step workflow fails mid-way, a saga defines compensating actions to undo completed steps — like a distributed transaction.',
             prompt: 'Implement a saga for this multi-service workflow. If any step fails, run the compensating actions to undo previous steps.',
             lang: 'javascript',
@@ -3183,7 +3180,7 @@ class PythonPRReviewer(PRReviewer):
           },
           {
             title: 'Event sourcing — log every action',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Instead of updating state in place, append events to a log. You can replay the log to reconstruct any past state — invaluable for debugging autonomous agents.',
             prompt: 'Store every state change as an immutable event in an append-only log. Rebuild current state by replaying events from the log.',
             lang: 'python',
@@ -3221,7 +3218,7 @@ append_event('COMMIT', {'sha': 'abc123', 'message': 'fix: auth token expiry'})`
           },
           {
             title: 'Bulkhead pattern — isolate failures',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'If one agent pool (e.g., test runners) fails, it should not starve other pools (e.g., file writers). Bulkheads prevent cascading failures.',
             prompt: 'Isolate calls to this third-party service behind a bulkhead so if it starts timing out, it doesn\'t affect the rest of the system.',
             lang: 'javascript',
@@ -3240,7 +3237,7 @@ async function readFile(path) {
           },
           {
             title: 'Dead letter queue — handle unprocessable items',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Some items will always fail processing. Instead of blocking the queue, move them to a dead letter file for later human review.',
             prompt: 'Add a dead letter queue for messages that fail processing 3 times. Inspect and retry them manually.',
             lang: 'python',
@@ -3318,7 +3315,7 @@ function debounce<F extends Function>(fn: F, ms: number): F {
           },
           {
             title: 'Idempotency keys — make retries safe',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'A retry on a non-idempotent endpoint can charge the customer twice. Require an Idempotency-Key header; cache responses by key for 24h.',
             prompt: 'Add an idempotency key to this payment API call so retries don\'t create duplicate charges.',
             lang: 'typescript',
@@ -3334,7 +3331,7 @@ function debounce<F extends Function>(fn: F, ms: number): F {
           },
           {
             title: 'Backpressure with reservoir sampling',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'When event rate exceeds processing rate, sampling preserves a representative set. Reservoir sampling gives uniform random selection in one pass.',
             prompt: 'When the queue is overwhelmed, use reservoir sampling to keep a representative sample of items instead of dropping everything.',
             lang: 'python',
@@ -3378,7 +3375,7 @@ class InMemoryUserRepo implements UserRepo { /* test impl */ }
         examples: [
           {
             title: 'The one-liner that refactored a monolith',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Single instruction. One agent. 3 hours of autonomous work. Split a 50k-line Rails monolith into 8 services, with tests and docs.',
             lang: 'bash',
             code: `# The legendary prompt:
@@ -3391,7 +3388,7 @@ Start with the Auth domain."
           },
           {
             title: 'Gary Tan\'s gstack pattern',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Garry Tan\'s productivity stack: Claude Code for all engineering, with every change immediately validated by tests and deployed to a preview. Zero manual steps.',
             prompt: 'Implement Gary Tan\'s gstack pattern: run multiple Claude sessions in parallel on independent parts of the codebase.',
             lang: 'bash',
@@ -3406,7 +3403,7 @@ Start with the Auth domain."
           },
           {
             title: 'The self-healing test suite',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Loop + Monitor + Stop hook. Claude writes code, tests fail, Claude fixes code, repeat. Ran for 6 hours unattended, went from 40% to 94% coverage.',
             prompt: '/loop 5m run tests; if any fail, read the failure and fix it; stop when everything is green',
             lang: 'bash',
@@ -3465,7 +3462,7 @@ Quality: \${qual.result}\`
           },
           {
             title: 'Fastest PR ever: idea to merged in 11 minutes',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Workflow: describe → implement → tests → PR → CI → merged. Human involvement: the feature description and clicking "Merge."',
             prompt: 'Implement [feature], write tests, create PR with description, and mark it ready for review — let\'s do it fast.',
             lang: 'bash',
@@ -3481,7 +3478,7 @@ echo "11 minutes, 0 context switches, 1 human decision"`
           },
           {
             title: 'The nuclear option: full repo migration',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'JavaScript → TypeScript, class components → hooks, CommonJS → ESM — all in one overnight run. Worktree isolation kept main safe.',
             prompt: 'Migrate the entire codebase from JavaScript to TypeScript strict mode. Do one file at a time, keep tests green.',
             lang: 'bash',
@@ -3499,7 +3496,7 @@ Start with leaf components (no dependencies), work toward the root.
           },
           {
             title: 'Most tokens saved: 50:1 ratio achieved',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'A team replaced a multishot prompt workflow (2M tokens/day) with an agentic loop (40k tokens/day). Same output. 50x cheaper.',
             prompt: 'Summarize what you\'ve read about this codebase in a compact CLAUDE.md so future sessions don\'t need to re-read everything.',
             lang: 'javascript',
@@ -3518,7 +3515,7 @@ Start with leaf components (no dependencies), work toward the root.
           },
           {
             title: 'The unbreakable deploy hook',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'This combination blocks bad deploys automatically: no failing tests, no security issues, no hardcoded secrets, no unreviewed migrations.',
             prompt: 'Add a deploy hook that runs all checks (tests, lint, security scan, migration check) and blocks deploy if anything fails.',
             lang: 'bash',
@@ -3541,7 +3538,7 @@ echo "✅ All checks passed"`
           },
           {
             title: 'The legendary CLAUDE.md that writes itself',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'A skill that keeps CLAUDE.md current automatically — invoked by a PostToolUse hook when certain files change.',
             prompt: 'Explore the entire codebase and write a comprehensive CLAUDE.md that a new engineer could use to understand the project in 5 minutes.',
             lang: 'markdown',
@@ -3558,7 +3555,7 @@ Update CLAUDE.md to reflect current codebase state.
           },
           {
             title: 'Zero-downtime database migration',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'The textbook migration: deploy code that writes both schemas, backfill in the background, then deploy code that reads only the new schema. Two PRs, zero downtime.',
             prompt: 'Write a zero-downtime migration plan for adding this column. Include: add nullable column, backfill, add constraint, remove old column.',
             lang: 'sql',
@@ -3575,7 +3572,7 @@ WHERE email_lower IS NULL AND id BETWEEN $1 AND $2;
           },
           {
             title: 'Test coverage 20% → 92% in a weekend',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Coverage report → uncovered functions → loop that writes tests for each. One sentence prompt, two days of background work, transformation complete.',
             prompt: 'Write tests for all the critical business logic in src/. Focus on the code that would hurt most if it broke.',
             lang: 'bash',
@@ -3592,7 +3589,7 @@ Target 90%+ coverage on src/ only (not generated files).
           },
           {
             title: 'Bundle size cut by 60% overnight',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Webpack-bundle-analyzer + Claude = automatic tree-shaking, lazy-loading, and dependency pruning. Real teams report 50-70% reductions.',
             prompt: 'Analyze the bundle and identify the 5 biggest opportunities to reduce size. Implement the top 3.',
             lang: 'bash',
@@ -3636,7 +3633,7 @@ Run npx i18n-validate to verify all keys present.\`
           },
           {
             title: 'JavaScript → TypeScript migration of 30k LOC',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'The migration that used to take a team a quarter, an agent finishes overnight. Leaf-up traversal ensures dependent files always typecheck.',
             prompt: 'Convert all .js files in src/ to .ts with proper types. Do 5 files per session, track progress in migration-log.md.',
             lang: 'bash',
@@ -3689,7 +3686,7 @@ Agent({
           },
           {
             title: 'The crash-resistant 72h workflow',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Three full days, 300k tokens, two container restarts, zero lost work. Checkpoint state + auto-resume + git push on every iteration = unbreakable.',
             prompt: 'Set up this long-running workflow with checkpointing, auto-restart, and Slack alerts so it runs safely for 72 hours.',
             lang: 'bash',
@@ -4218,7 +4215,7 @@ BAD:  "An error occurred. Please try again."`
           },
           {
             title: 'Runbook for failure modes',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Every recurring incident should have a runbook. Symptom → diagnosis → mitigation → escalation. Lets Claude (or oncall) react fast.',
             prompt: 'Write runbooks for our top 5 failure modes. For each: how to detect it, immediate mitigation, root cause fix, and prevention.',
             lang: 'markdown',
@@ -4422,7 +4419,7 @@ const securityHeaders = [
           },
           {
             title: 'Audit logging — track sensitive actions',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Audit logs let you answer "who did what when" after a security incident. Log every sensitive action — not as part of error handling, but as a matter of course.',
             prompt: 'Add audit logging for all sensitive actions: login, logout, password change, admin operations, and data exports.',
             lang: 'typescript',
@@ -4504,7 +4501,7 @@ res.cookie('rt', refreshToken, {
           },
           {
             title: 'OAuth — verify state and PKCE',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'CSRF and code interception attacks against OAuth are real. Always verify the state parameter; for public clients, always use PKCE.',
             prompt: 'Implement PKCE for our OAuth authorization flow. Generate code verifier/challenge and verify on token exchange.',
             lang: 'typescript',
@@ -4573,7 +4570,7 @@ async function validate(buf: Buffer) {
           },
           {
             title: 'Content Security Policy — block injected scripts',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'CSP is your last line of defense against XSS. A strict policy disallows inline scripts and limits where scripts can load from.',
             prompt: 'Write a Content Security Policy that disallows inline scripts and restricts script sources to our own domain and CDN. Include the HTTP header.',
             lang: 'typescript',
@@ -4591,7 +4588,7 @@ res.setHeader('Content-Security-Policy', csp);`
           },
           {
             title: 'Defense in depth — layered controls',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Don\'t rely on one control. Auth, authz, rate limit, input validation, output encoding, logging, monitoring — every layer catches what the others miss.',
             prompt: 'Add rate limiting, input validation, parameterized queries, and authorization checks to this endpoint — all four layers.',
             lang: 'typescript',
@@ -4642,7 +4639,7 @@ ResourceTypes:
           },
           {
             title: 'Tenant isolation — query scoping by tenantId',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'B2B SaaS leaks happen when a query forgets the tenant filter. Repository layer adds tenant scope automatically; never trust application code to remember.',
             prompt: 'Add tenant isolation to all database queries. Every query must include a WHERE tenantId = :currentTenantId clause.',
             lang: 'typescript',
@@ -4659,7 +4656,7 @@ ResourceTypes:
           },
           {
             title: 'Audit log — immutable, append-only, searchable',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'After an incident, you need to know who did what when. An immutable audit log (no UPDATE, no DELETE) is your investigation tool.',
             prompt: 'Create an append-only audit log table that tracks all data changes. Make it impossible to update or delete entries.',
             lang: 'sql',
@@ -4811,7 +4808,7 @@ Do not create new files."`
           },
           {
             title: 'Use temperature hints in the prompt',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'You can\'t set temperature directly in Claude Code, but you can ask for conservative vs creative output and Claude will adjust its style accordingly.',
             prompt: '"Give me the most conventional, boring implementation of a rate limiter. No cleverness, just the simplest thing that works."',
             lang: 'bash',
@@ -4944,7 +4941,7 @@ it('renders verified user', () => {
           },
           {
             title: 'Contract test between two services',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Integration tests are brittle. Contract tests verify that producer and consumer agree on the API shape, without needing both services running.',
             prompt: '"Write a Pact contract test between the frontend and /users endpoint. The consumer expects: { id: string, email: string, role: \'admin\' | \'user\' }."',
             lang: 'typescript',
@@ -4983,7 +4980,7 @@ Do not rewrite the tests — just report your findings."`
           },
           {
             title: 'Generate load test scenarios',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Load tests are often written once and never updated. Claude can generate realistic k6 or artillery scripts from your API spec.',
             prompt: '"Write a k6 load test for the checkout API. Ramp from 10 to 200 VUs over 2 minutes, hold for 3 minutes. Mix: 70% browse, 20% add-to-cart, 10% checkout."',
             lang: 'javascript',
@@ -5009,7 +5006,7 @@ export default function () {
           },
           {
             title: 'Mutation testing — kill surviving mutants',
-            difficulty: 'expert',
+            difficulty: 'advanced',
             why: 'Mutation testing reveals tests that pass even when the code is wrong. Claude can read Stryker output and write the targeted tests that kill survivors.',
             prompt: '"These mutations survived Stryker:\n- Line 42: changed > to >= in discount threshold\n- Line 87: removed null guard before user.email\n\nWrite a targeted test that kills each one."',
             lang: 'bash',
@@ -5034,8 +5031,8 @@ let activeDifficulty = 'all';
 let searchQuery     = '';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-const DIFF_LABELS = { essential:'Essential', advanced:'Advanced', expert:'Expert' };
-const DIFF_ACTIVE = { all:'active-diff-all', essential:'active-diff-essential', advanced:'active-diff-advanced', expert:'active-diff-expert' };
+const DIFF_LABELS = { essential:'Essential', advanced:'Advanced' };
+const DIFF_ACTIVE = { all:'active-diff-all', essential:'active-diff-essential', advanced:'active-diff-advanced' };
 
 function hl(code, lang) {
   try { return hljs.highlight(code.trim(), { language: lang }).value; }
