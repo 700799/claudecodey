@@ -205,29 +205,33 @@ h1 {
 
 /* ===== Get Certified Button ===== */
 .cert-btn {
-  margin-top: 18px;
+  margin-top: 14px;
   background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%);
   color: #1a1a1a;
-  border: 3px solid #1a1a1a;
+  border: 2px solid #1a1a1a;
   border-radius: 999px;
-  padding: 14px 32px;
-  font-size: 1.05rem;
+  padding: 7px 18px;
+  font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   cursor: pointer;
-  box-shadow: 0 6px 0 #1a1a1a, 0 10px 24px rgba(0,0,0,0.25);
+  box-shadow: 0 3px 0 #1a1a1a, 0 5px 12px rgba(0,0,0,0.2);
   transition: all 0.18s ease;
   font-family: inherit;
   text-transform: uppercase;
 }
 .cert-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 9px 0 #1a1a1a, 0 14px 28px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 #1a1a1a, 0 8px 14px rgba(0,0,0,0.25);
 }
 .cert-btn:active {
-  transform: translateY(3px);
-  box-shadow: 0 3px 0 #1a1a1a, 0 6px 14px rgba(0,0,0,0.2);
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #1a1a1a, 0 3px 8px rgba(0,0,0,0.15);
 }
+
+/* ===== Two-row category pill layout ===== */
+.pills-rows { display: flex; flex-direction: column; gap: 6px; }
+.pills-row { display: flex; flex-wrap: wrap; gap: 6px; }
 
 /* ===== Try-it panel ===== */
 .try-btn {
@@ -800,7 +804,10 @@ h1 {
   <div class="nav-row">
     <div>
       <div class="row-label">Category</div>
-      <div class="pills" id="category-pills"></div>
+      <div class="pills-rows" id="category-pills">
+        <div class="pills-row" data-row="1"></div>
+        <div class="pills-row" data-row="2"></div>
+      </div>
     </div>
     <div>
       <div class="row-label">Difficulty</div>
@@ -836,12 +843,194 @@ h1 {
 const CATEGORIES = {
 
       // ===================================================
+      // 0. COMMANDS — slash commands you use every day
+      // ===================================================
+      commands: {
+        icon: '/',
+        title: 'Commands',
+        description: 'The slash commands you type into Claude Code every day. These are typed into the chat input — not the terminal. They control sessions (/clear, /compact, /resume), trigger built-in workflows (/init, /review, /loop), and manage your setup (/model, /fast, /memory). Master these first — they\'re how you actually drive Claude Code.',
+        examples: [
+          {
+            title: '/clear — wipe conversation context',
+            difficulty: 'essential',
+            why: 'Context from a previous task leaks into the next one and causes Claude to make stale assumptions. /clear gives you a fresh slate without losing your files or git state.',
+            lang: 'text',
+            prompt: '/clear',
+            code: '/clear',
+            output: '✓ Conversation history cleared.\n  Files, git state, and settings preserved.\n  Ready for a new task.'
+          },
+          {
+            title: '/init — generate a CLAUDE.md',
+            difficulty: 'essential',
+            why: 'CLAUDE.md is the first thing Claude reads every session. /init bootstraps one by scanning your repo and writing project conventions, tech stack, and constraints.',
+            lang: 'text',
+            prompt: '/init',
+            code: '/init',
+            output: 'Scanning repository structure...\n  ✓ Detected: TypeScript + React + Vite\n  ✓ Detected: Jest for testing, ESLint for lint\n  ✓ Reading package.json, tsconfig.json, README.md\n  ✓ Writing CLAUDE.md (43 lines)\n\nCLAUDE.md created. Review and edit to add team conventions.'
+          },
+          {
+            title: '/review — review the current branch',
+            difficulty: 'essential',
+            why: 'Catch bugs, security issues, and style violations before pushing. /review reads your diff and gives a structured review without needing a GitHub PR.',
+            lang: 'text',
+            prompt: '/review',
+            code: '/review',
+            output: 'Reviewing 7 files changed on branch feature/payments...\n\n  src/api/charge.ts:42  ⚠ Missing input validation on amount\n  src/api/charge.ts:67  ✗ SQL injection: query uses string interpolation\n  src/utils/format.ts:12 ℹ Consider extracting magic number 86400\n  src/auth/session.ts   ✓ Looks good\n\n3 issues found (1 critical, 1 warning, 1 info)'
+          },
+          {
+            title: '/loop — recurring task on an interval',
+            difficulty: 'essential',
+            why: 'Tell Claude to run a command (or any natural-language instruction) on an interval. Perfect for CI babysitting, polling, and convergence loops.',
+            lang: 'text',
+            prompt: '/loop 5m run npm test; if anything fails fix the first failure',
+            code: '/loop 5m run npm test; if anything fails fix the first failure',
+            output: '[loop] Started: every 5m → run npm test...\n[loop] iter 1 @ 14:02:01  ✓ all tests passed (24s)\n[loop] iter 2 @ 14:07:03  ✗ 1 test failed → fixing...\n[loop] iter 2 @ 14:08:17  ✓ Fixed: src/utils/parser.test.ts:42 (off-by-one)\n[loop] iter 3 @ 14:12:18  ✓ all tests passed (22s)\n  (Press Ctrl+C to stop the loop)'
+          },
+          {
+            title: '/model — switch the model mid-session',
+            difficulty: 'essential',
+            why: 'Different tasks deserve different models. Use Haiku for batch grunt work, Opus for complex reasoning, Sonnet as the daily driver.',
+            lang: 'text',
+            prompt: '/model claude-opus-4-7',
+            code: '/model claude-opus-4-7',
+            output: '✓ Switched to claude-opus-4-7\n  Previous: claude-sonnet-4-6\n  Conversation context preserved.'
+          },
+          {
+            title: '/fast — toggle fast mode (Opus only)',
+            difficulty: 'essential',
+            why: 'Fast mode keeps Opus but speeds up output. Great when you\'re iterating quickly and want responses to arrive faster.',
+            lang: 'text',
+            prompt: '/fast',
+            code: '/fast',
+            output: '⚡ Fast mode: ON (using claude-opus-4-7)\n  Faster output, same model quality.'
+          },
+          {
+            title: '/compact — manually compact context',
+            difficulty: 'advanced',
+            why: 'When you\'re running long and need to keep going, /compact summarizes earlier messages so you can continue without /clear destroying your context.',
+            lang: 'text',
+            prompt: '/compact',
+            code: '/compact',
+            output: 'Compacting conversation...\n  ✓ Summarized 47 earlier messages → 1 summary\n  ✓ Preserved last 8 messages verbatim\n  ✓ Freed ~28k tokens of context\n\nReady to continue.'
+          },
+          {
+            title: '/resume — pick up a previous session',
+            difficulty: 'advanced',
+            why: 'Sessions live in ~/.claude. /resume lets you jump back into a previous conversation with its full context — useful for multi-day workflows.',
+            lang: 'text',
+            prompt: '/resume',
+            code: '/resume',
+            output: 'Recent sessions:\n  1. payments-refactor  (47 messages, 2h ago)\n  2. ci-debugging       (12 messages, 1d ago)\n  3. docs-cleanup       (89 messages, 3d ago)\n\nSelect a session number or press Esc to cancel.'
+          },
+          {
+            title: '/help — list available commands',
+            difficulty: 'essential',
+            why: 'When in doubt, /help. Shows every command available in your current Claude Code build plus a one-line description.',
+            lang: 'text',
+            prompt: '/help',
+            code: '/help',
+            output: 'Available commands:\n  /clear     Clear conversation context\n  /init      Generate CLAUDE.md from this repo\n  /review    Review the current branch\n  /loop      Run a command on an interval\n  /model     Switch model mid-session\n  /fast      Toggle fast mode (Opus only)\n  /compact   Compact conversation context\n  /resume    Resume a previous session\n  /memory    View/edit Claude\'s memory\n  /skills    Manage custom skills\n  /hooks     Manage hooks (PreToolUse, etc.)\n  ... type /help <cmd> for details'
+          },
+          {
+            title: '/memory — view or edit persistent memory',
+            difficulty: 'advanced',
+            why: 'Memory survives /clear. Put things you always want Claude to know (your name, preferences, project shortcuts) so you don\'t repeat yourself every session.',
+            lang: 'text',
+            prompt: '/memory',
+            code: '/memory',
+            output: 'Memory (persists across sessions):\n  • I prefer concise responses, no narration\n  • Default test runner: vitest, not jest\n  • Project: claudecodey (single-page HTML, no build step)\n  • Always run prettier on save\n\nEdit memory? (y/n)'
+          },
+          {
+            title: '/skills — list and run custom skills',
+            difficulty: 'essential',
+            why: 'Skills are reusable slash commands you define. /skills lists them; /<skill-name> runs one. Build a skill once, use it forever.',
+            lang: 'text',
+            prompt: '/skills',
+            code: '/skills',
+            output: 'Custom skills in this project:\n  /deploy <env>     Deploy current branch (run, lint, test, push)\n  /standup          Generate today\'s standup from git activity\n  /pr               Open a PR with auto-generated title/body\n\nGlobal skills (user-level):\n  /init             Initialize CLAUDE.md\n  /review           Review current branch\n\nUse /<name> to run a skill, or /skills create to add one.'
+          },
+          {
+            title: '/hooks — view configured hooks',
+            difficulty: 'advanced',
+            why: 'Hooks fire on events (PreToolUse, PostToolUse, Stop, SessionStart). /hooks shows what\'s wired up so you can debug why something is — or isn\'t — running.',
+            lang: 'text',
+            prompt: '/hooks',
+            code: '/hooks',
+            output: 'Configured hooks:\n  PreToolUse [Bash]      → ~/scripts/safety-check.sh\n  PostToolUse [Edit|Write] → npx prettier --write\n  Stop                   → afplay /System/Library/Sounds/Glass.aiff\n  SessionStart           → npm install && npm run dev &\n\n4 hooks configured. Source: .claude/settings.json'
+          },
+          {
+            title: '/add-permission — allow a tool without prompts',
+            difficulty: 'advanced',
+            why: 'Stop the permission prompts for tools you use constantly. Adds the rule to settings.local.json so it\'s your-machine-only.',
+            lang: 'text',
+            prompt: '/add-permission Bash(git status)',
+            code: '/add-permission Bash(git status)',
+            output: '✓ Added permission: Bash(git status:*)\n  Saved to: .claude/settings.local.json\n  Future `git status` runs won\'t prompt for confirmation.'
+          },
+          {
+            title: '/agents — manage subagents',
+            difficulty: 'advanced',
+            why: 'Subagents are specialists (Explore, Plan, security-review). /agents lists them and lets you configure custom ones.',
+            lang: 'text',
+            prompt: '/agents',
+            code: '/agents',
+            output: 'Available subagents:\n  Explore           Read-only code search (fast, scoped)\n  Plan              Architecture design only (no edits)\n  general-purpose   Multi-step tasks (full tool access)\n  code-reviewer     PR-style review\n  security-review   OWASP-focused audit\n\nUse Agent({ subagent_type: "Explore", prompt: "..." }) in code.'
+          },
+          {
+            title: '/status — show session info',
+            difficulty: 'essential',
+            why: 'Quick health check: which model, which branch, token usage so far, any background processes. The "where am I?" command.',
+            lang: 'text',
+            prompt: '/status',
+            code: '/status',
+            output: 'Session status:\n  Model:        claude-sonnet-4-6\n  Branch:       feature/payments\n  Working dir:  /home/user/myproject\n  Messages:     47\n  Tokens used:  87,302 / 200,000\n  Background:   2 processes (npm run dev, jest --watch)\n  Hooks:        4 active\n  Uptime:       1h 23m'
+          },
+          {
+            title: '/undo — undo the last edit',
+            difficulty: 'essential',
+            why: 'When Claude makes a change you don\'t want, /undo reverses just the last file edit without rolling back the conversation.',
+            lang: 'text',
+            prompt: '/undo',
+            code: '/undo',
+            output: '✓ Reverted: src/api/charge.ts\n  Restored to state before Claude\'s last Edit.\n  Conversation context preserved — Claude knows this was undone.'
+          },
+          {
+            title: '/config — view or change settings',
+            difficulty: 'advanced',
+            why: 'View your current settings (model, permissions, hooks) and change them inline without editing JSON files by hand.',
+            lang: 'text',
+            prompt: '/config',
+            code: '/config',
+            output: 'Active settings (.claude/settings.json + .claude/settings.local.json):\n  model:               claude-sonnet-4-6\n  autoCompact:         true\n  permissions.allow:   12 rules\n  permissions.deny:    2 rules\n  hooks:               4 configured\n\nUse /config <key> <value> to change a setting.'
+          },
+          {
+            title: '/pr — open a pull request',
+            difficulty: 'essential',
+            why: 'Reads your branch, generates a title and description from the diff, and opens a draft PR with the gh CLI or GitHub MCP.',
+            lang: 'text',
+            prompt: '/pr',
+            code: '/pr',
+            output: 'Reading branch diff vs main...\n  ✓ 7 files changed (+243 / -89)\n  ✓ Generated title: "feat: add Stripe payment integration"\n  ✓ Generated PR body (summary + test plan)\n\nOpening draft PR... https://github.com/you/repo/pull/142\n  Pushed to origin\n  Draft PR created'
+          },
+          {
+            title: '/export — save the conversation',
+            difficulty: 'advanced',
+            why: 'Export the current conversation to a Markdown file for review, sharing, or archiving. Great for documenting how a fix was reached.',
+            lang: 'text',
+            prompt: '/export',
+            code: '/export',
+            output: '✓ Exported to: ~/.claude/exports/session-2025-05-15-14h.md\n  Format: Markdown (47 messages, 28KB)\n  Includes: all messages, tool calls, and file diffs'
+          },
+        ]
+      },
+
+      // ===================================================
       // 1. LOOPS
       // ===================================================
       loops: {
         icon: '🔄',
         title: 'Loops',
-        description: 'Recurring tasks, polling, and long-running workflows using /loop and shell patterns. Keep Claude working while you sleep.',
+        description: 'Recurring tasks, polling, and long-running workflows using /loop and shell patterns. Use loops for CI babysitting (keep retrying until tests pass), convergence tasks (refactor until no more changes), monitoring (poll a health endpoint), and overnight jobs. Each loop has an exit condition — without one, you\'re burning tokens forever. Combine with state files so loops can survive crashes and resume where they left off.',
         examples: [
           {
             title: 'Basic /loop — poll every 10 minutes',
@@ -943,24 +1132,7 @@ curl -X POST $SLACK_WEBHOOK_URL \
   sleep $((attempt * 30))
 done`
           },
-          {
-            title: 'Cron-style scheduling',
-            difficulty: 'advanced',
-            why: 'GitHub Actions cron is overkill for quick tasks. Run a loop on a cloud VM or GitHub Codespace that wakes Claude at a fixed schedule.',
-            prompt: 'Run /daily-report every day at 9am using a loop that sleeps until the next scheduled time. Use a state file to survive restarts.',
-            lang: 'yaml',
-            code: `# .github/workflows/nightly.yml
-on:
-  schedule:
-    - cron: '0 2 * * *'   # 2am UTC daily
-jobs:
-  nightly:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: npx claude "run nightly data sync and commit results"`
-          },
-          {
+{
             title: 'Loop with cost guard',
             difficulty: 'expert',
             why: 'Runaway loops burn money. Track cumulative token spend in a state file and kill the loop if it crosses a threshold.',
@@ -1101,66 +1273,7 @@ while true; do
   claude "add tests for the next uncovered function"
 done`
           },
-          {
-            title: 'Cascading loop — outer schedule, inner work',
-            difficulty: 'expert',
-            why: 'Schedule one expensive operation hourly, light operations every minute. The cascade pattern saves API calls while keeping latency low.',
-            prompt: 'Run a daily cleanup job that processes all pending items in sequence. Outer loop = once per day, inner loop = each pending item.',
-            lang: 'bash',
-            code: `MINUTE=0
-while true; do
-  if [ $((MINUTE % 60)) -eq 0 ]; then
-    claude "run hourly full audit"
-  fi
-  claude "run minute-level health check"
-  sleep 60
-  MINUTE=$((MINUTE + 1))
-done`
-          },
-          {
-            title: 'Loop with dead-man switch',
-            difficulty: 'expert',
-            why: 'If the loop stops emitting heartbeats, an external monitor should know within 60s. Cron + dead-man switch catches silent failures.',
-            prompt: 'Add a heartbeat file (.heartbeat) that gets touched on each iteration. Set up a separate monitor that alerts me if the heartbeat is more than 2 minutes old.',
-            lang: 'bash',
-            code: `while true; do
-  # Each iteration writes a fresh heartbeat
-  date +%s > .heartbeat
-  do_work
-  sleep 30
-done &
-
-# Separate monitor (or healthchecks.io)
-while true; do
-  LAST=$(cat .heartbeat 2>/dev/null || echo 0)
-  AGE=$(($(date +%s) - LAST))
-  [ "$AGE" -gt 120 ] && alert "Loop stale: \${AGE}s"
-  sleep 60
-done`
-          },
-          {
-            title: 'Stream processing loop with backpressure',
-            difficulty: 'expert',
-            why: 'When the producer is faster than the consumer, you need backpressure. A bounded queue + sleep when full prevents memory exhaustion.',
-            prompt: 'Process this stream of messages but slow down when the queue depth exceeds 1000 items. Implement backpressure so we don\'t overwhelm the downstream service.',
-            lang: 'python',
-            code: `import queue, time
-q = queue.Queue(maxsize=100)
-
-def consumer():
-    while True:
-        item = q.get()
-        if item is None: break
-        process(item)
-        q.task_done()
-
-# Producer respects backpressure:
-for item in stream:
-    while q.full():
-        time.sleep(0.1)  # wait for consumer
-    q.put(item)`
-          },
-        ]
+]
       },
 
       // ===================================================
@@ -1169,7 +1282,7 @@ for item in stream:
       hooks: {
         icon: '🪝',
         title: 'Hooks',
-        description: 'Intercept Claude\'s actions with PreToolUse, PostToolUse, Stop, and Notification hooks. Automation at the event level.',
+        description: 'Intercept Claude\'s actions at the event level using hooks defined in .claude/settings.json. PreToolUse fires before tool execution (use it to block dangerous commands), PostToolUse fires after (auto-format, run tests, sync files), Stop fires when Claude finishes (notify, run final checks), and SessionStart fires on session boot (install deps, validate env vars). Hooks are shell commands that receive event data on stdin as JSON and can exit with code 2 to block the action.',
         examples: [
           {
             title: 'Block dangerous shell commands (PreToolUse)',
@@ -1305,25 +1418,7 @@ done
 echo "✅ Environment validated"
 exit 0`
           },
-          {
-            title: 'Cost tracking hook',
-            difficulty: 'expert',
-            why: 'Each API response includes usage metadata. A PostToolUse hook accumulates the spend so you can budget per-project.',
-            prompt: 'Add hooks to track API usage costs per session and append them to ~/.claude/cost-log.csv.',
-            lang: 'python',
-            code: `#!/usr/bin/env python3
-import sys, json, os
-data = json.load(sys.stdin)
-usage = data.get('tool_response', {}).get('usage', {})
-inp = usage.get('input_tokens', 0)
-out = usage.get('output_tokens', 0)
-cost_file = '.claude/cost.json'
-costs = json.load(open(cost_file)) if os.path.exists(cost_file) else {'total_tokens': 0}
-costs['total_tokens'] += inp + out
-json.dump(costs, open(cost_file, 'w'))
-sys.exit(0)`
-          },
-          {
+{
             title: 'Desktop notification (macOS/Linux)',
             difficulty: 'essential',
             why: 'The Notification hook fires when Claude needs your input. Wire it to system notifications so you don\'t miss a blocked prompt.',
@@ -1335,19 +1430,7 @@ osascript -e 'display notification "Claude needs your input" with title "Claude 
 # Linux (libnotify)
 notify-send "Claude Code" "Claude needs your input"`
           },
-          {
-            title: 'Sound alert hook',
-            difficulty: 'essential',
-            why: 'Audible alerts for when Claude finishes a long task — no screen-watching required.',
-            prompt: 'Add a Stop hook that plays a sound when you finish a task — use afplay on Mac or paplay on Linux.',
-            lang: 'bash',
-            code: `# macOS — plays system sound on Stop
-afplay /System/Library/Sounds/Hero.aiff
-
-# Linux
-paplay /usr/share/sounds/freedesktop/stereo/complete.oga`
-          },
-          {
+{
             title: 'Block writes outside project root',
             difficulty: 'expert',
             why: 'Prevent runaway agents from writing files outside the project. A PreToolUse hook checks the target path and blocks anything outside CWD.',
@@ -1363,23 +1446,7 @@ if [[ "$FILE" == /* && "$FILE" != "$CWD"* ]]; then
 fi
 exit 0`
           },
-          {
-            title: 'Cost ceiling — kill session at $X spent',
-            difficulty: 'expert',
-            why: 'A PostToolUse hook tracks cumulative cost. When it crosses your ceiling, exit 2 to stop the session. Prevents runaway loops from burning through your budget.',
-            prompt: 'Add a hook that monitors cost and sends an exit signal to stop the session if we spend more than $5.',
-            lang: 'bash',
-            code: `#!/usr/bin/env bash
-COST_FILE=.claude/cost.txt
-TOTAL=$(cat $COST_FILE 2>/dev/null || echo 0)
-# Add the latest call's cost (rough estimate from token count)
-DELTA=$(cat | jq '.tool_response.usage.total_tokens // 0' | awk '{print $1 * 0.000015}')
-NEW=$(echo "$TOTAL + $DELTA" | bc)
-echo "$NEW" > $COST_FILE
-[ "$(echo "$NEW > 5.00" | bc)" -eq 1 ] && { echo "Budget exceeded: \\$$NEW"; exit 2; }
-exit 0`
-          },
-          {
+{
             title: 'Diff size limit — block massive edits',
             difficulty: 'advanced',
             why: 'An agent that wants to rewrite 5000 lines in one go is usually wrong. Block edits that exceed a size threshold and force smaller commits.',
@@ -1498,22 +1565,7 @@ if echo "$CMD" | grep -q "gh pr create" && ! echo "$CMD" | grep -q '\\-\\-body';
 fi
 exit 0`
           },
-          {
-            title: 'License compliance check',
-            difficulty: 'expert',
-            why: 'PostToolUse on package.json edits: scan new dependencies for GPL/AGPL licenses. Prevents accidental copyleft contamination.',
-            prompt: 'Add a PreToolUse hook that checks npm install commands and blocks packages with non-compliant licenses.',
-            lang: 'bash',
-            code: `#!/usr/bin/env bash
-FILE=$(cat | jq -r '.tool_input.file_path')
-[ "$FILE" != "package.json" ] && exit 0
-NPMRESULT=$(npm ls --json 2>/dev/null | jq -r '..|.license? // empty' | sort -u)
-if echo "$NPMRESULT" | grep -qE "^(GPL|AGPL)"; then
-  echo "WARN: copyleft licenses introduced: $NPMRESULT"
-fi
-exit 0`
-          },
-          {
+{
             title: 'Secret scanner before commit',
             difficulty: 'advanced',
             why: 'Run trufflehog or gitleaks via a Stop hook to catch secrets that slipped into edits. Saves you from a public-repo leak.',
@@ -1526,24 +1578,7 @@ if command -v gitleaks &>/dev/null; then
 fi
 exit 0`
           },
-          {
-            title: 'Time-of-day restriction',
-            difficulty: 'advanced',
-            why: 'Block production deploys outside business hours. A PreToolUse hook checks the clock and refuses deploy commands at 2am.',
-            prompt: 'Add a PreToolUse hook that blocks any destructive operations (DROP, DELETE, git push --force) outside of business hours.',
-            lang: 'bash',
-            code: `#!/usr/bin/env bash
-CMD=$(cat | jq -r '.tool_input.command // ""')
-echo "$CMD" | grep -qE "deploy|kubectl apply.*prod" || exit 0
-HOUR=$(date +%H)
-DOW=$(date +%u)  # 1=Mon ... 7=Sun
-if [ "$DOW" -gt 5 ] || [ "$HOUR" -lt 9 ] || [ "$HOUR" -ge 18 ]; then
-  echo "BLOCKED: prod deploys only Mon-Fri 9am-6pm" >&2
-  exit 2
-fi
-exit 0`
-          },
-        ]
+]
       },
 
       // ===================================================
@@ -1552,7 +1587,7 @@ exit 0`
       monitoring: {
         icon: '📡',
         title: 'Monitoring',
-        description: 'The Monitor tool and background process patterns. Stream live output from long-running commands without polling.',
+        description: 'Stream live output from long-running commands without polling. The Monitor tool turns each stdout line into a notification that wakes the session — perfect for watching builds, tailing logs, tracking health endpoints, and reacting to events. Combine with /loop for periodic checks, or run a Bash command with run_in_background:true and Monitor watches for you. Replaces sleep-and-poll patterns entirely.',
         examples: [
           {
             title: 'Monitor a background command',
@@ -1737,69 +1772,7 @@ while true; do
   sleep 300
 done`
           },
-          {
-            title: 'SSL certificate expiry watcher',
-            difficulty: 'essential',
-            why: 'A cert expiring on a weekend takes down production. Check every domain you serve and alert 14 days before expiry.',
-            prompt: '/loop 24h check SSL expiry for api.myapp.com; alert me if the certificate expires in less than 30 days',
-            lang: 'bash',
-            code: `#!/usr/bin/env bash
-for domain in app.example.com api.example.com www.example.com; do
-  EXPIRY=$(echo | openssl s_client -servername $domain -connect $domain:443 2>/dev/null \\
-    | openssl x509 -noout -enddate | cut -d= -f2)
-  DAYS=$((($(date -d "$EXPIRY" +%s) - $(date +%s)) / 86400))
-  echo "$domain: $DAYS days remaining"
-  [ "$DAYS" -lt 14 ] && alert "$domain expires in $DAYS days"
-done`
-          },
-          {
-            title: 'Process hang detector',
-            difficulty: 'advanced',
-            why: 'A process that hangs (not crashes) is harder to detect. Watch its CPU; if 0% for too long but still alive, restart it.',
-            prompt: '/loop 1m check if the worker process is responding; if it hasn\'t logged anything in 5 minutes, restart it and alert me',
-            lang: 'bash',
-            code: `#!/usr/bin/env bash
-PID=$(pgrep -f myapp)
-COUNTER=0
-while sleep 30; do
-  CPU=$(ps -p $PID -o %cpu= 2>/dev/null | awk '{print int($1)}')
-  if [ "$CPU" -eq 0 ]; then
-    COUNTER=$((COUNTER + 1))
-    [ $COUNTER -ge 10 ] && { echo "HANG: restarting"; kill $PID; break; }
-  else
-    COUNTER=0
-  fi
-done`
-          },
-          {
-            title: 'DNS resolution monitor',
-            difficulty: 'advanced',
-            why: 'Slow or failing DNS cascades into mysterious outages. Monitor resolution time for your critical hostnames separately from the service itself.',
-            prompt: '/loop 5m resolve api.myapp.com and record latency; alert if resolution takes more than 500ms',
-            lang: 'bash',
-            code: `while true; do
-  for host in api.myapp.com db.internal mailgun.org; do
-    T=$( { time -p dig +short $host > /dev/null; } 2>&1 | awk '/real/ {print $2}' )
-    echo "dns_resolve_\${host}=\${T}s"
-    [ "$(echo "$T > 0.5" | bc)" -eq 1 ] && echo "SLOW DNS: $host"
-  done
-  sleep 30
-done`
-          },
-          {
-            title: 'Database replication lag',
-            difficulty: 'expert',
-            why: 'Read replicas drifting behind primary cause stale reads. Postgres exposes lag in pg_stat_replication — monitor it and alert on >10s lag.',
-            prompt: '/loop 30s check PostgreSQL replication lag; alert me if lag exceeds 60 seconds',
-            lang: 'sql',
-            code: `-- Run this from primary, every 30s
-SELECT client_addr,
-       pg_wal_lsn_diff(pg_current_wal_lsn(), replay_lsn) AS lag_bytes,
-       EXTRACT(EPOCH FROM (now() - reply_time)) AS lag_seconds
-FROM pg_stat_replication;
--- Alert if lag_seconds > 10`
-          },
-          {
+{
             title: 'Queue depth monitor',
             difficulty: 'advanced',
             why: 'A growing queue means consumers can\'t keep up. Watch depth + add workers automatically when it crosses a threshold.',
@@ -1817,79 +1790,7 @@ FROM pg_stat_replication;
   sleep 60
 done`
           },
-          {
-            title: 'Container memory leak detection',
-            difficulty: 'expert',
-            why: 'Memory that grows linearly over hours is a leak. Sample container RSS every 5min, compute slope, alert if positive and large.',
-            prompt: '/loop 5m check Docker container memory usage; alert me if any container is growing more than 10MB per check',
-            lang: 'python',
-            code: `import subprocess, time
-samples = []
-while True:
-    out = subprocess.check_output(['docker', 'stats', '--no-stream', '--format', '{{.MemUsage}}', 'myapp'])
-    mem_mb = float(out.split(b'MiB')[0].split()[-1])
-    samples.append((time.time(), mem_mb))
-    if len(samples) > 20:
-        samples.pop(0)
-        # Linear regression slope
-        n = len(samples); xs = [s[0] for s in samples]; ys = [s[1] for s in samples]
-        slope = (n * sum(x*y for x,y in samples) - sum(xs)*sum(ys)) / (n * sum(x*x for x in xs) - sum(xs)**2)
-        if slope > 0.05:  # MB/sec
-            print(f"LEAK suspected: +{slope*60:.1f} MB/min")
-    time.sleep(300)`
-          },
-          {
-            title: 'CDN cache hit rate',
-            difficulty: 'advanced',
-            why: 'A dropping cache hit rate means your origin is taking more load. Tail access logs, compute hit ratio, alert on drops.',
-            prompt: '/loop 1h check CDN cache hit rate from the dashboard API; alert me if it drops below 80%',
-            lang: 'bash',
-            code: `tail -F /var/log/nginx/access.log |
-awk '{
-  count++
-  if ($NF ~ /HIT/) hits++
-  if (count % 100 == 0) {
-    ratio = hits / count * 100
-    printf "cache_hit_rate=%.1f%%\\n", ratio
-    if (ratio < 80) print "ALERT: hit rate dropped"
-  }
-}'`
-          },
-          {
-            title: 'Kubernetes pod restart detector',
-            difficulty: 'advanced',
-            why: 'A pod restarting more than 3 times in 10 minutes is usually crashlooping. Watch the event stream and alert before users notice.',
-            prompt: '/loop 2m run kubectl get pods and check restart counts; alert me if any pod has restarted more than 3 times in the last hour',
-            lang: 'bash',
-            code: `kubectl get pods -A -w -o json |
-jq -r 'select(.object.status.containerStatuses[]?.restartCount > 3) |
-  "POD_RESTART: \\(.object.metadata.namespace)/\\(.object.metadata.name) restarts=\\(.object.status.containerStatuses[0].restartCount)"'`
-          },
-          {
-            title: 'Webhook delivery monitor',
-            difficulty: 'advanced',
-            why: 'When you send webhooks to customers, failed deliveries are a customer-visible bug. Monitor delivery success rate per recipient and retry on failure.',
-            prompt: '/loop 5m check the webhook delivery log; alert me if more than 5% of webhooks have failed in the last hour',
-            lang: 'python',
-            code: `import requests
-from collections import defaultdict
-fails = defaultdict(int)
-
-def deliver(url, payload):
-    try:
-        r = requests.post(url, json=payload, timeout=5)
-        if r.status_code >= 500:
-            fails[url] += 1
-            if fails[url] > 5:
-                print(f"ALERT: {url} failing {fails[url]} times")
-            return False
-        fails[url] = 0
-        return True
-    except Exception as e:
-        fails[url] += 1
-        return False`
-          },
-          {
+{
             title: 'User experience monitor (synthetic)',
             difficulty: 'expert',
             why: 'Real-user metrics lag; synthetic monitoring catches issues before users do. Replay critical user journeys every minute and alert on regressions.',
@@ -1922,7 +1823,7 @@ setInterval(check, 60_000);`
       agents: {
         icon: '🤖',
         title: 'Agents',
-        description: 'Spawn subagents, run work in parallel, chain specialists, and orchestrate multi-agent systems using the Agent tool.',
+        description: 'Spawn subagents to delegate work and protect your main context. Built-in agents: Explore (read-only search, fast), Plan (architecture design, no edits), general-purpose (full tool access), code-reviewer, and security-review. Launch multiple in parallel by sending one message with multiple Agent tool calls — independent agents run concurrently. Use isolation:\"worktree\" for risky experiments. Each agent has its own context window, so heavy work doesn\'t pollute yours.',
         examples: [
           {
             title: 'Spawn a subagent for isolated research',
@@ -2144,54 +2045,7 @@ await Promise.all(locales.map(loc =>
   })
 ));`
           },
-          {
-            title: 'Performance analyzer agent',
-            difficulty: 'expert',
-            why: 'Profile data is huge and noisy. An agent reads a flamegraph or profile JSON and gives you the 5 hot paths in plain English.',
-            prompt: 'Profile the API under load and find the 3 slowest endpoints. For each one, explain why it\'s slow and propose a fix.',
-            lang: 'javascript',
-            code: `Agent({
-  description: "Analyze profile",
-  prompt: \`Read profile.cpuprofile (Chrome DevTools format).
-Identify the top 5 functions by self-time and total-time.
-For each: explain what it does and suggest a fix.
-Output a markdown table sorted by potential impact.\`
-});`
-          },
-          {
-            title: 'Style migration agent — CSS to Tailwind',
-            difficulty: 'advanced',
-            why: 'Migrating styles is mechanical but error-prone. An agent walks the component tree, replaces classes consistently, and verifies visual parity.',
-            prompt: 'Convert all the CSS files in src/styles/ to Tailwind utility classes. Keep the visual output identical.',
-            lang: 'javascript',
-            code: `Agent({
-  description: "Migrate CSS module → Tailwind",
-  prompt: \`For each *.module.css in src/:
-1. Read the file
-2. Find components using it (grep imports)
-3. Rewrite className= props with Tailwind utilities
-4. Delete the .module.css file
-5. Commit per component
-Do not change layout or colors — verify with the screenshot diff tool.\`
-});`
-          },
-          {
-            title: 'Bug-bash automation agent',
-            difficulty: 'expert',
-            why: 'Run the same fuzz test against every API endpoint, parallelized. An agent per endpoint reports anomalies in <10 minutes total.',
-            prompt: 'Read the open bug list and triage each one: reproduce it, identify the root cause, and either fix it or add a detailed reproduction case.',
-            lang: 'javascript',
-            code: `const endpoints = await loadOpenApiSpec();
-await Promise.all(endpoints.map(ep =>
-  Agent({
-    description: \`Fuzz \${ep.path}\`,
-    prompt: \`Send 100 randomized requests to \${ep.method} \${ep.path}.
-Test: missing fields, wrong types, oversized values, SQL/XSS in strings, negative numbers, future dates.
-Report any 500 responses with the request that caused them.\`
-  })
-));`
-          },
-          {
+{
             title: 'Doc-writer agent — JSDoc from code',
             difficulty: 'essential',
             why: 'Documentation written after the fact is always stale. An agent reads each exported function and writes a JSDoc block — consistent, repeatable.',
@@ -2206,23 +2060,7 @@ Report any 500 responses with the request that caused them.\`
 Do not modify the function body.\`
 });`
           },
-          {
-            title: 'PR triager — auto-label and route',
-            difficulty: 'advanced',
-            why: 'New PRs sit unrouted in busy repos. A triage agent reads the diff and applies labels, requests reviewers based on CODEOWNERS.',
-            prompt: 'Look at all open PRs and apply appropriate labels (bug, feature, docs, breaking-change) and request review from the right team member.',
-            lang: 'javascript',
-            code: `Agent({
-  description: "Triage new PRs",
-  prompt: \`Use GitHub MCP to list PRs labeled "needs-triage".
-For each:
-1. Read the diff
-2. Apply labels: area/* based on paths, size/{S,M,L,XL} based on lines, breaking/non-breaking
-3. Request reviewers based on CODEOWNERS for the changed paths
-4. Remove "needs-triage" label\`
-});`
-          },
-          {
+{
             title: 'Migration agent — one-time big task',
             difficulty: 'expert',
             why: 'Some changes are too big for an interactive session. A long-running agent with checkpoints handles overnight migrations safely.',
@@ -2240,21 +2078,7 @@ For each:
 5. If interrupted, resume from state file\`
 });`
           },
-          {
-            title: 'Screenshot diff agent — visual regression',
-            difficulty: 'expert',
-            why: 'Visual regressions slip past unit tests. An agent runs Playwright, captures screenshots before/after, and reports pixel diffs.',
-            prompt: 'Take screenshots of all the key UI pages before and after this CSS change and flag any visual regressions.',
-            lang: 'javascript',
-            code: `Agent({
-  description: "Visual regression test",
-  prompt: \`Run npx playwright test --update-snapshots on the main branch (baseline).
-Switch to the PR branch and re-run without --update.
-For each screenshot mismatch: explain what changed (layout shift, color, missing element).
-Output a table: page | severity | description.\`
-});`
-          },
-          {
+{
             title: 'Accessibility audit agent',
             difficulty: 'advanced',
             why: 'An a11y audit agent runs axe, lighthouse, and pa11y in parallel — then synthesizes the findings into a ranked action list.',
@@ -2280,7 +2104,7 @@ Output top 10 fixes with file:line references.\`
       limits: {
         icon: '🚫',
         title: 'Never Hit Limits',
-        description: 'Token budgeting, context compaction, chunking, and patterns that keep you under rate limits while doing more work.',
+        description: 'Stay productive in long sessions without burning through context or hitting rate limits. Use /compact to summarize old messages, /clear between unrelated tasks, .claudeignore to exclude noise from glob searches, and Explore subagents to keep large search results out of your main context. Read with offset/limit instead of dumping whole files. Choose the cheapest capable model for each task.',
         examples: [
           {
             title: 'Enable automatic context compaction',
@@ -2565,39 +2389,7 @@ grep -rn "TODO" src/ | awk -F: '{print $1}' | sort -u`
 #  - Lists when ≥3 items, not when 1-2
 #  - Code blocks only when actually writing code"`
           },
-          {
-            title: 'Bound retries — fail-fast over fail-slow',
-            difficulty: 'advanced',
-            why: 'A retry loop that runs 50 times costs 50× the tokens. Set a max retry count of 3-5 and fail loudly. Better to surface the bug than mask it.',
-            prompt: 'Retry this operation at most 3 times with 2-second delays. After 3 failures, stop and report the error — don\'t keep trying.',
-            lang: 'python',
-            code: `MAX = 3
-for attempt in range(MAX):
-    try:
-        result = run_task()
-        break
-    except Exception as e:
-        if attempt == MAX - 1:
-            print(f"Failed after {MAX} attempts: {e}")
-            raise
-        time.sleep(2 ** attempt)`
-          },
-          {
-            title: 'Trim tool result lists with --max-count',
-            difficulty: 'essential',
-            why: 'grep -m 5 returns 5 hits and stops. Faster to run, cheaper to send, easier for Claude to reason about than 500 hits.',
-            prompt: 'Use --max-count=50 in grep and find commands to avoid getting thousands of results.',
-            lang: 'bash',
-            code: `# Cap results upfront:
-grep -rln -m 5 "pattern" src/
-
-# rg version (ripgrep):
-rg -l --max-count=5 "pattern"
-
-# find version:
-find . -name "*.ts" | head -20`
-          },
-          {
+{
             title: 'Compact long conversations',
             difficulty: 'advanced',
             why: 'Claude Code\'s /compact summarizes earlier turns into a condensed bullet list. Trade some context fidelity for ~80% token savings on long sessions.',
@@ -2618,7 +2410,7 @@ find . -name "*.ts" | head -20`
       run24: {
         icon: '⏰',
         title: 'Run 24 Hours',
-        description: 'Long-running autonomous workflows: persistence, checkpointing, error recovery, and keeping sessions alive across restarts.',
+        description: 'Run workflows that survive crashes, disconnections, and restarts. Use JSON checkpoint files so Claude knows where to resume, auto-commit every N iterations so progress is saved to git, ping a heartbeat URL so external monitors notice if you die, and make every step idempotent so retries don\'t double-charge or duplicate work. The 24-hour mindset: assume you\'ll be interrupted, design for resumption.',
         examples: [
           {
             title: 'Auto-commit every N minutes',
@@ -2988,7 +2780,7 @@ sys.excepthook = crash_dump`
       skills: {
         icon: '🎯',
         title: 'Skills',
-        description: 'Custom slash commands that package multi-step workflows. Build, chain, and share skills across projects.',
+        description: 'Custom slash commands that package multi-step workflows into a single invocation. Define a skill once in .claude/commands/<name>.md, then call it as /<name>. Skills accept $ARGUMENTS for parameters, can chain other skills, and can be project-level or global (user-level). Build skills for the workflows you repeat: /deploy, /review, /standup, /onboard. Share them with your team by checking them into the repo.',
         examples: [
           {
             title: 'What is a skill?',
@@ -3206,59 +2998,7 @@ Diagnose production incident: $ARGUMENTS
 6. Write findings to incidents/$(date +%F-%H%M).md
 7. Suggest immediate mitigation (rollback? scale?)`
           },
-          {
-            title: 'Skill for terraform plan + review',
-            difficulty: 'advanced',
-            why: 'Terraform plans are noisy. A skill that runs plan, summarizes the deltas, and flags destructive changes saves you from "what is even changing here?"',
-            prompt: 'Create a /tf-plan $ARGUMENTS skill that runs terraform plan for the given environment and summarizes the changes.',
-            lang: 'markdown',
-            code: `# .claude/commands/tf-plan.md
-Run terraform plan and review for: $ARGUMENTS
-
-1. cd infra/$ARGUMENTS
-2. terraform init -upgrade
-3. terraform plan -out=tfplan
-4. terraform show -json tfplan > plan.json
-5. Summarize: total resources, additions, changes, destroys
-6. Flag any destroy of: rds_instance, s3_bucket, dynamodb_table
-7. Print the summary and ask for explicit approval before apply`
-          },
-          {
-            title: 'Skill for K8s deploy',
-            difficulty: 'advanced',
-            why: 'Kubernetes deploy is a chain of commands. A skill bundles them with safety checks: dry-run, diff, apply, wait, rollback on failure.',
-            prompt: 'Create a /k8s-deploy $ARGUMENTS skill that deploys to Kubernetes and waits for the rollout to succeed.',
-            lang: 'markdown',
-            code: `# .claude/commands/k8s-deploy.md
-Deploy to $ARGUMENTS environment
-
-1. Set context: kubectl config use-context $ARGUMENTS
-2. Dry run: kubectl apply -f k8s/$ARGUMENTS/ --dry-run=client
-3. Show diff: kubectl diff -f k8s/$ARGUMENTS/
-4. If destructive (Deployment delete, PVC delete): require confirmation
-5. Apply: kubectl apply -f k8s/$ARGUMENTS/
-6. Wait: kubectl rollout status deployment/app --timeout=5m
-7. On failure: kubectl rollout undo deployment/app + print logs`
-          },
-          {
-            title: 'Skill for ER diagram from migrations',
-            difficulty: 'advanced',
-            why: 'ER diagrams drift from reality. A skill that generates a Mermaid diagram from your migrations gives you accurate, version-controlled docs.',
-            prompt: 'Create an /er-diagram skill that reads all migration files and generates a text-based entity-relationship diagram.',
-            lang: 'markdown',
-            code: `# .claude/commands/erd.md
-Generate Mermaid ER diagram from db/migrations/.
-
-1. Parse each migration file for CREATE TABLE, ALTER TABLE
-2. Build a model: tables, columns, FKs
-3. Emit Mermaid:
-   erDiagram
-       USERS ||--o{ ORDERS : places
-       ORDERS ||--|{ LINE_ITEMS : contains
-4. Write to docs/erd.md
-5. Commit: "docs: regenerate ERD"`
-          },
-          {
+{
             title: 'Skill for API client generation',
             difficulty: 'expert',
             why: 'Hand-written API clients drift from the server. A skill that reads OpenAPI and emits a typed TypeScript client keeps them in sync.',
@@ -3275,39 +3015,7 @@ Generate TypeScript API client from openapi.yaml.
 3. Write integration test using msw mocks
 4. Commit: "feat(api-client): regenerate from openapi v$ARGUMENTS"`
           },
-          {
-            title: 'Skill for performance profile',
-            difficulty: 'expert',
-            why: 'Profiling has many steps and is easy to skip. A skill makes it one command: profile, capture, analyze, suggest fixes.',
-            prompt: 'Create a /perf $ARGUMENTS skill that runs the specified endpoint under load and reports latency percentiles.',
-            lang: 'markdown',
-            code: `# .claude/commands/profile.md
-Profile $ARGUMENTS (default: main user flow).
-
-1. Run: NODE_ENV=production node --cpu-prof src/index.js
-2. Wait for trigger, then SIGINT after 30s
-3. Open the CPU profile, find top 5 hot functions by self-time
-4. For each: explain the algorithm and suggest optimizations
-5. Output: profile-report.md with the analysis
-6. Optionally: generate a flamegraph using 0x`
-          },
-          {
-            title: 'Skill for monorepo navigation',
-            difficulty: 'advanced',
-            why: 'Finding things in a 100-package monorepo wastes time. A skill that maps a feature name to its packages saves the lookup every session.',
-            prompt: 'Create a /workspace $ARGUMENTS skill that switches context to the specified monorepo package and primes CLAUDE.md.',
-            lang: 'markdown',
-            code: `# .claude/commands/where.md
-Find code related to: $ARGUMENTS
-
-1. grep -rln "$ARGUMENTS" packages/*/src | head -30
-2. Group results by package
-3. For each package: list the files
-4. Identify the primary owner package (most matches)
-5. Print: "Primary location: packages/<x>"
-6. Print: "Related: packages/<y>, packages/<z>"`
-          },
-          {
+{
             title: 'Skill for changelog generation',
             difficulty: 'essential',
             why: 'Changelogs after every release are toil; a skill removes the toil. Reads git log, groups by conventional-commits type, writes pretty markdown.',
@@ -3323,41 +3031,7 @@ Generate release notes for $ARGUMENTS (e.g. v1.4.0).
 5. Write CHANGELOG.md "## [$ARGUMENTS] - YYYY-MM-DD" section
 6. Commit: "docs: release notes for $ARGUMENTS"`
           },
-          {
-            title: 'Skill for screenshot diff (visual regression)',
-            difficulty: 'expert',
-            why: 'Visual regressions slip through unit tests. A skill that runs Playwright snapshots and reports pixel diffs catches them automatically.',
-            prompt: 'Create a /screenshot-diff skill that takes screenshots before and after my changes and highlights visual regressions.',
-            lang: 'markdown',
-            code: `# .claude/commands/visual-diff.md
-Run visual regression test against $ARGUMENTS (default: production).
-
-1. Checkout baseline: git stash
-2. npx playwright test --update-snapshots
-3. git stash pop
-4. npx playwright test (without --update)
-5. For each failure: open the diff image, describe the change
-6. Output a report with images at docs/visual-report.md`
-          },
-          {
-            title: 'Skill for cost report',
-            difficulty: 'advanced',
-            why: 'Cloud bills get out of hand quickly. A monthly skill that pulls AWS/GCP usage and ranks the top cost drivers keeps spend visible.',
-            prompt: 'Create a /cost-report skill that reads ~/.claude/cost-log.csv and shows this week\'s API cost breakdown.',
-            lang: 'markdown',
-            code: `# .claude/commands/costs.md
-Generate cost report for last $ARGUMENTS days.
-
-1. aws ce get-cost-and-usage \\
-   --time-period Start=$(date -d "$ARGUMENTS days ago" +%F),End=$(date +%F) \\
-   --granularity DAILY --metrics UnblendedCost \\
-   --group-by Type=DIMENSION,Key=SERVICE
-2. Top 10 services by cost, ranked
-3. Day-over-day deltas
-4. Flag any service >2x its 30-day average
-5. Write to reports/cost-$(date +%F).md`
-          },
-        ]
+]
       },
 
       // ===================================================
@@ -3366,7 +3040,7 @@ Generate cost report for last $ARGUMENTS days.
       patterns: {
         icon: '🏗️',
         title: 'Design Patterns',
-        description: 'Architecture patterns for Claude-powered systems: pipelines, observers, factories, circuit breakers, and more.',
+        description: 'Classical design patterns adapted for Claude-powered systems. Pipelines for sequential transformations, observers via PostToolUse hooks, circuit breakers to stop retrying broken services, sagas for distributed workflows with compensating actions, idempotency keys to make retries safe, and state machines for explicit workflows. Resilience at scale.',
         examples: [
           {
             title: 'Pipeline pattern',
@@ -3584,26 +3258,7 @@ def process_with_dlq(items):
 
 # Review DLQ periodically and process manually`
           },
-          {
-            title: 'CQRS — separate reads from writes',
-            difficulty: 'expert',
-            why: 'Read operations (Explore agents) have different throughput needs than write operations. Separate them to optimize each path independently.',
-            prompt: 'Separate the read model from the write model. Use the write model for mutations, the read model for queries.',
-            lang: 'javascript',
-            code: `// Command side — writes, always serialized
-async function writeCommand(cmd) {
-  await commandQueue.enqueue(cmd);
-  return await commandQueue.process();
-}
-
-// Query side — reads, massively parallel
-async function readQuery(query) {
-  return await Promise.all(
-    shards.map(shard => Agent({ subagent_type: 'Explore', prompt: \`\${query} in \${shard}\` }))
-  );
-}`
-          },
-          {
+{
             title: 'State machine pattern',
             difficulty: 'advanced',
             why: 'Hand-rolled state transitions become a tangle of if-statements. A state machine makes valid transitions explicit and invalid ones impossible.',
@@ -3640,24 +3295,7 @@ function next(from: State, to: State): State {
 }
 const cachedFetchUser = withCache(fetchUser);`
           },
-          {
-            title: 'Adapter pattern — bridge incompatible interfaces',
-            difficulty: 'advanced',
-            why: 'When you replace one provider with another (Stripe → Paddle), an adapter keeps your call sites unchanged. The swap is invisible to the rest of the codebase.',
-            prompt: 'Create an adapter that makes our internal API compatible with the third-party SDK\'s expected interface.',
-            lang: 'typescript',
-            code: `interface PaymentProvider {
-  charge(amountCents: number, customerId: string): Promise<string>;
-}
-class StripeAdapter implements PaymentProvider {
-  async charge(c: number, id: string) {
-    const intent = await stripe.paymentIntents.create({ amount: c, customer: id });
-    return intent.id;
-  }
-}
-class PaddleAdapter implements PaymentProvider { /* same interface, different SDK */ }`
-          },
-          {
+{
             title: 'Throttle and debounce',
             difficulty: 'essential',
             why: 'Throttle limits how often a function CAN run (1/sec). Debounce delays execution until activity stops (typing finished). Use throttle for scroll, debounce for search input.',
@@ -3712,61 +3350,7 @@ def reservoir(stream, k):
     return sample
 # After processing 1M events, sample has k representative items`
           },
-          {
-            title: 'Mediator — decouple components',
-            difficulty: 'advanced',
-            why: 'Many-to-many communication becomes a mesh. A mediator (event bus) lets components broadcast without knowing each other directly.',
-            prompt: 'Create a mediator that handles communication between these components so they don\'t reference each other directly.',
-            lang: 'typescript',
-            code: `class EventBus {
-  private handlers = new Map<string, Function[]>();
-  on(event: string, h: Function) {
-    const arr = this.handlers.get(event) ?? [];
-    this.handlers.set(event, [...arr, h]);
-  }
-  emit(event: string, payload: unknown) {
-    (this.handlers.get(event) ?? []).forEach(h => h(payload));
-  }
-}
-const bus = new EventBus();
-bus.on('user.created', sendWelcomeEmail);
-bus.on('user.created', logAnalytics);`
-          },
-          {
-            title: 'Memento — snapshot/restore',
-            difficulty: 'advanced',
-            why: 'Undo/redo and rollback require capturing state. The memento pattern serializes state to a token you can use to restore later.',
-            prompt: 'Add snapshot and restore to this editor state so users can undo and redo changes.',
-            lang: 'typescript',
-            code: `interface Memento<T> { state: T; ts: number; }
-class History<T> {
-  private snaps: Memento<T>[] = [];
-  save(state: T) { this.snaps.push({ state: structuredClone(state), ts: Date.now() }); }
-  undo(): T | undefined {
-    this.snaps.pop(); // discard current
-    return this.snaps[this.snaps.length - 1]?.state;
-  }
-}`
-          },
-          {
-            title: 'Visitor — operate on a tree without changing nodes',
-            difficulty: 'expert',
-            why: 'When you need many operations on the same data structure (AST, file tree), Visitor lets you add operations without modifying node classes.',
-            prompt: 'Implement a visitor that traverses this AST and collects all identifier names without modifying any nodes.',
-            lang: 'typescript',
-            code: `interface ASTVisitor {
-  visitFunctionDecl(n: FunctionDecl): void;
-  visitVariableDecl(n: VariableDecl): void;
-}
-class CountIdentifiers implements ASTVisitor {
-  count = 0;
-  visitFunctionDecl(n) { this.count++; n.body.forEach(c => c.accept(this)); }
-  visitVariableDecl(n) { this.count++; }
-}
-const v = new CountIdentifiers();
-ast.accept(v);`
-          },
-          {
+{
             title: 'Repository pattern — abstract data access',
             difficulty: 'advanced',
             why: 'When you might swap Postgres for DynamoDB, a Repository layer means changing one file instead of grep-and-replace across the app.',
@@ -3781,22 +3365,7 @@ class PgUserRepo implements UserRepo { /* postgres impl */ }
 class InMemoryUserRepo implements UserRepo { /* test impl */ }
 // Wire up via DI; tests use InMemory, prod uses Pg`
           },
-          {
-            title: 'Specification pattern — composable filters',
-            difficulty: 'expert',
-            why: 'Hard-coded query filters become a tangle. A Specification is a predicate you can combine with and/or/not — composable, testable, reusable.',
-            prompt: 'Build a specification pattern for filtering products so I can compose rules like: inStock AND (priceBelow(100) OR onSale()).',
-            lang: 'typescript',
-            code: `type Spec<T> = (t: T) => boolean;
-const and = <T>(a: Spec<T>, b: Spec<T>): Spec<T> => t => a(t) && b(t);
-const or  = <T>(a: Spec<T>, b: Spec<T>): Spec<T> => t => a(t) || b(t);
-
-const active: Spec<User> = u => u.status === 'active';
-const paid:   Spec<User> = u => u.plan !== 'free';
-const target = and(active, paid);
-users.filter(target);`
-          },
-        ]
+]
       },
 
       // ===================================================
@@ -3805,7 +3374,7 @@ users.filter(target);`
       halloffame: {
         icon: '🏆',
         title: 'Hall of Fame',
-        description: 'Community legends — the most powerful, most elegant, and most surprising Claude Code patterns ever discovered.',
+        description: 'Battle-tested patterns from real-world Claude Code workflows. CLAUDE.md templates that 10x team productivity, overnight migration workflows that ship 30k LOC, self-healing test suites, fastest-PR records, and legendary recipes. Each entry tells a story: what was tried, what worked, why it matters. Steal the patterns, adapt them to your codebase.',
         examples: [
           {
             title: 'The one-liner that refactored a monolith',
@@ -4176,7 +3745,7 @@ Re-run lighthouse after each batch. Stop at 100/100.
       markdown: {
         icon: '📝',
         title: 'Markdown Essentials',
-        description: 'CLAUDE.md mastery, project documentation, ADRs, runbooks, and the writing patterns that save the most tokens.',
+        description: 'Markdown is Claude\'s first language. A good CLAUDE.md primes every session — tech stack, conventions, constraints, and the 3 mistakes to avoid. ADRs capture why decisions were made. Runbooks turn incidents into 10-minute fixes. Onboarding docs take new engineers from zero to first PR. Every line of Markdown you write earns its keep by saving repeated explanation across hundreds of sessions.',
         examples: [
           {
             title: 'Minimal CLAUDE.md that works hardest',
@@ -4682,7 +4251,7 @@ If not resolved in 10 min → page on-call lead.`
       security: {
         icon: '🔐',
         title: 'Secure Code',
-        description: 'Patterns for writing secure code: injection prevention, secrets management, auth, input validation, and the OWASP Top 10.',
+        description: 'Security patterns Claude should always apply: parameterized queries to prevent SQL injection, input validation at the boundary with schema validators, bcrypt for passwords (never plain text), short-lived JWTs with refresh tokens, CSRF protection with SameSite cookies, server-side authorization (never trust the client), CSP headers, and audit logs for sensitive actions. Defense in depth.',
         examples: [
           {
             title: 'Parameterized queries — prevent SQL injection',
@@ -5119,7 +4688,7 @@ CREATE INDEX ON audit_log (actor_id, ts DESC);`
       prompting: {
         icon: '💬',
         title: 'Prompting',
-        description: 'Write better prompts for Claude Code. Task decomposition, context priming, one-shot examples, and the patterns that get consistent results.',
+        description: 'The prompts you actually type to Claude. Effective prompting is the highest-leverage skill — better prompts mean better results with fewer iterations. Prime context before big tasks, use one-shot examples for formatting, break large tasks into numbered steps, constrain scope explicitly ("don\'t refactor, don\'t add comments"), ask for a plan before code, reference files by path, and debrief at the end.',
         examples: [
           {
             title: 'Prime context before a big task',
@@ -5269,7 +4838,7 @@ Do not create new files."`
       testing: {
         icon: '🧪',
         title: 'Testing',
-        description: 'Test-driven development with Claude Code. Generate tests, improve coverage, write property tests, and use Claude to debug flaky tests.',
+        description: 'TDD pairs beautifully with Claude — write the failing test in natural language, let Claude implement it, watch it pass. Generate comprehensive coverage from a function signature (Claude infers edge cases humans miss), find untested branches without chasing a coverage number, debug flaky tests by reading the test + implementation + failure log, and write property-based tests that find bugs example tests miss.',
         examples: [
           {
             title: 'Test-first: write the test, then the implementation',
@@ -5493,11 +5062,14 @@ function getPrompt(ex) {
 }
 
 // ── Render category pills ──────────────────────────────────────────────────
+const ROW_1 = ['commands','loops','agents','skills','hooks','monitoring','prompting'];
+
 function renderCategoryPills() {
-  const el = document.getElementById('category-pills');
-  el.innerHTML = Object.entries(CATEGORIES).map(([id, c]) =>
-    `<button class="pill${activeCategory === id ? ' active-cat' : ''}" data-cat="${id}">${c.icon} ${c.title} <span class="pill-count">${c.examples.length}</span></button>`
-  ).join('');
+  const row1 = document.querySelector('#category-pills [data-row="1"]');
+  const row2 = document.querySelector('#category-pills [data-row="2"]');
+  const pill = (id, c) => `<button class="pill${activeCategory === id ? ' active-cat' : ''}" data-cat="${id}">${c.icon} ${c.title} <span class="pill-count">${c.examples.length}</span></button>`;
+  row1.innerHTML = ROW_1.filter(id => CATEGORIES[id]).map(id => pill(id, CATEGORIES[id])).join('');
+  row2.innerHTML = Object.entries(CATEGORIES).filter(([id]) => !ROW_1.includes(id)).map(([id, c]) => pill(id, c)).join('');
 }
 
 // ── Render difficulty pills ────────────────────────────────────────────────
@@ -5646,42 +5218,93 @@ document.addEventListener('DOMContentLoaded', () => {
 function simulate(code, lang, defaultOutput) {
   if (defaultOutput && defaultOutput.trim()) return defaultOutput;
   const trimmed = code.trim();
-  const firstLine = trimmed.split('\n')[0].slice(0, 80);
+  const now = new Date().toTimeString().slice(0,8);
+
+  // ── Slash commands (rich, realistic output) ──
+  if (/^\/loop\s+/i.test(trimmed)) {
+    const m = trimmed.match(/^\/loop\s+(\S+)\s+(.+)/);
+    const interval = m ? m[1] : '5m';
+    const task = m ? m[2] : 'the task';
+    return `[loop] Started: every ${interval} → ${task.slice(0,60)}\n[loop] iter 1 @ ${now}  ✓ completed (12s)\n[loop] iter 2 @ ${now}  ✓ completed (14s)\n[loop] iter 3 @ ${now}  ✗ failed — fixing...\n[loop] iter 3 @ ${now}  ✓ fixed and verified\n  (Press Ctrl+C to stop the loop)`;
+  }
+  if (/^\/clear\b/i.test(trimmed)) return '✓ Conversation history cleared.\n  Files, git state, and settings preserved.\n  Ready for a new task.';
+  if (/^\/init\b/i.test(trimmed)) return 'Scanning repository structure...\n  ✓ Detected: TypeScript + React + Vite\n  ✓ Detected: Jest for testing, ESLint for lint\n  ✓ Reading package.json, tsconfig.json, README.md\n  ✓ Writing CLAUDE.md (43 lines)\n\nCLAUDE.md created. Review and edit to add team conventions.';
+  if (/^\/review\b/i.test(trimmed)) return 'Reviewing 4 files changed on current branch...\n  src/api/auth.ts:42  ⚠ Missing input validation\n  src/utils/hash.ts   ✓ Looks good\n  src/api/refund.ts:18 ✗ Potential null dereference\n3 issues found (1 critical, 1 warning, 1 info)';
+  if (/^\/model\b/i.test(trimmed)) return '✓ Switched model.\n  Conversation context preserved.';
+  if (/^\/fast\b/i.test(trimmed)) return '⚡ Fast mode toggled.';
+  if (/^\/compact\b/i.test(trimmed)) return 'Compacting conversation...\n  ✓ Summarized 32 earlier messages → 1 summary\n  ✓ Preserved last 8 messages verbatim\n  ✓ Freed ~18k tokens of context\n\nReady to continue.';
+  if (/^\/help\b/i.test(trimmed)) return 'Available commands:\n  /clear  /init  /review  /loop  /model  /fast  /compact  /resume\n  /memory /skills /hooks /agents /status /undo /config /pr /export';
+  if (/^\//.test(trimmed)) {
+    const cmd = trimmed.split(/\s+/)[0];
+    return `${cmd} executed in Claude Code session.\n  (Output depends on your current session context — see card description above)`;
+  }
+
+  // ── Bash with real-looking output ──
   if (lang === 'bash' || !lang) {
-    if (/^\/(loop|clear|skill|model|help|init|review)/.test(trimmed)) {
-      return `[Claude Code]  Detected slash command: ${trimmed.split(/\s+/)[0]}\n` +
-             `→ This would run inside an active Claude Code session.\n` +
-             `→ Try it in your terminal: claude\n   then paste the line above.`;
-    }
-    if (/git\s+(push|commit|rebase|reset)/.test(trimmed)) {
-      return `[Simulated git]  Would run: ${firstLine}\n→ Not executed here. Run locally to apply.`;
-    }
-    return `[Simulated shell]  $ ${firstLine}${trimmed.includes('\n') ? '\n  …(' + (trimmed.split('\n').length-1) + ' more lines)' : ''}\n→ Output simulation: copy & run locally to see real result.`;
+    const firstCmd = trimmed.split('\n').find(l => l && !l.startsWith('#')) || trimmed;
+    if (/npm\s+test/.test(firstCmd)) return '> npm test\n\n PASS  src/utils/parser.test.ts  (24 tests)\n PASS  src/api/charge.test.ts   (18 tests)\n PASS  src/auth/session.test.ts (12 tests)\n\nTest Suites: 3 passed, 3 total\nTests:       54 passed, 54 total\nTime:        3.42s';
+    if (/npm\s+run\s+build/.test(firstCmd)) return '> npm run build\n\n  ✓ TypeScript: 0 errors\n  ✓ Bundle: 142.3 KB (gzipped: 42.1 KB)\n  ✓ Build complete in 4.1s';
+    if (/npm\s+install/.test(firstCmd)) return '> npm install\n\nadded 234 packages, audited 235 packages in 8s\n  found 0 vulnerabilities';
+    if (/git\s+status/.test(firstCmd)) return "On branch feature/payments\nYour branch is up to date with 'origin/feature/payments'.\n\nChanges not staged for commit:\n  modified:   src/api/charge.ts\n  modified:   src/utils/format.ts\n\nno changes added to commit";
+    if (/git\s+log/.test(firstCmd)) return 'commit a3f2b1c (HEAD -> feature/payments)\nAuthor: you <you@example.com>\n    feat: add Stripe charge endpoint\n\ncommit 7d8e9a1\n    chore: bump deps';
+    if (/git\s+commit/.test(firstCmd)) return '[feature/payments a3f2b1c] feat: add Stripe charge endpoint\n 2 files changed, 47 insertions(+), 3 deletions(-)';
+    if (/git\s+push/.test(firstCmd)) return 'Enumerating objects: 12, done.\nCounting objects: 100% (12/12), done.\nWriting objects: 100% (8/8), 1.4 KiB\nTo origin\n   7d8e9a1..a3f2b1c  feature/payments -> feature/payments';
+    if (/curl\s+/.test(firstCmd)) return `> ${firstCmd.slice(0,60)}\n\nHTTP/2 200\ncontent-type: application/json\n\n{\n  "status": "ok",\n  "uptime": 84321\n}`;
+    if (/tail\s+-f/.test(firstCmd)) return '[14:02:18] INFO  GET /api/users 200 12ms\n[14:02:19] INFO  POST /api/auth/login 200 47ms\n[14:02:22] WARN  Rate limit warning for IP 10.0.0.42\n[14:02:24] ERROR Database connection pool exhausted\n  (streaming — Ctrl+C to stop)';
+    if (/while\s+true/.test(trimmed)) return '[loop] iter 1 — ✓ ok\n[loop] iter 2 — ✓ ok\n[loop] iter 3 — ⚠ slow (2.1s)\n[loop] iter 4 — ✓ ok\n  (loop continues until interrupted)';
+    if (/^echo\s+/.test(firstCmd)) return firstCmd.replace(/^echo\s+["']?/, '').replace(/["']?\s*$/, '');
+    if (/grep|find|ls\b/.test(firstCmd)) return `> ${firstCmd.slice(0,70)}\n\nsrc/api/charge.ts\nsrc/api/refund.ts\nsrc/utils/payments.ts\n  (3 files matched)`;
+    if (/jq\s+/.test(firstCmd)) return `> ${firstCmd.slice(0,60)}\n\n{\n  "status": "ok",\n  "count": 42\n}`;
+    if (/docker\s+/.test(firstCmd)) return `> ${firstCmd.slice(0,60)}\n\nCONTAINER ID   IMAGE         STATUS\n3a8f2b1c       myapp:latest  Up 2 hours\n  1 container running`;
+    if (/kubectl\s+/.test(firstCmd)) return `> ${firstCmd.slice(0,60)}\n\nNAME              READY   STATUS    RESTARTS   AGE\napp-7d8b6f-xkz2   1/1     Running   0          2d\napp-7d8b6f-mn4p   1/1     Running   0          2d`;
+    return `> ${firstCmd.slice(0,70)}\n\n(executed successfully)\nexit 0`;
   }
-  if (lang === 'javascript' || lang === 'typescript') {
-    return `[Simulated ${lang}]\n→ Code parsed (${trimmed.split('\n').length} lines).\n→ Run with: node script.${lang === 'typescript' ? 'ts' : 'js'}\n→ Expected: see the "Why this matters" note above.`;
-  }
-  if (lang === 'json' || lang === 'yaml') {
+
+  // ── JSON ──
+  if (lang === 'json') {
     try {
-      if (lang === 'json') {
-        const parsed = JSON.parse(trimmed);
-        return `[Valid JSON]  ✓ Parsed ${Object.keys(parsed).length} top-level key(s).\n${JSON.stringify(parsed, null, 2).slice(0, 400)}`;
-      }
-    } catch (err) {
-      return `[Invalid JSON]  ✗ ${err.message}`;
+      const parsed = JSON.parse(trimmed);
+      const keys = Object.keys(parsed);
+      const sample = JSON.stringify(parsed, null, 2).slice(0, 350);
+      return `✓ Valid JSON — ${keys.length} top-level key(s): ${keys.slice(0,5).join(', ')}\n\n${sample}${sample.length === 350 ? '\n  ...(truncated)' : ''}`;
+    } catch (err) { return `✗ Invalid JSON: ${err.message}`; }
+  }
+
+  if (lang === 'yaml' || lang === 'toml') {
+    const lines = trimmed.split('\n').filter(l => l.trim() && !l.trim().startsWith('#'));
+    return `✓ ${lang.toUpperCase()} parsed (${lines.length} non-comment lines)\n  Drop this into your config file — will be picked up on next run.\n\nKey settings:\n${lines.slice(0,4).map(l => '  • ' + l.trim()).join('\n')}`;
+  }
+
+  if (lang === 'javascript' || lang === 'typescript') {
+    const funcs = (trimmed.match(/\b(function|const\s+\w+\s*=\s*(?:async\s*)?\(|class\s+\w+)/g) || []).length;
+    const hasAgent = /Agent\s*\(/.test(trimmed);
+    if (hasAgent) {
+      const desc = (trimmed.match(/description:\s*["']([^"']+)/) || [])[1] || 'task';
+      const subagent = (trimmed.match(/subagent_type:\s*["']([^"']+)/) || [])[1] || 'general-purpose';
+      return `[Agent spawned]\n  → Description: ${desc}\n  → Subagent: ${subagent}\n  → Status: running...\n  → Estimated time: 30-90s\n\n(Agent runs in isolated context. Result returns to the main session.)`;
     }
-    return `[Valid ${lang}]  ✓ Drop this into the appropriate config file.`;
+    return `✓ ${lang} parsed — ${trimmed.split('\n').length} lines, ${funcs} function/class definitions\n  Run with: ${lang === 'typescript' ? 'tsx' : 'node'} script.${lang === 'typescript' ? 'ts' : 'js'}\n  Expected behavior: see "Why this matters" above.`;
   }
+
   if (lang === 'sql') {
-    return `[Simulated SQL]\n→ ${firstLine}\n→ Execute on your database to see actual rows affected.`;
+    if (/CREATE\s+TABLE/i.test(trimmed)) return 'CREATE TABLE\nTime: 18 ms\n  Table created successfully.';
+    if (/SELECT/i.test(trimmed)) return ' id  |     email     |    role\n-----+---------------+----------\n   1 | a@example.com | admin\n   2 | b@example.com | user\n   3 | c@example.com | user\n(3 rows)\nTime: 4.2 ms';
+    const m = trimmed.match(/^(INSERT|UPDATE|DELETE)/i);
+    if (m) return `${m[1]} 1\nTime: 2.1 ms`;
+    return 'SQL executed.\nTime: 5.3 ms';
   }
-  if (lang === 'python') {
-    return `[Simulated python]\n→ Would run: python -c "..."\n→ ${trimmed.split('\n').length} lines parsed.\n→ See "Why this matters" for expected behavior.`;
+
+  if (lang === 'python') return '$ python script.py\n\n✓ Imports resolved\n✓ Script ran without errors\n  Output depends on input — see "Why this matters" for what to expect.';
+
+  if (lang === 'markdown' || lang === 'text' || lang === 'md') {
+    const lines = trimmed.split('\n').length;
+    const headings = (trimmed.match(/^#+\s/gm) || []).length;
+    return `📄 Rendered as Markdown\n  ${lines} lines, ${headings} headings\n  Drop this into your project — Claude reads it on every session.`;
   }
-  if (lang === 'html') {
-    return `[Rendered as HTML preview not available]\n→ Save as .html and open in a browser to inspect.`;
-  }
-  return `[Simulator]  Language: ${lang}\n→ ${trimmed.split('\n').length} lines of code.\n→ Behavior: see "Why this matters" above.`;
+
+  if (lang === 'html') return `<HTML output>\n  ${trimmed.split('\n').length} lines of markup\n  Open in a browser to preview.`;
+
+  return `Executed.\n  Language: ${lang}\n  Lines: ${trimmed.split('\n').length}\n  See "Why this matters" above for expected behavior.`;
 }
 
 // ── Quiz data ──
