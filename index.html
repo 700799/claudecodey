@@ -769,7 +769,7 @@ done`
             code: `TARGET=90
 while true; do
   CURRENT=$(npm run coverage --silent | grep -oP 'All files[^|]+\\|\\s+\\K[0-9.]+')
-  echo "Coverage: ${CURRENT}%"
+  echo "Coverage: \${CURRENT}%"
   if [ "$(echo "$CURRENT >= $TARGET" | bc)" -eq 1 ]; then
     break
   fi
@@ -807,7 +807,7 @@ done &
 while true; do
   LAST=$(cat .heartbeat 2>/dev/null || echo 0)
   AGE=$(($(date +%s) - LAST))
-  [ "$AGE" -gt 120 ] && alert "Loop stale: ${AGE}s"
+  [ "$AGE" -gt 120 ] && alert "Loop stale: \${AGE}s"
   sleep 60
 done`
           },
@@ -872,7 +872,7 @@ INPUT=$(cat)
 CMD=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
 
 DANGER_PATTERNS=("rm -rf /" "DROP TABLE" "DELETE FROM" "--force" "chmod 777")
-for pattern in "${DANGER_PATTERNS[@]}"; do
+for pattern in "\${DANGER_PATTERNS[@]}"; do
   if echo "$CMD" | grep -q "$pattern"; then
     echo "BLOCKED: dangerous pattern detected: $pattern" >&2
     exit 2
@@ -960,8 +960,8 @@ exit 0`
             code: `#!/usr/bin/env bash
 # session-start-check.sh
 REQUIRED=(DATABASE_URL API_KEY NODE_ENV)
-for var in "${REQUIRED[@]}"; do
-  if [ -z "${!var}" ]; then
+for var in "\${REQUIRED[@]}"; do
+  if [ -z "\${!var}" ]; then
     echo "ERROR: Required env var $var is not set" >&2
     exit 1
   fi
@@ -1269,9 +1269,9 @@ npm run build 2>&1 | tee build.log
 # latency-monitor.sh
 while true; do
   T=$(curl -s -o /dev/null -w "%{time_total}" https://api.myapp.com/ping)
-  echo "latency=${T}s"
+  echo "latency=\${T}s"
   python3 -c "import sys; t=float('$T'); sys.exit(1 if t > 2.0 else 0)" \
-    || echo "ALERT: latency ${T}s exceeds 2s SLO"
+    || echo "ALERT: latency \${T}s exceeds 2s SLO"
   sleep 10
 done`
           },
@@ -1313,9 +1313,9 @@ done < services.txt`
 while true; do
   MEM=$(free | awk '/^Mem:/{printf "%.0f", $3/$2*100}')
   CPU=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d. -f1)
-  echo "mem=${MEM}% cpu=${CPU}%"
-  [ "$MEM" -gt 90 ] && echo "ALERT: memory at ${MEM}%"
-  [ "$CPU" -gt 95 ] && echo "ALERT: CPU at ${CPU}%"
+  echo "mem=\${MEM}% cpu=\${CPU}%"
+  [ "$MEM" -gt 90 ] && echo "ALERT: memory at \${MEM}%"
+  [ "$CPU" -gt 95 ] && echo "ALERT: CPU at \${CPU}%"
   sleep 15
 done`
           },
@@ -1414,7 +1414,7 @@ done`
             code: `while true; do
   for host in api.myapp.com db.internal mailgun.org; do
     T=$( { time -p dig +short $host > /dev/null; } 2>&1 | awk '/real/ {print $2}' )
-    echo "dns_resolve_${host}=${T}s"
+    echo "dns_resolve_\${host}=\${T}s"
     [ "$(echo "$T > 0.5" | bc)" -eq 1 ] && echo "SLOW DNS: $host"
   done
   sleep 30
@@ -2716,7 +2716,7 @@ Always run health check after deploy.`
             code: `#!/usr/bin/env bash
 # test-skills.sh
 SKILLS=(deploy review changelog onboard)
-for skill in "${SKILLS[@]}"; do
+for skill in "\${SKILLS[@]}"; do
   echo "Testing /$skill..."
   if grep -q "\\$ARGUMENTS" ".claude/commands/$skill.md" 2>/dev/null; then
     echo "  $skill has \\$ARGUMENTS"
