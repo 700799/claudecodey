@@ -814,14 +814,7 @@ h1 {
       <div class="pills-rows" id="category-pills">
         <div class="pills-row" data-row="1"></div>
         <div class="pills-row" data-row="2"></div>
-      </div>
-    </div>
-    <div>
-      <div class="row-label">Difficulty</div>
-      <div class="pills" id="difficulty-pills">
-        <button class="pill active-diff-all" data-diff="all">All</button>
-        <button class="pill" data-diff="essential">Essential</button>
-        <button class="pill" data-diff="advanced">Advanced</button>
+        <div class="pills-row" data-row="3"></div>
       </div>
     </div>
     <div class="search-bar">
@@ -6244,7 +6237,6 @@ APP_CHECKPOINT.json → { session: 2 }`
 
 // ── State ──────────────────────────────────────────────────────────────────
 let activeCategory  = 'loops';
-let activeDifficulty = 'all';
 let searchQuery     = '';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -6277,21 +6269,17 @@ function getPrompt(ex) {
 
 // ── Render category pills ──────────────────────────────────────────────────
 const ROW_1 = ['commands','loops','agents','skills','hooks','monitoring','prompting'];
+const ROW_2 = ['limits','run24','patterns','halloffame','markdown','security','testing'];
+const ROW_3 = ['webdev','gamedev','ghpages','jupyter','paper','webscan','reposcan','vulnscan','schools'];
 
 function renderCategoryPills() {
   const row1 = document.querySelector('#category-pills [data-row="1"]');
   const row2 = document.querySelector('#category-pills [data-row="2"]');
+  const row3 = document.querySelector('#category-pills [data-row="3"]');
   const pill = (id, c) => `<button class="pill${activeCategory === id ? ' active-cat' : ''}" data-cat="${id}">${c.icon} ${c.title} <span class="pill-count">${c.examples.length}</span></button>`;
   row1.innerHTML = ROW_1.filter(id => CATEGORIES[id]).map(id => pill(id, CATEGORIES[id])).join('');
-  row2.innerHTML = Object.entries(CATEGORIES).filter(([id]) => !ROW_1.includes(id)).map(([id, c]) => pill(id, c)).join('');
-}
-
-// ── Render difficulty pills ────────────────────────────────────────────────
-function renderDiffPills() {
-  document.querySelectorAll('#difficulty-pills .pill').forEach(btn => {
-    const d = btn.dataset.diff;
-    btn.className = 'pill' + (activeDifficulty === d ? ' ' + DIFF_ACTIVE[d] : '');
-  });
+  row2.innerHTML = ROW_2.filter(id => CATEGORIES[id]).map(id => pill(id, CATEGORIES[id])).join('');
+  row3.innerHTML = ROW_3.filter(id => CATEGORIES[id]).map(id => pill(id, CATEGORIES[id])).join('');
 }
 
 // ── Render main content ────────────────────────────────────────────────────
@@ -6301,7 +6289,7 @@ function renderContent() {
   if (!cat) { main.innerHTML = ''; return; }
 
   let examples = cat.examples;
-  if (activeDifficulty !== 'all') examples = examples.filter(e => e.difficulty === activeDifficulty);
+
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
     examples = examples.filter(e =>
@@ -6369,15 +6357,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderContent();
   });
 
-  // Difficulty pills — clicking the active pill deselects back to "all"
-  document.getElementById('difficulty-pills').addEventListener('click', e => {
-    const btn = e.target.closest('[data-diff]');
-    if (!btn) return;
-    const d = btn.dataset.diff;
-    activeDifficulty = (activeDifficulty === d && d !== 'all') ? 'all' : d;
-    renderDiffPills();
-    renderContent();
-  });
 
   // Search
   document.getElementById('search-input').addEventListener('input', e => {
