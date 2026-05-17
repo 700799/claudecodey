@@ -6233,6 +6233,210 @@ APP_CHECKPOINT.json → { session: 2 }`
         ]
       },
 
+      tokensave: {
+        icon: '💰',
+        title: 'Token Saving',
+        description: 'Every token you send costs money and fills context. These patterns cut prompt size, avoid redundant context, and stretch your token budget further — without sacrificing quality.',
+        examples: [
+          {
+            title: 'Speak like a caveman to cut system prompt length',
+            difficulty: 'essential',
+            why: 'Verbose system prompts waste tokens on every single call. Ultra-compressed instructions work just as well for simple tasks.',
+            prompt: '"Rewrite this system prompt to be as short as possible while keeping the intent. Drop pleasantries, verbose descriptions, and any instruction Claude follows by default anyway."',
+            lang: 'bash',
+            code: `# Instead of:
+"You are a helpful, friendly assistant. Please respond in a clear,
+professional manner. Always be polite and considerate. When answering
+questions, make sure to be thorough and accurate..."
+
+# Write:
+"Answer directly. No fluff."
+
+# Or for a coding assistant:
+"Code only. No explanations unless asked."
+
+# Claude follows reasonable defaults — only state exceptions.`,
+            output: `Before: 847 tokens in system prompt
+After:   12 tokens
+
+Savings per call: 835 tokens
+At 1000 calls/day: 835,000 tokens saved daily`
+          },
+          {
+            title: 'Ask for diffs instead of full file rewrites',
+            difficulty: 'essential',
+            why: 'When Claude rewrites a 500-line file to change 3 lines, you pay for 500 lines of output. Ask for a diff and pay for 3.',
+            prompt: '"Show me only the diff/patch for this change, not the full file. Use unified diff format."',
+            lang: 'bash',
+            code: `# Bad — Claude rewrites the entire file:
+"Update the validateEmail function in src/utils.ts to also reject
+plus-sign aliases"
+
+# Good — Claude returns only what changed:
+"Show me a unified diff for src/utils.ts that makes validateEmail
+reject plus-sign aliases. Do not show the full file."
+
+# Even better — explicit constraint:
+"Respond with only the changed lines in diff format.
+File: src/utils.ts  Function: validateEmail"`,
+            output: `--- a/src/utils.ts
++++ b/src/utils.ts
+@@ -14,7 +14,7 @@
+ export function validateEmail(email: string): boolean {
+-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
++  return /^[^+\s@][^\s@]*@[^\s@]+\.[^\s@]+$/.test(email);
+ }
+
+Output: 8 lines instead of 312 lines`
+          },
+          {
+            title: 'Tell Claude: "respond with only changed code"',
+            difficulty: 'essential',
+            why: 'Without this instruction Claude often restates the whole function, adds explanation, and summarizes what it did. One sentence eliminates all of that.',
+            prompt: 'Add "Respond with only the changed code, no explanation." to any edit request.',
+            lang: 'bash',
+            code: `# Append to any code edit request:
+"Respond with only the changed code, no explanation."
+
+# Example:
+"Add input sanitization to the createUser handler in
+src/routes/users.ts. Respond with only the changed code,
+no explanation."
+
+# For multiple small edits:
+"Fix these 3 issues in src/auth.ts:
+1. bcrypt rounds should be 12 not 8
+2. JWT expiry should be 15m not 1h
+3. Remove the console.log on line 47
+Respond with only the changed lines, no explanation."`,
+            output: `// Line 23:
+const hash = await bcrypt.hash(password, 12);
+// Line 31:
+const token = jwt.sign(payload, secret, { expiresIn: '15m' });
+
+(2 lines returned instead of 89-line full function)`
+          },
+          {
+            title: 'Limit files added to context',
+            difficulty: 'essential',
+            why: 'Reading 20 files "just in case" is the fastest way to fill context. Reference only the files Claude actually needs for the current task.',
+            prompt: '"Before reading any file, tell me which specific files you need and why. Only read those."',
+            lang: 'bash',
+            code: `# Bad — loads everything:
+"Read all files in src/ and tell me how auth works"
+
+# Good — targeted:
+"Auth is in src/middleware/auth.ts and src/routes/login.ts.
+Read only those two files and explain how JWT validation works."
+
+# For Claude Code sessions, add to CLAUDE.md:
+# "Do not read files speculatively. Only read a file when
+#  you need its specific contents to complete the current task."
+
+# When spawning subagents, scope their reads:
+Agent({
+  prompt: "Read ONLY src/db/schema.ts and answer: what tables exist?"
+})`,
+            output: `Files read: 2 (instead of 47)
+Tokens used: ~1,200 (instead of ~18,000)
+
+Tip: Use the Explore subagent for discovery — it reads
+excerpts rather than full files, keeping context lean.`
+          },
+          {
+            title: 'Feed a summary back instead of the full chat history',
+            difficulty: 'essential',
+            why: 'Long conversations accumulate context fast. Periodically summarize progress and start a fresh session with just the summary — same results, a fraction of the tokens.',
+            prompt: '"Summarize everything we\'ve accomplished in this session: decisions made, files changed, and what still needs to be done. I\'ll use this to start a fresh session."',
+            lang: 'bash',
+            code: `# At a natural break point, ask:
+"Summarize this session for handoff:
+1. What was the goal?
+2. What did we complete? (list files changed)
+3. What decisions were made and why?
+4. What still needs to be done?
+5. Any blockers or open questions?
+Keep it under 400 words."
+
+# Then start a new session with:
+"Context from previous session:
+[paste summary]
+
+Continue from where we left off. Next task: [next item]"`,
+            output: `Summary generated (287 words):
+Goal: Add payment processing to checkout flow
+Completed: src/payments/stripe.ts, src/routes/checkout.ts
+Decisions: Use Stripe webhooks (not polling)
+Remaining: refund flow, webhook signature validation
+Blockers: none
+
+New session token cost: ~400 vs ~12,000`
+          },
+          {
+            title: 'Use /compact to summarize conversation context',
+            difficulty: 'essential',
+            why: '/compact summarizes older messages in-place so you can keep working without starting over. Use it before context fills up, not after.',
+            prompt: '/compact',
+            lang: 'bash',
+            code: `# Run before context gets full:
+/compact
+
+# Or enable auto-compaction in settings so Claude does it automatically:
+# Settings → Auto-compact context: On
+
+# To compact with a focus hint:
+/compact "Focus the summary on the auth refactor — discard the
+debugging tangents from earlier."
+
+# Check your context usage before compacting:
+/status  # shows token usage if available
+
+# Rule of thumb: compact at 60-70% context used,
+# not at 95% when it's too late to be selective.`,
+            output: `/compact
+
+Compacting conversation...
+Previous: 48,000 tokens
+After compact: 6,200 tokens
+Preserved: all decisions, file changes, current task
+Discarded: exploratory tangents, repeated context
+
+Continue working — context state is preserved.`
+          },
+          {
+            title: 'Keep logs and stack traces out of context',
+            difficulty: 'essential',
+            why: 'A 2,000-line stack trace burns context for one error. Paste only the relevant error lines, not the full log dump.',
+            prompt: '"Here is the relevant part of the error: [paste 5-10 lines]. Full log is in logs/app.log if you need more context."',
+            lang: 'bash',
+            code: `# Bad — pastes 2,000 lines of logs:
+"Here are the logs: [massive dump]"
+
+# Good — paste only what matters:
+"Getting this error when I POST to /api/checkout:
+  TypeError: Cannot read properties of undefined (reading 'id')
+    at processPayment (src/payments/stripe.ts:47:23)
+    at async POST /api/checkout (src/routes/checkout.ts:89:5)
+
+Full logs at logs/app.log line 4,892 if you need more."
+
+# For generated files (build output, test reports):
+# Don't paste them — reference the file path:
+"Test run failed. Results in test-results/junit.xml. What failed?"
+
+# Add to CLAUDE.md:
+# "Never read logs/, dist/, or coverage/ unless explicitly asked."`,
+            output: `Error identified from 4 lines:
+  stripe.ts:47 — payment object is undefined when user
+  has no saved payment method (new user checkout)
+
+Fix: add null check before accessing payment.id
+
+Context used: 180 tokens (vs 8,000 for full log dump)`
+          },
+        ]
+      },
+
 }; // end CATEGORIES
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -6269,7 +6473,7 @@ function getPrompt(ex) {
 
 // ── Render category pills ──────────────────────────────────────────────────
 const ROW_1 = ['commands','loops','agents','skills','hooks','monitoring','prompting'];
-const ROW_2 = ['limits','run24','patterns','halloffame','markdown','security','testing'];
+const ROW_2 = ['limits','run24','tokensave','patterns','halloffame','markdown','security','testing'];
 const ROW_3 = ['webdev','gamedev','ghpages','jupyter','paper','webscan','reposcan','vulnscan','schools'];
 
 function renderCategoryPills() {
