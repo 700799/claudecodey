@@ -5486,161 +5486,227 @@ CHECKPOINT.json written → { phase: 2 }`
         ]
       },
 
-      gamedev: {
-        icon: '🎮',
-        title: 'Game Dev',
-        description: 'Build games with Claude — ASCII terminal games to browser-based 2D/3D with physics, scoring, and WebSocket multiplayer. Multi-step workflows from a playable prototype to a 3-day autonomous build.',
+      syndata: {
+        icon: '🧬',
+        title: 'Synthetic Data',
+        description: 'Generate realistic synthetic datasets for training, testing, and privacy-safe analytics. Workflows scale from a single CSV to 24-hour multi-agent pipelines with eval-reflect quality loops, intermediate checkpoints, and rate-limit-aware batch scheduling.',
         examples: [
           {
-            title: 'ASCII Snake game in Python',
+            title: 'Generate a synthetic customer CSV from a schema',
             difficulty: 'essential',
-            why: 'Terminal games teach game loops, input handling, and collision detection in 80 lines. No browser, no framework.',
-            prompt: '"Build a playable Snake game in Python using curses. Arrow keys to move, * symbols are food, walls and self-collision end the game. Show score in the header. Save as snake.py."',
-            lang: 'python',
-            code: `# Ask Claude: "Build snake.py — a terminal Snake game:
-# - curses library for rendering
-# - Arrow keys to move
-# - '*' symbols are food; eating grows the snake
-# - Hitting a wall or yourself ends the game
-# - Score displayed in top bar
-# - Press 'q' to quit
-# ~80 lines, no external dependencies"
-
-# Claude generates:
-import curses, random
-
-def main(stdscr):
-    curses.curs_set(0)
-    sh, sw = stdscr.getmaxyx()
-    snake = [[sh//2, sw//4+1], [sh//2, sw//4]]
-    direction = curses.KEY_RIGHT
-    score = 0
-    # ... full game loop with collision detection
-
-# Run: python3 snake.py`,
-            output: `snake.py created (78 lines)
-
-Run: python3 snake.py
-
-Controls: ← ↑ → ↓  |  q to quit
-Score shown in header bar`
-          },
-          {
-            title: 'Browser platformer with Phaser 3',
-            difficulty: 'advanced',
-            why: 'Phaser is the most popular 2D browser game framework. Claude scaffolds a working scene with physics, movement, and collectibles in a single HTML file.',
-            prompt: '"Create a Phaser 3 platformer in a single HTML file (CDN). Player: colored rectangle, WASD controls, gravity. 5 platforms, 10 coins to collect, score HUD. Restart on R key."',
-            lang: 'javascript',
-            code: `// Ask Claude: "Build game.html — a Phaser 3 platformer:
-// - Load Phaser 3 from CDN (no npm)
-// - Player: 32x48 blue rectangle, WASD / arrow keys
-// - Gravity: 800, jump: velocity -500 (space or up)
-// - 5 static platforms (green rectangles)
-// - 10 coin collectibles (yellow circles)
-// - Score HUD: top-left text, updates on collect
-// - Fall off screen → game over text + R to restart
-// Single index.html file"
-
-class GameScene extends Phaser.Scene {
-  create() {
-    this.platforms = this.physics.add.staticGroup();
-    this.player = this.physics.add.rectangle(100, 200, 32, 48, 0x4488ff);
-    this.coins = this.physics.add.group();
-    this.cursors = this.input.keyboard.createCursorKeys();
-    // ... collision, scoring, restart
-  }
-}`,
-            output: `game.html created (147 lines)
-
-Open: python3 -m http.server 8080
-→ http://localhost:8080/game.html
-
-Controls: WASD / arrow keys + space to jump
-Collect all 10 coins for bonus points`
-          },
-          {
-            title: 'Multiplayer game: WebSockets + 3-day build',
-            difficulty: 'advanced',
-            why: 'Multiplayer games require server authority, client interpolation, and careful state sync. A 3-session checkpoint workflow lets Claude build this incrementally.',
-            prompt: '"Build a real-time multiplayer top-down game over 3 sessions. Checkpoint after each session. Run integration tests before each commit. Resume from GAME_CHECKPOINT.json."',
+            why: 'The fastest way to get realistic test data: describe your schema and Claude generates a properly distributed CSV with no PII.',
+            prompt: '"Generate 2,000 synthetic customer records as data/customers.csv. Fields: customer_id (UUID), full_name (US names), email (name-derived), age (18–75, normal dist mean 38), state (weighted by US population), plan (free 60% / pro 30% / enterprise 10%), ltv_usd (correlated with plan). Show column stats after saving."',
             lang: 'bash',
-            code: `"Build a multiplayer top-down game over 3 sessions.
-Read GAME_CHECKPOINT.json first and resume from last completed step.
+            code: `"Generate 2,000 synthetic customer records as data/customers.csv.
 
-SESSION 1 — Server:
-[ ] Node.js + ws WebSocket server
-[ ] Lobby: players join with name, server assigns ID + color
-[ ] 60fps game loop: broadcast all player positions
-[ ] WASD movement: client sends direction, server computes position
-[ ] Server-side bounds checking (never trust client)
-[ ] Integration tests with ws mock client (6 tests, all pass)
-[ ] git commit -m 'game: server + movement'
-[ ] GAME_CHECKPOINT.json → { session: 2 }
+Schema:
+- customer_id: UUID v4
+- full_name: realistic US first + last name
+- email: derived from name (john.smith42@gmail.com pattern)
+- age: integer 18–75, normal distribution mean=38 std=12
+- state: random US state weighted by population (CA, TX, FL, NY most likely)
+- plan: 'free' (60%), 'pro' (30%), 'enterprise' (10%)
+- ltv_usd: float correlated with plan (free $0–200, pro $200–1200, enterprise $1200–8000)
 
-SESSION 2 — Frontend:
-[ ] Read GAME_CHECKPOINT.json
-[ ] Canvas renderer: draw each player as colored circle + name tag
-[ ] Smooth interpolation between server ticks
-[ ] keydown/keyup state map for input
-[ ] Connection status UI (Connected / Reconnecting)
-[ ] git commit -m 'game: client renderer'
+After generating, print:
+- Row count
+- Age mean ± std
+- Plan distribution %
+- LTV quartiles by plan
+- Any duplicate emails found"`,
+            output: `data/customers.csv created (2,000 rows, 7 columns)
 
-SESSION 3 — Mechanics:
-[ ] Read GAME_CHECKPOINT.json
-[ ] Spacebar fires bullet; server validates hits
-[ ] Health: 3 hits = eliminated, respawn countdown
-[ ] Leaderboard: kills/deaths, synced every 5s
-[ ] Full test run: npm test -- --coverage
-[ ] git commit -m 'game: mechanics COMPLETE'"`,
-            output: `[Session 1] GAME_CHECKPOINT.json not found — starting fresh.
-✓ WebSocket server on :8080
-✓ Lobby + ID assignment
-✓ 60fps broadcast loop
-✓ Integration tests: 6/6 passing
-✓ git commit: 'game: server + movement'
-GAME_CHECKPOINT.json → { session: 2 }`
+Age: mean=38.2 std=11.9 ✓
+Plan: free=59.8% pro=30.4% enterprise=9.8% ✓
+LTV quartiles:
+  free:       $0 / $48 / $112 / $198
+  pro:        $201 / $520 / $870 / $1,194
+  enterprise: $1,208 / $3,102 / $5,800 / $7,988
+Duplicate emails: 0 ✓`
           },
           {
-            title: 'Procedural map generation with tests',
+            title: 'Batch generation with /compact for rate-limit safety',
+            difficulty: 'essential',
+            why: 'Large synthetic datasets (100k+ rows) exceed a single context window. Batch in chunks of 10k, /compact between rounds, and checkpoint progress so a rate-limit pause never loses work.',
+            prompt: '"Generate 100,000 synthetic transaction records in 10 batches of 10,000. After each batch: append to data/transactions.csv, update SYNDATA_CHECKPOINT.json, then /compact. Resume from checkpoint if already started."',
+            lang: 'bash',
+            code: `"Generate 100,000 synthetic transaction records in batches.
+
+FIRST: read SYNDATA_CHECKPOINT.json (if it exists) and resume from last completed batch.
+
+Each record:
+- txn_id: UUID
+- customer_id: foreign key from data/customers.csv
+- ts: ISO-8601 timestamp (last 90 days, business-hours skew)
+- amount_usd: 0.99–499.99, log-normal distribution
+- category: groceries/dining/travel/software/other (weighted)
+- status: completed (92%), refunded (5%), failed (3%)
+
+Batch loop (10 rounds of 10,000):
+1. Generate 10,000 rows
+2. Append to data/transactions.csv (create on batch 1)
+3. Update SYNDATA_CHECKPOINT.json → { batch: N, total_rows: N*10000, ts: now }
+4. Print: 'Batch N/10 done — N rows total'
+5. /compact — summarise progress, drop the generated rows from context
+
+After all 10 batches: print final statistics."`,
+            output: `SYNDATA_CHECKPOINT.json not found — starting from batch 1.
+
+Batch 1/10 done —  10,000 rows total
+Batch 2/10 done —  20,000 rows total
+[/compact applied — context reset, resuming from checkpoint]
+Batch 3/10 done —  30,000 rows total
+...
+Batch 10/10 done — 100,000 rows total
+
+Final stats:
+  Amount: mean=$47.20 median=$22.40 p99=$398.10
+  Categories: groceries 28% dining 22% travel 19% software 18% other 13%
+  Status: completed 91.8% refunded 5.1% failed 3.1%
+SYNDATA_CHECKPOINT.json → { batch: 10, total_rows: 100000 }`
+          },
+          {
+            title: 'Eval-reflect quality loop',
             difficulty: 'advanced',
-            why: 'Procedural generation makes games replayable. Claude implements a maze generator with unit tests for connectivity and coverage.',
-            prompt: '"Write a procedural maze generator in Python using recursive backtracking. Generate a 21x21 maze, print it to terminal, and write 5 unit tests: no isolated cells, all cells reachable, start/end always open, walls always even rows."',
-            lang: 'python',
-            code: `# Ask Claude: "Build maze_gen.py:
-# Algorithm: recursive backtracking (DFS)
-# Grid: 21x21 (odd dimensions so walls are even cells)
-# Output: print maze to terminal with '#' walls, ' ' paths
-# Mark 'S' at top-left, 'E' at bottom-right
-# 
-# Also write tests/test_maze.py with pytest:
-# 1. All path cells are reachable from S (BFS check)
-# 2. S and E cells are always open
-# 3. Wall cells are always at even row/col indices
-# 4. Maze dimensions are exactly 21x21
-# 5. Two different seeds produce different mazes
-#
-# Run: python3 maze_gen.py --seed 42"
+            why: 'Raw synthetic data often has subtle distribution errors — impossible values, unrealistic correlations, demographic skew. An eval-reflect cycle catches and fixes these before the data reaches a model.',
+            prompt: '"Generate a synthetic medical dataset (5,000 patients), evaluate it for quality issues (impossible values, unrealistic correlations, demographic bias), reflect on the top 3 problems, fix them, and save a CHECKPOINT with quality scores before and after."',
+            lang: 'bash',
+            code: `# STEP 1 — Generate
+"Generate 5,000 synthetic patient records as data/patients_v1.csv.
+Fields: patient_id, age (0–95), sex (M/F), bmi (10–60),
+blood_pressure_systolic (60–250), diagnosis_code (ICD-10 top 20),
+num_medications (0–15), readmitted_30d (bool, correlated with age and medications).
+Save and show first 5 rows."
 
-import random, sys
-from collections import deque
+# STEP 2 — Evaluate (run after Step 1 completes)
+"Evaluate data/patients_v1.csv for synthetic data quality:
+1. Impossible combinations (age 5 with 12 medications)
+2. Unrealistic correlations (bmi vs bp should be weakly positive r~0.25)
+3. Demographic distribution vs US census baseline
+4. Readmission rate (expect 15–20% for this cohort)
+5. ICD-10 code frequency vs real prevalence data
+Rate each dimension 1–10. Save report to data/eval_v1.md. Print overall quality score."
 
-def generate_maze(rows=21, cols=21, seed=None):
-    if seed: random.seed(seed)
-    maze = [['#'] * cols for _ in range(rows)]
-    # ... recursive backtracking implementation`,
-            output: `maze_gen.py created (67 lines)
-tests/test_maze.py created (45 lines)
+# STEP 3 — Reflect and fix (run after Step 2 completes)
+"Read data/eval_v1.md. Fix the 3 lowest-scoring issues.
+Regenerate only affected rows (preserve valid rows).
+Save fixed dataset to data/patients_v2.csv.
+Re-run the same 5 quality checks.
+Save SYNDATA_CHECKPOINT.json → { version: 2, v1_score: X, v2_score: Y, issues_fixed: [...] }
+Print before/after quality scores side by side."`,
+            output: `[Step 1] data/patients_v1.csv created (5,000 rows)
 
-Sample output (seed=42):
-#S###############
-#   #       #   #
-# # # ##### # # #
-# #   #   # # # #
-# ##### # # # ###
-#       #   #  E#
-#################
+[Step 2] Quality evaluation:
+  Impossible combos:  3/10 — 47 children under 10 with 8+ medications
+  Correlations:       6/10 — BMI vs BP r=0.08 (expected ~0.25)
+  Demographics:       7/10 — Hispanic patients underrepresented by 6%
+  Readmission rate:   8/10 — 17.2% ✓
+  ICD-10 frequency:   5/10 — Z00 wellness checks 3× overrepresented
+Overall: 5.8/10 → data/eval_v1.md saved
 
-pytest: 5/5 passing ✓`
+[Step 3] Fixing 3 issues: impossible combos, correlations, ICD-10 freq
+  Regenerated 312 affected rows
+  data/patients_v2.csv created (5,000 rows)
+Re-evaluation v2:
+  Impossible combos:  9/10 ✓
+  Correlations:       8/10 ✓ (r=0.23)
+  ICD-10 frequency:   8/10 ✓
+Overall: 7.6/10 (+1.8 improvement)
+SYNDATA_CHECKPOINT.json → { version: 2, v1_score: 5.8, v2_score: 7.6 }`
+          },
+          {
+            title: 'Parallel multi-agent relational table generation',
+            difficulty: 'advanced',
+            why: 'A relational dataset (users + products + orders) is faster and safer with one sub-agent per table running in parallel, then a validator checking foreign-key consistency.',
+            prompt: '"Use three sub-agents in parallel to generate: (1) 10,000 users, (2) 5,000 products, (3) 50,000 orders linking both. After all three finish, run a validator sub-agent to check referential integrity and save SYNDATA_CHECKPOINT.json."',
+            lang: 'bash',
+            code: `"Generate a 3-table relational synthetic dataset using parallel sub-agents.
+
+Launch all three sub-agents in a single message (they run concurrently):
+
+SUB-AGENT 1 — Users:
+  Generate 10,000 user records → data/users.csv
+  Fields: user_id (UUID), name, email, country, signup_date (last 3 years), tier (free/pro/enterprise)
+  Report: row count and email uniqueness.
+
+SUB-AGENT 2 — Products:
+  Generate 5,000 product records → data/products.csv
+  Fields: product_id (UUID), name, category, price_usd, stock_qty, created_date
+  Report: row count and category distribution.
+
+SUB-AGENT 3 — Orders (wait for users and products CSVs to exist):
+  Read user_ids from data/users.csv and product_ids from data/products.csv
+  Generate 50,000 orders → data/orders.csv
+  Fields: order_id (UUID), user_id (FK→users), product_id (FK→products),
+          qty, unit_price_usd, order_date, status (completed/cancelled/pending)
+  Use only real FK values from the CSVs — no invented IDs.
+
+After all three complete, launch VALIDATOR sub-agent:
+  Check every order.user_id exists in users.csv
+  Check every order.product_id exists in products.csv
+  Count orphaned rows (expect 0)
+  Save SYNDATA_CHECKPOINT.json → { tables: 3, users: 10000, products: 5000, orders: 50000, fk_errors: 0 }
+  Print validation report."`,
+            output: `[Sub-agent 1] data/users.csv — 10,000 rows, 0 duplicate emails ✓
+[Sub-agent 2] data/products.csv — 5,000 rows, 8 categories ✓
+[Sub-agent 3] data/orders.csv — 50,000 rows (using real FK values from CSVs) ✓
+
+[Validator sub-agent]
+  user_id FK check:    50,000/50,000 valid ✓
+  product_id FK check: 50,000/50,000 valid ✓
+  Orphaned rows: 0 ✓
+SYNDATA_CHECKPOINT.json → { tables: 3, users: 10000, products: 5000, orders: 50000, fk_errors: 0 }`
+          },
+          {
+            title: '24-hour synthetic data factory: /loop + Monitor + eval-reflect',
+            difficulty: 'advanced',
+            why: 'Training datasets need 250k+ rows across multiple sessions. /loop drives cycles every 30 minutes, /compact prevents context bloat, Monitor streams live progress, and CHECKPOINT.json survives rate-limit pauses and restarts.',
+            prompt: '"Run a 24-hour synthetic data factory: /loop every 30m, 5,000 rows per cycle with parallel generator + eval sub-agents, reflect and adjust params if quality drops below 7.5, /compact after each cycle, checkpoint every round. Stop at 250,000 rows total."',
+            lang: 'bash',
+            code: `# Start the factory — paste once and let it run:
+"Run a synthetic data generation factory until SYNDATA_CHECKPOINT.json shows total_rows >= 250,000.
+
+Create SYNDATA_CHECKPOINT.json if missing:
+{ cycle: 0, total_rows: 0, last_quality: 0, params: { dist: 'normal', std: 12 } }
+
+CYCLE LOOP — run every 30 minutes (/loop 30m):
+1. Read SYNDATA_CHECKPOINT.json. If total_rows >= 250,000 → print final report and stop.
+
+2. Launch two sub-agents in parallel:
+   GENERATOR: generate 5,000 rows using current params → data/batch_N.csv
+   EVAL (skip cycle 1): evaluate data/batch_{N-1}.csv (5 quality checks, score 1–10)
+
+3. Append data/batch_N.csv to data/full_dataset.csv
+
+4. If eval_score < 7.5:
+   Reflect: find lowest-scoring dimension
+   Adjust: update params in SYNDATA_CHECKPOINT.json (e.g. widen std, fix correlation)
+   Append to data/adjustments.log: { cycle: N, issue: '...', fix: '...' }
+
+5. Update SYNDATA_CHECKPOINT.json:
+   { cycle: N+1, total_rows: N*5000, last_quality: score, params: updated }
+
+6. /compact — keep context lean. Print: 'Cycle N done — X rows, quality Y/10'
+
+Rate-limit safety: checkpoint is written before /compact.
+Resume after pause: 'Read SYNDATA_CHECKPOINT.json and continue from cycle N.'
+
+# Monitor in a parallel Claude session:
+/loop 10m 'Read SYNDATA_CHECKPOINT.json — print cycle, total_rows, last_quality, last param change'"`,
+            output: `Cycle 1 done —   5,000 rows, quality —/10 (eval starts cycle 2)
+Cycle 2 done —  10,000 rows, quality 8.1/10 ✓
+Cycle 3 done —  15,000 rows, quality 7.2/10 ⚠
+  → Reflected: age std too narrow. Adjusted std 10→14.
+  → data/adjustments.log updated.
+Cycle 4 done —  20,000 rows, quality 8.4/10 ✓
+[/compact applied — context reset, checkpoint preserved]
+...
+[Rate limit hit at cycle 18 — paused. Resume: read SYNDATA_CHECKPOINT.json]
+...
+Cycle 50 done — 250,000 rows, quality 8.7/10
+FACTORY COMPLETE.
+Final dataset: data/full_dataset.csv (250,000 rows)
+Average quality across 49 eval cycles: 8.3/10`
           },
         ]
       },
@@ -6398,140 +6464,288 @@ Exit code will be 1 (HIGH CVE found)`
         ]
       },
 
-      schools: {
-        icon: '🎓',
-        title: 'Research Schools',
-        description: 'Research schools and programs with Claude — from initial shortlisting to a weighted decision matrix, deadline tracker, essay prompt analysis, and complete application kit.',
+      emailanalysis: {
+        icon: '📧',
+        title: 'Email Analysis',
+        description: 'Extract structured intelligence from email corpora — entity extraction, ontology mapping, accountability graphs, and network analytics. Workflows stack sub-agents and eval-reflect loops to go from raw .eml files to actionable insight reports.',
         examples: [
           {
-            title: 'Build a program shortlist from criteria',
+            title: 'Entity extraction from an email thread',
             difficulty: 'essential',
-            why: 'Researching programs manually across 20 schools takes hours. Claude cross-references your criteria and produces a ranked shortlist with sources.',
-            prompt: '"Research online MBA programs for me: AACSB accredited, under $35k total, no GMAT required, strong finance track. List 10 matches with: URL, total cost, GMAT policy, duration, one standout feature. Save to schools/shortlist.md."',
+            why: 'Email threads contain buried action items, decisions, deadlines, and stakeholders. A single extraction prompt pulls all of them into a structured format you can act on.',
+            prompt: '"Read emails/*.eml (or paste thread text). Extract: all people mentioned (name, role if inferable, email), organizations, dates and deadlines, explicit action items (owner + due date), and key decisions made. Save to analysis/entities.json and print a summary table."',
             lang: 'bash',
-            code: `"Research online MBA programs matching my criteria.
-Save results to schools/shortlist.md.
+            code: `"Read all .eml files in emails/ (or accept thread text pasted below).
 
-My requirements:
-- AACSB or AMBA accredited
-- Total program cost under $35,000
-- No GMAT required (or easy waiver)
-- Fully online or hybrid
-- Finance specialization available
+Extract and structure the following entities:
 
-For each match provide:
-1. School + program name
-2. Program URL
-3. Total estimated cost
-4. GMAT: Required / Optional / Waived
-5. Typical completion time
-6. One standout feature
+PEOPLE: { name, email_address, role (inferred from context), org }
+ORGANIZATIONS: { name, type (client/vendor/internal), mentioned_in_subject }
+DATES & DEADLINES: { date_str, iso_date, context_quote, owner_if_known }
+ACTION ITEMS: { description, owner, due_date, status (open/unclear), source_email }
+DECISIONS: { description, decided_by, date, rationale_if_given }
+KEY TOPICS: top 10 noun phrases by frequency, weighted by recency
 
-Find at least 10 programs.
-Also flag any I should avoid and why (accreditation issues, hidden fees, etc.)"`,
-            output: `Researching online MBA programs...
-Created schools/shortlist.md
+For each action item, confidence-score the owner (certain/probable/unclear).
 
-Top 10 matches:
-1. Indiana Kelley Online MBA — $30,600, No GMAT, #1 ranked online
-2. UNC Kenan-Flagler — $32,500, GMAT optional
-3. Arizona State W.P. Carey — $26,000, No GMAT
-... (7 more)
+Save to analysis/entities.json (machine-readable).
+Also save analysis/entities_summary.md (human-readable table per category).
+Print: person count, org count, action item count, decision count, earliest and latest date."`,
+            output: `Processed 23 emails (thread: Q3 roadmap planning, Apr 14–May 6)
 
-Avoid: 2 programs with accreditation concerns
-       1 program with hidden fees (true cost: $52k)`
+PEOPLE (7):
+  Sarah Chen      — sarah@company.com   — VP Product
+  Marcus Williams — marcus@company.com  — Eng Lead
+  Priya Nair      — priya@vendor.com    — Partner (Acme Corp)
+  ...
+
+ORGANIZATIONS (3): Company Inc, Acme Corp, FastShip LLC
+
+DATES & DEADLINES (11):
+  May 15 — API spec freeze (owner: Marcus)
+  May 22 — Partner demo (owner: Priya)
+  Jun 1  — GA launch (owner: Sarah)
+
+ACTION ITEMS (8, open):
+  Marcus: finalize auth spec by May 15 [certain]
+  Sarah:  schedule exec review by May 10 [probable]
+  ...
+
+DECISIONS (4):
+  REST over GraphQL — decided by Sarah, Apr 16
+  ...
+
+analysis/entities.json and analysis/entities_summary.md saved.`
           },
           {
-            title: 'Weighted decision matrix with scoring',
-            difficulty: 'advanced',
-            why: 'A decision matrix removes emotion from school selection. Claude scores each program against your weighted criteria and explains the trade-offs.',
-            prompt: '"Read schools/shortlist.md. Build a weighted decision matrix (schools/matrix.md): cost 30%, reputation 25%, flexibility 20%, alumni network 15%, time-to-complete 10%. Score each school 1-5 per criterion, compute totals, rank them. Explain the top 3."',
+            title: 'Build an email corpus ontology',
+            difficulty: 'essential',
+            why: 'A topic ontology turns a raw inbox into a navigable knowledge structure. Claude identifies topic clusters, builds a hierarchy, and maps every email to the right node — giving you a searchable taxonomy of what was actually discussed.',
+            prompt: '"Analyse emails/*.eml and build a topic ontology: cluster emails by subject matter, name each cluster, identify 2–3 sub-topics per cluster, assign every email to its primary cluster, and save the ontology as analysis/ontology.json with a plain-English summary."',
             lang: 'bash',
-            code: `"Read schools/shortlist.md.
-Build a weighted decision matrix in schools/matrix.md.
+            code: `"Analyse all emails in emails/ and build a topic ontology.
 
-Scoring rubric:
-- Cost (30%): 5=$25k, 4=$25-30k, 3=$30-35k, 2=$35-40k, 1=$40k+
-- Reputation (25%): 1-5 based on US News / FT / Bloomberg Businessweek rank
-- Flexibility (20%): 5=fully async, 4=mostly async, 3=some sync, 2=hybrid
-- Alumni Network (15%): 1-5 based on LinkedIn alumni density in finance
-- Time to Complete (10%): 5=18mo, 4=18-24mo, 3=24-30mo, 2=30-36mo
+STEP 1 — Read and summarise:
+Read each .eml. For each email record: { id, date, from, to, subject, 3-sentence summary }.
+Do NOT read attachments. Save to analysis/email_index.json.
 
-Format as a Markdown table with weighted totals.
-Sort by TOTAL score descending.
+STEP 2 — Cluster:
+Group emails into 5–10 thematic clusters using subject + summary.
+Name each cluster (e.g. 'API Design', 'Launch Planning', 'Vendor Negotiation').
+For each cluster identify 2–3 sub-topics.
 
-Add a paragraph explaining:
-- Why #1 is the recommendation
-- Key trade-off vs #2 and #3
-- Any non-obvious deal-breakers"`,
-            output: `Created schools/matrix.md
+STEP 3 — Assign:
+For each email, assign: primary_cluster, sub_topic (if clear), confidence (high/medium/low).
+Flag any emails that don't fit any cluster as 'Unclassified'.
 
-Rankings:
-1. Indiana Kelley    — 4.35 (cost:5 rep:4 flex:4 net:4 time:5)
-2. UNC Kenan-Flagler — 4.10 (cost:3 rep:5 flex:4 net:5 time:3)
-3. AZ State Carey    — 4.05 (cost:5 rep:3 flex:5 net:3 time:4)
+STEP 4 — Build ontology:
+Save analysis/ontology.json:
+{
+  clusters: [
+    { name: '...', sub_topics: [...], email_ids: [...], date_range: '...' }
+  ],
+  unclassified: [email_ids],
+  coverage: '95% assigned'
+}
 
-Recommendation: Kelley leads on cost + flexibility balance.
-Trade-off vs UNC: Kelley costs $2k less; UNC has stronger alumni network.`
+Save analysis/ontology_summary.md: plain-English description of each cluster,
+what decisions were made there, and who the key contributors are."`,
+            output: `Processed 23 emails → analysis/email_index.json
+
+Clusters identified (6):
+  [1] API Design & Auth (8 emails, Apr 14–May 3)
+      Sub-topics: OAuth2 flow, rate limiting, versioning
+  [2] Launch Planning (5 emails, Apr 20–May 6)
+      Sub-topics: GA date, rollback plan, comms
+  [3] Vendor Negotiation — Acme Corp (4 emails, Apr 15–Apr 28)
+      Sub-topics: pricing, SLA, integration scope
+  [4] Engineering Resourcing (3 emails, Apr 17–Apr 22)
+  [5] QA & Testing Strategy (2 emails, Apr 29–May 2)
+  [6] Exec Alignment (1 email, May 5)
+  Unclassified: 0
+
+analysis/ontology.json saved (6 clusters, 23 emails assigned, 100% coverage)
+analysis/ontology_summary.md saved`
           },
           {
-            title: '3-session application research kit',
+            title: 'Thread accountability and ownership map',
             difficulty: 'advanced',
-            why: 'A complete application involves deadlines, essay prompts, recommendation letters, and outreach templates. A 3-session workflow builds the full kit.',
-            prompt: '"Run a 3-session application research project. Session 1: school research + requirements. Session 2: essay prompts + timeline. Session 3: application tracker + outreach email templates. Track in APP_CHECKPOINT.json."',
+            why: 'In long threads, action items get buried and owners become ambiguous. This workflow uses sub-agents for extraction and analysis in parallel, then builds an ownership matrix so nothing falls through the cracks.',
+            prompt: '"Use two sub-agents to (1) extract every action item and its stated or inferred owner from emails/*.eml, and (2) build a per-person accountability matrix. Then produce a markdown report with overdue items flagged and ownership confidence scored. Save CHECKPOINT after each phase."',
             lang: 'bash',
-            code: `"3-session application research project.
-Read APP_CHECKPOINT.json first and resume.
+            code: `"Build a thread accountability map from emails/*.eml using sub-agents.
 
-SESSION 1 — Research & Requirements:
-[ ] Create schools/ directory
-[ ] Research 8 target schools from schools/criteria.md
-[ ] For each school, create schools/SCHOOL_NAME.md with:
-    - Application deadlines (early + regular decision)
-    - Required: transcripts, LOR count, test scores
-    - Admitted student averages (GPA, GMAT/GRE)
-    - Application fee + fee waiver availability
-    - Scholarships / financial aid info
-[ ] Build schools/deadlines.md — sorted by earliest deadline
-[ ] git commit -m 'schools: research complete'
-[ ] APP_CHECKPOINT.json → { session: 2 }
+Launch two sub-agents in parallel:
 
-SESSION 2 — Essays & Timeline:
-[ ] Read APP_CHECKPOINT.json
-[ ] For each school: extract essay prompts + word limits
-    Save to schools/SCHOOL_NAME_essays.md
-[ ] Build schools/timeline.md:
-    - 12-week countdown from earliest deadline
-    - Week-by-week action items
-    - Milestones: essays drafted, reviewed, submitted
-[ ] git commit -m 'schools: essays + timeline'
+SUB-AGENT A — Action Item Extractor:
+  Read every email. For each action item found:
+  { description, raw_quote, email_id, email_date, stated_owner (name or null),
+    inferred_owner (if null — use context, reply-to, thread position),
+    owner_confidence (certain/probable/unclear),
+    due_date (explicit or inferred from context),
+    status (open/completed/blocked) }
+  Save to analysis/action_items.json.
+  Report total count.
 
-SESSION 3 — Tracker + Outreach:
-[ ] Read APP_CHECKPOINT.json
-[ ] Build schools/APPLICATION_TRACKER.md (checklist per school):
-    [ ] Request transcripts
-    [ ] Ask LOR writers (name + ask date)
-    [ ] Draft essays
-    [ ] Final review
-    [ ] Submit + pay fee
-[ ] Create schools/templates/:
-    - lor_request.md (email to recommender)
-    - admissions_question.md (email to admissions)
-    - alumni_coffee.md (LinkedIn message to alumni)
-[ ] git commit -m 'schools: complete application kit'"`,
-            output: `[Session 1] APP_CHECKPOINT.json not found.
-Researching 8 schools from schools/criteria.md...
-✓ Stanford GSB — saved (deadline: Jan 10)
-✓ Wharton — saved (deadline: Jan 3)
-✓ Harvard HBS — saved (deadline: Jan 3)
-... (5 more)
-✓ schools/deadlines.md created
-✓ git commit: 'schools: research complete'
-APP_CHECKPOINT.json → { session: 2 }`
+SUB-AGENT B — Participant Profiler:
+  For each person in the thread: count emails sent, topics they weigh in on,
+  questions they ask vs answer, their typical response time.
+  Save to analysis/participants.json.
+
+After both complete:
+Update ANALYSIS_CHECKPOINT.json → { phase: 'extraction_done', action_items: N }
+
+Then: build accountability matrix.
+For each person: list all action items assigned (certain + probable).
+Flag items where due_date < today as OVERDUE.
+Flag items with unclear owner as NEEDS_OWNER.
+
+Save analysis/accountability.md:
+  - Header: thread name, date range, participant count
+  - Table per person: action items, due dates, status, confidence
+  - Section: OVERDUE items (sorted by date)
+  - Section: NEEDS_OWNER items (needs human assignment)
+Update ANALYSIS_CHECKPOINT.json → { phase: 'complete', overdue: N, needs_owner: N }"`,
+            output: `[Sub-agent A] 8 action items found → analysis/action_items.json
+  certain owner: 5  probable: 2  unclear: 1
+[Sub-agent B] 4 participants profiled → analysis/participants.json
+ANALYSIS_CHECKPOINT.json → { phase: 'extraction_done', action_items: 8 }
+
+Building accountability matrix...
+
+ACCOUNTABILITY REPORT (analysis/accountability.md):
+  Marcus Williams (3 items):
+    ✓ Finalize auth spec — due May 15 [certain]
+    ⚠ OVERDUE: Set up staging env — due May 8 [certain]
+    · API load-test plan — due May 20 [probable]
+  Sarah Chen (2 items): ...
+  NEEDS_OWNER (1): 'Confirm vendor SLA terms' — assigned to thread? [unclear]
+
+ANALYSIS_CHECKPOINT.json → { phase: 'complete', overdue: 1, needs_owner: 1 }`
+          },
+          {
+            title: 'Email network graph analytics',
+            difficulty: 'advanced',
+            why: 'Who connects to whom? Graph analytics on email metadata reveals key connectors, communication bottlenecks, and community structure — without reading any message content.',
+            prompt: '"Build an email communication graph from emails/*.eml metadata (no content). Compute: degree centrality, betweenness centrality, community clusters, and top-5 bridge nodes. Save as analysis/graph.json and a Mermaid diagram. Use sub-agents for graph construction and analytics in parallel."',
+            lang: 'bash',
+            code: `"Build and analyse an email communication graph from emails/*.eml.
+Only use metadata: From, To, Cc, Date, Subject, Thread-Id. Do NOT read message bodies.
+
+SUB-AGENT 1 — Graph Builder:
+  Parse all .eml headers. For each email:
+    Add directed edge: sender → recipient (weight = email count)
+    Add directed edge: sender → cc_recipient (weight = 0.3, partial attention)
+  Build adjacency list. Save analysis/graph.json:
+  { nodes: [{id, email, name, sent, received}], edges: [{from, to, weight}] }
+
+SUB-AGENT 2 — Ontology Linker (run in parallel):
+  Read analysis/ontology.json (from previous step if exists).
+  For each cluster, identify which people are most active in it.
+  Save analysis/cluster_actors.json.
+
+After both complete, run ANALYTICS sub-agent:
+  Load analysis/graph.json.
+  Compute:
+  1. Degree centrality (in + out) — who sends/receives most
+  2. Betweenness centrality — who sits on the most paths (bridge nodes)
+  3. Community detection (greedy modularity or label propagation)
+  4. Reciprocity — who replies vs broadcasts
+  5. Response time distribution per sender
+
+  Save analysis/graph_metrics.json.
+  Print top-5 by betweenness (key connectors) and top-3 communities.
+
+  Generate analysis/graph.mmd (Mermaid diagram):
+    Show top-15 nodes by degree, sized by betweenness, colored by community."`,
+            output: `[Sub-agent 1] Graph: 7 nodes, 34 directed edges → analysis/graph.json
+[Sub-agent 2] Cluster actors linked → analysis/cluster_actors.json
+
+[Analytics sub-agent]
+Top-5 by betweenness centrality (key connectors):
+  1. sarah@company.com     — 0.82 (bridges eng↔product↔vendor)
+  2. marcus@company.com    — 0.61 (bridges eng↔vendor)
+  3. priya@vendor.com      — 0.44 (only external bridge)
+  ...
+
+Communities detected (3):
+  [A] Internal core: Sarah, Marcus, Alex, Jamie
+  [B] Vendor thread: Priya, Sarah, Marcus
+  [C] Exec loop: Sarah, CEO (single thread)
+
+Reciprocity: Marcus 0.91 (replies to almost everything)
+             CEO 0.12 (broadcasts, rarely replies)
+
+analysis/graph_metrics.json saved
+analysis/graph.mmd saved (Mermaid diagram, 15 nodes)`
+          },
+          {
+            title: 'Full pipeline: extract → ontology → graph → insight report',
+            difficulty: 'advanced',
+            why: 'The complete analysis: entity extraction feeds the ontology, the ontology scopes the graph, the graph reveals structural patterns, and a final sub-agent synthesises everything into an executive report — with checkpoints at every phase so long corpora survive rate-limit pauses.',
+            prompt: '"Run the full 4-phase email analysis pipeline on emails/*.eml using sub-agents at each phase. Checkpoint after every phase. Final output: analysis/exec_report.md covering key stakeholders, topic taxonomy, accountability gaps, network bottlenecks, and top-3 risk flags."',
+            lang: 'bash',
+            code: `"Run a full email analysis pipeline on emails/*.eml.
+
+Read PIPELINE_CHECKPOINT.json first. Resume from last completed phase.
+Create if missing: { phase: 0, email_count: 0 }
+
+PHASE 1 — Entity Extraction (sub-agent):
+  Extract people, orgs, action items, decisions, dates from all .eml files.
+  Save analysis/entities.json.
+  Update PIPELINE_CHECKPOINT.json → { phase: 1, email_count: N, people: P, actions: A }
+  /compact
+
+PHASE 2 — Ontology Mapping (sub-agent, uses entities.json):
+  Cluster emails into 5–10 topic groups.
+  Map entities to clusters.
+  Save analysis/ontology.json + analysis/cluster_actors.json.
+  Update PIPELINE_CHECKPOINT.json → { phase: 2, clusters: C }
+  /compact
+
+PHASE 3 — Graph Analytics (two parallel sub-agents):
+  Sub-agent A: build communication graph from headers → analysis/graph.json
+  Sub-agent B: compute centrality + communities → analysis/graph_metrics.json
+  Update PIPELINE_CHECKPOINT.json → { phase: 3, nodes: N, bridge_nodes: [...] }
+  /compact
+
+PHASE 4 — Insight Synthesis (sub-agent):
+  Read all analysis/*.json files.
+  Write analysis/exec_report.md containing:
+  ## Key Stakeholders — who drives decisions and who bridges groups
+  ## Topic Taxonomy — the 5–10 cluster ontology, plain English
+  ## Accountability Gaps — overdue items, unclear owners, missing follow-ups
+  ## Network Bottlenecks — who is a single point of failure in communication
+  ## Risk Flags — top 3 concerns inferred from patterns (e.g. vendor dependency, deadline pressure)
+  ## Recommended Actions — 3–5 concrete next steps with owners
+
+  Update PIPELINE_CHECKPOINT.json → { phase: 4, complete: true }
+  Print: 'Pipeline complete. Report: analysis/exec_report.md'"`,
+            output: `PIPELINE_CHECKPOINT.json not found — starting Phase 1.
+
+[Phase 1] Entity extraction complete (23 emails)
+  7 people · 3 orgs · 8 action items · 4 decisions
+  PIPELINE_CHECKPOINT.json → { phase: 1 } | /compact applied
+
+[Phase 2] Ontology: 6 clusters, 100% coverage
+  PIPELINE_CHECKPOINT.json → { phase: 2, clusters: 6 } | /compact applied
+
+[Phase 3] Graph: 7 nodes, 34 edges, 3 communities, 2 bridge nodes identified
+  PIPELINE_CHECKPOINT.json → { phase: 3 } | /compact applied
+
+[Phase 4] Synthesising across all analysis/*.json files...
+
+## Risk Flags (top 3):
+  1. Single vendor dependency: Acme Corp controls 40% of May launch blockers
+  2. Marcus Williams: highest betweenness + 1 overdue item — bottleneck risk
+  3. 'Confirm SLA terms' action item has no owner — blocks vendor phase
+
+analysis/exec_report.md saved (847 words, 5 sections)
+PIPELINE_CHECKPOINT.json → { phase: 4, complete: true }
+Pipeline complete. Report: analysis/exec_report.md`
           },
         ]
       },
-
       tokensave: {
         icon: '💰',
         title: 'Token Saving',
@@ -7012,7 +7226,7 @@ function renderChainCard(ex, idx) {
 // ── Render category pills ──────────────────────────────────────────────────
 const ROW_1 = ['commands','loops','agents','skills','hooks','monitoring','prompting'];
 const ROW_2 = ['chains','limits','run24','tokensave','patterns','halloffame','markdown','security','testing'];
-const ROW_3 = ['webdev','gamedev','ghpages','jupyter','paper','webscan','reposcan','vulnscan','schools'];
+const ROW_3 = ['webdev','syndata','ghpages','jupyter','paper','webscan','reposcan','vulnscan','emailanalysis'];
 
 function renderCategoryPills() {
   const row1 = document.querySelector('#category-pills [data-row="1"]');
