@@ -6742,7 +6742,7 @@ Context used: 180 tokens (vs 8,000 for full log dump)`
       chains: {
         icon: '🔗',
         title: 'Chains',
-        description: 'Multi-step prompt sequences that combine categories to reach a real outcome — applying a code archive, integrating an API, shipping a feature from a spec. Each chain lists the resources you need up front (zip files, API docs URLs, env vars, log files) so you can drop them straight into Claude and go.',
+        description: 'Multi-step prompt sequences that combine categories to reach a real outcome. <strong>How to use:</strong> copy each step\'s prompt and paste it into Claude Code\'s chat input one at a time — wait for Claude to finish each step before sending the next. 💬 chat prompts go in the input box, / slash commands go in the same input box, 🪝 hook configs go in <code>.claude/settings.json</code>, and 📎 resource files (zips, CSVs, specs) live in your project folder before you start.',
         examples: [
           {
             title: 'Ship Changes from a Code Archive',
@@ -6837,6 +6837,101 @@ Context used: 180 tokens (vs 8,000 for full log dump)`
             code: 'I have a data file at ./data/input.csv. Read the first 20 rows and describe the schema: column names, inferred types, null rates, and any obvious quality issues. I want the output to be [describe target format].',
             lang: 'text',
             output: '[Step 1 — prompting]\nReading ./data/input.csv (first 20 rows)...\n  Schema detected:\n    id:         integer, 0% null\n    email:      string, 2% null\n    created_at: ISO-8601 string, 0% null\n    revenue:    float (comma-encoded string), 4% null\n    country:    string, 7% null — 42 distinct values\n  Quality issues:\n    • revenue uses comma as decimal separator\n    • 3 duplicate id values detected\n\n[Step 2 — patterns]\nPipeline stages built:\n  validate:   rejects rows missing id/email; flags revenue format errors\n  normalise:  parses revenue strings → float; lowercases country codes\n  transform:  computes revenue_usd via FX lookup; adds month_bucket field\n  output:     serialises to ./data/output.jsonl (one JSON object per line)\n  Each stage is a pure function — fully composable and independently testable.\n\n[Step 3 — testing]\n  PASS  src/pipeline/validate.test.ts  (9 tests — empty, null, malformed)\n  PASS  src/pipeline/normalise.test.ts (7 tests — comma decimals, casing)\n  PASS  src/pipeline/transform.test.ts (6 tests — FX, bucketing, snapshot)\n  PASS  src/pipeline/output.test.ts    (4 tests — round-trip, schema check)\nAll 26 tests pass.\n\n[Step 4 — monitoring]\nMonitor attached — streaming per batch:\n  [pipeline] batch  1/10 — 500 rows processed,  3 skipped (validate)\n  [pipeline] batch  2/10 — 500 rows processed,  1 skipped\n  [pipeline] batch  3/10 — 500 rows processed,  7 skipped\n  ...\n  [pipeline] done   — 4 872 rows output, 128 skipped (2.6%)\n  Skipped rows logged to ./data/skipped.log\n\n[Step 5 — commands]\nFull run on ./data/input.csv complete.\n  Input:  5 000 rows\n  Output: 4 872 rows → ./data/output.jsonl\n  [main e3a7f2b] feat(pipeline): CSV-to-JSONL transform pipeline\n   7 files changed, 312 insertions(+)\nPushed to origin/main.'
+          },
+          {
+            title: 'Address a Pull Request Review',
+            difficulty: 'advanced',
+            why: 'Reviewer comments scatter across files and priorities — this chain triages them, implements fixes in logical groups, and re-requests review without losing any comment.',
+            resources: [
+              'PR URL or PR number — e.g. https://github.com/org/repo/pull/42',
+              'Your local feature branch checked out'
+            ],
+            steps: [
+              { category: 'prompting', icon: '💬', prompt: 'Fetch all open review comments from [PR URL]. List every comment with: file, line, reviewer, and whether it is blocking or a suggestion. Do not change any code yet.' },
+              { category: 'agents', icon: '🤖', prompt: 'Launch a subagent to triage the comment list into three groups: (1) blocking — must fix before merge, (2) suggestions — good to fix now, (3) deferred — track in a follow-up ticket. Show me the grouped list.' },
+              { category: 'patterns', icon: '🏗️', prompt: 'Implement all blocking fixes first, then the suggestions. Make one commit per logical group — not one giant commit. Each commit message should reference the reviewer comment it addresses.' },
+              { category: 'commands', icon: '/', prompt: '/review\n\nIf clean, push the updated branch and re-request review from the original reviewers.' }
+            ],
+            code: 'Fetch all open review comments from [PR URL]. List every comment with: file, line, reviewer, and whether it is blocking or a suggestion. Do not change any code yet.',
+            lang: 'text',
+            output: '[Step 1 — prompting]\nFetching review comments from PR #42...\n  Found 8 comments across 4 files:\n  src/api/users.ts:34   — @reviewer1  ⛔ BLOCKING: missing rate-limit header\n  src/api/users.ts:78   — @reviewer1  💡 SUGGESTION: extract magic number 300\n  src/auth/session.ts:12 — @reviewer2 ⛔ BLOCKING: token not invalidated on logout\n  src/utils/hash.ts:5   — @reviewer2  💡 SUGGESTION: use crypto.timingSafeEqual\n  src/models/user.ts:23 — @reviewer1  📌 DEFERRED: consider caching layer\n  ... (3 more)\n\n[Step 2 — agents]\nSubagent triage complete:\n  Blocking (2): rate-limit header, token invalidation on logout\n  Suggestions (4): magic number, timing-safe compare, error message copy, unused import\n  Deferred (2): caching layer, pagination strategy\nDeferred items saved to ./docs/followup-pr42.md\n\n[Step 3 — patterns]\nImplementing fixes...\n  Commit 1: fix(auth): invalidate session token on logout [PR42-review]\n  Commit 2: fix(api): add X-RateLimit headers to users endpoint [PR42-review]\n  Commit 3: refactor: extract constants and use timingSafeEqual [PR42-suggestions]\nAll commits pushed. Unused imports cleaned.\n\n[Step 4 — commands]\n/review — 0 issues found on updated diff\nPushing to origin/feature/user-auth...\nRe-requesting review from @reviewer1, @reviewer2... done.'
+          },
+          {
+            title: 'Database Schema Migration with Rollback',
+            difficulty: 'advanced',
+            why: 'Migrations that break prod at 2am usually skipped the rollback test. This chain writes and verifies the down-migration before a single line goes to staging.',
+            resources: [
+              './schema/current.sql — your existing schema',
+              './docs/migration-spec.md — describe what needs to change',
+              'Staging database connection string in .env as DATABASE_URL_STAGING'
+            ],
+            steps: [
+              { category: 'markdown', icon: '📝', prompt: 'Read ./docs/migration-spec.md and write a Migration ADR to ./docs/adr/NNNN-migration-name.md. Include: what changes, why, the rollback strategy, and estimated lock duration for each statement.' },
+              { category: 'testing', icon: '🧪', prompt: 'Write two test suites before touching the schema: (1) migration-up.test — applies the migration and asserts the new shape, (2) migration-down.test — rolls it back and asserts the original shape is restored. Both must pass on a test database.' },
+              { category: 'patterns', icon: '🏗️', prompt: 'Write the migration SQL with explicit up and down sections. Each destructive statement (DROP, ALTER, RENAME) must be preceded by a comment explaining the rollback step. Use transactions where the database supports it.' },
+              { category: 'commands', icon: '/', prompt: 'Run both test suites against the staging database at DATABASE_URL_STAGING. If both pass, print the final up-migration SQL for human review before any prod apply.' }
+            ],
+            code: 'Read ./docs/migration-spec.md and write a Migration ADR to ./docs/adr/NNNN-migration-name.md. Include: what changes, why, the rollback strategy, and estimated lock duration for each statement.',
+            lang: 'text',
+            output: '[Step 1 — markdown]\nReading ./docs/migration-spec.md...\n  Change: add notifications table + FK from users.id\n  Risk: ALTER TABLE on users (50M rows) — estimated lock: 180ms with CONCURRENTLY\nADR written → ./docs/adr/0014-notifications-table.md\n  Rollback: DROP TABLE notifications; DROP INDEX CONCURRENTLY ...\n\n[Step 2 — testing]\nTest databases initialised from ./schema/current.sql\n  PASS  migrations/0014.up.test.sql   — table created, FK verified, index present\n  PASS  migrations/0014.down.test.sql — table dropped, users table restored exactly\nBoth suites pass on test DB.\n\n[Step 3 — patterns]\nMigration written → ./migrations/0014_add_notifications.sql\n  -- UP\n  CREATE TABLE notifications (...);\n  ALTER TABLE notifications ADD CONSTRAINT fk_user ...; -- rollback: DROP CONSTRAINT\n  CREATE INDEX CONCURRENTLY idx_notifications_user_id ON notifications(user_id);\n  -- DOWN\n  DROP INDEX CONCURRENTLY idx_notifications_user_id;\n  DROP TABLE notifications;\n\n[Step 4 — commands]\nRunning test suites against staging...\n  PASS  migrations/0014.up.test.sql   ✓ staging\n  PASS  migrations/0014.down.test.sql ✓ staging\n\nFinal up-migration SQL ready for prod apply:\n  → ./migrations/0014_add_notifications.sql\n  Estimated prod impact: ~180ms lock on users table\n  Rollback tested: ✓'
+          },
+          {
+            title: 'Onboard to an Unfamiliar Codebase',
+            difficulty: 'advanced',
+            why: 'Most onboarding wastes hours on surface-level reading. This chain uses parallel agents to map the key dimensions of a codebase simultaneously, then captures what you learn.',
+            resources: [
+              'Local clone of the repository',
+              '30–60 minutes — this chain is thorough by design'
+            ],
+            steps: [
+              { category: 'commands', icon: '/', prompt: '/init\n\nGenerate a CLAUDE.md for this repo. This is your first action — it forces a structured scan of the tech stack, test setup, and build system before anything else.' },
+              { category: 'agents', icon: '🤖', prompt: 'Launch three subagents in parallel:\n• Agent 1: Read the 5 most-changed files in the last 30 git commits. What are the hot spots?\n• Agent 2: Read the test suite structure. What patterns does it use? What is and isn\'t covered?\n• Agent 3: Read the CI/CD config and deployment scripts. How does code get to production?' },
+              { category: 'markdown', icon: '📝', prompt: 'Using the subagent results, write a personal onboarding cheatsheet to ./docs/onboarding-notes.md. Include: entry points, dangerous files to be careful with, the deploy process in plain English, and 3 questions you still have.' },
+              { category: 'prompting', icon: '💬', prompt: 'Answer the 3 open questions from the cheatsheet by reading the relevant source files. Update ./docs/onboarding-notes.md with the answers.' }
+            ],
+            code: '/init\n\nGenerate a CLAUDE.md for this repo. This is your first action — it forces a structured scan of the tech stack, test setup, and build system before anything else.',
+            lang: 'text',
+            output: '[Step 1 — commands]\n/init scanning repository...\n  ✓ Stack: Node.js 20 + TypeScript + Express\n  ✓ Tests: Jest + Supertest (integration)\n  ✓ DB: PostgreSQL via Prisma ORM\n  ✓ Deploy: GitHub Actions → AWS ECS via Terraform\n  ✓ CLAUDE.md written (58 lines)\n\n[Step 2 — agents]\nThree subagents running in parallel...\n  Agent 1 — Hot spots (last 30 commits):\n    src/api/billing.ts     — 12 changes (most active)\n    src/workers/invoice.ts — 8 changes\n    prisma/schema.prisma   — 7 changes\n  Agent 2 — Test coverage:\n    Integration tests cover all API routes ✓\n    Workers have 0 test coverage ⚠\n    No E2E tests — manual QA before each deploy\n  Agent 3 — Deploy path:\n    Push to main → Actions runs tests → Docker build → ECS rolling deploy\n    Rollback: redeploy previous ECS task definition (< 3 min)\n\n[Step 3 — markdown]\nOnboarding cheatsheet written → ./docs/onboarding-notes.md\n  Entry points: src/index.ts (server), src/workers/index.ts (job queue)\n  ⚠ Dangerous: prisma/schema.prisma — migrations auto-run on deploy\n  Deploy: git push main → ~8 min to production\n  Open questions: (1) Why no worker tests? (2) What triggers invoice worker?\n                  (3) Where are env vars managed?\n\n[Step 4 — prompting]\nAnswering open questions...\n  (1) Worker tests: TODO in src/workers/invoice.ts:3 — acknowledged tech debt\n  (2) Invoice trigger: SQS queue, messages from billing.ts:processPayment()\n  (3) Env vars: AWS Parameter Store, synced via scripts/sync-env.sh\nCheatsheet updated. Onboarding complete.'
+          },
+          {
+            title: 'Debug a Performance Regression',
+            difficulty: 'overengineer',
+            why: 'Performance bugs are hard to fix without first knowing exactly which commit introduced them. This chain uses git bisect to find the culprit, then locks the fix with a benchmark test.',
+            resources: [
+              './benchmarks/ — existing benchmark suite, or describe what is slow',
+              'Performance baseline (response time, memory, or throughput number)',
+              'Approximate date/commit range when regression appeared'
+            ],
+            steps: [
+              { category: 'prompting', icon: '💬', prompt: 'I have a performance regression. [Describe it: e.g. "API p99 latency jumped from 80ms to 340ms sometime in the last 2 weeks"]. Read the benchmark suite at ./benchmarks/ and confirm you can reproduce the slow result on the current HEAD.' },
+              { category: 'agents', icon: '🤖', prompt: 'Launch a subagent to run git bisect between [good-commit-hash] and HEAD. At each bisect step, run the benchmark and report pass/fail. Identify the exact commit that introduced the regression.' },
+              { category: 'testing', icon: '🧪', prompt: 'Write a benchmark test that fails on the current code (the regression) and would pass at the performance baseline. This test must be added to the CI suite so the regression cannot silently reappear.' },
+              { category: 'patterns', icon: '🏗️', prompt: 'Read the introducing commit identified by bisect. Understand the change, then implement a fix. The benchmark test you wrote must now pass.' },
+              { category: 'commands', icon: '/', prompt: '/review\n\nRun the full benchmark suite to confirm no other regressions were introduced. Commit with a message that names the regression, the fix, and the performance delta (e.g. "perf: fix N+1 in getUserOrders — p99 80ms → 74ms").' }
+            ],
+            code: 'I have a performance regression. [Describe it]. Read the benchmark suite at ./benchmarks/ and confirm you can reproduce the slow result on the current HEAD.',
+            lang: 'text',
+            output: '[Step 1 — prompting]\nRunning ./benchmarks/api.bench.ts on HEAD...\n  GET /api/users/:id — p50: 312ms  p99: 341ms\n  Baseline in ./benchmarks/baseline.json:  p99: 82ms\n  ✓ Regression confirmed — 4.2x slowdown at p99.\n\n[Step 2 — agents]\nBisect subagent running (21 commits, ~5 steps)...\n  HEAD            SLOW  (341ms)\n  a8f3c2d         SLOW  (338ms)\n  4b1e9f2         SLOW  (335ms)\n  c7d4a83         FAST  (81ms)\n  Introducing commit: d2f6e10 — "feat: add user preferences to profile endpoint"\n  Changed: src/api/users.ts — added 3 new Prisma queries inside getUser()\n\n[Step 3 — testing]\nBenchmark test written → ./benchmarks/regression.bench.ts\n  FAIL (current HEAD):\n    ✗ GET /api/users/:id p99 must be < 120ms — got 341ms\n  (Will pass after fix)\n\n[Step 4 — patterns]\nRoot cause: 3 sequential Prisma queries added inside getUser() — classic N+1 pattern.\nFix: combined into a single query with Prisma include.\n  Before: 4 DB round-trips per request\n  After:  1 DB round-trip per request\n\n[Step 5 — commands]\n/review — clean\n  PASS  ./benchmarks/regression.bench.ts — p99: 76ms (baseline: 82ms)\n  PASS  ./benchmarks/api.bench.ts        — all endpoints within baseline\n  [main f9a2c14] perf: fix N+1 query in getUser — p99 341ms → 76ms\n   1 file changed, 14 insertions(+), 18 deletions(-)\nPushed to origin/main.'
+          },
+          {
+            title: 'Add Observability to a Running Service',
+            difficulty: 'overengineer',
+            why: 'Services without structured logs and metrics are black boxes in production. This chain adds logging, metrics, and a live health monitor in a single coordinated pass.',
+            resources: [
+              'Existing service source directory',
+              'Observability config: .env keys for DATADOG_API_KEY or CLOUDWATCH_LOG_GROUP, etc.',
+              'Optional: ./docs/runbook-template.md to fill in'
+            ],
+            steps: [
+              { category: 'patterns', icon: '🏗️', prompt: 'Audit the service for observability gaps. List: (1) functions that run > 100ms with no timing, (2) error paths that catch and swallow exceptions silently, (3) external calls with no timeout or retry logging. Show me the list before we add anything.' },
+              { category: 'monitoring', icon: '📡', prompt: 'Add structured JSON logging to every gap identified. Each log line must include: timestamp, level, traceId, durationMs (for timed operations), and a message. Add a background Monitor that polls service health every 30s and logs a heartbeat.' },
+              { category: 'testing', icon: '🧪', prompt: 'Write tests that assert the log output format. Use a log-capture mock to verify: (1) error paths emit ERROR level with a stack trace, (2) slow operations emit WARN when they exceed the threshold, (3) the heartbeat emits INFO with an uptime field.' },
+              { category: 'markdown', icon: '📝', prompt: 'Write a runbook to ./docs/runbook.md. Include: the log query to find errors in production, what each alert means and the first 3 steps to take, and the health endpoint URL.' },
+              { category: 'commands', icon: '/', prompt: '/review\n\nCommit everything — observability code, tests, and runbook — in a single commit so the ops change is atomic and traceable.' }
+            ],
+            code: 'Audit the service for observability gaps. List: (1) functions that run > 100ms with no timing, (2) error paths that swallow exceptions silently, (3) external calls with no timeout or retry logging. Show me the list before we add anything.',
+            lang: 'text',
+            output: '[Step 1 — patterns]\nObservability audit complete:\n  Timing gaps (4):\n    processPayment()     — no duration log (avg 380ms in prod)\n    fetchUserProfile()   — no duration log (external API call)\n    generateReport()     — no duration log (can take up to 8s)\n    sendEmailBatch()     — no duration log (SMTP bulk send)\n  Silent errors (3):\n    catch(e) {} in invoiceWorker.ts:87\n    catch(e) { console.log(e) } in scheduler.ts:44  ← not JSON\n    catch(e) { return null } in auth/session.ts:102\n  External calls without timeout (2):\n    fetch(stripeUrl) — no AbortController timeout\n    axios.get(crmUrl) — no timeout option\n\n[Step 2 — monitoring]\nStructured JSON logging added to all 9 gaps.\nSample log line:\n  {"ts":"2026-05-18T14:02:17Z","level":"INFO","traceId":"a8f3","op":"processPayment","durationMs":312}\nBackground Monitor added — heartbeat every 30s:\n  {"ts":"...","level":"INFO","op":"heartbeat","uptime":84321,"memMb":142}\n\n[Step 3 — testing]\n  PASS  src/observability.test.ts  (12 tests)\n    ✓ error paths emit ERROR with stack\n    ✓ processPayment emits WARN when > 500ms threshold\n    ✓ heartbeat includes uptime field\n\n[Step 4 — markdown]\nRunbook written → ./docs/runbook.md\n  Log query: @level:ERROR service:payments last 1h\n  Alert: HIGH_LATENCY → check processPayment duration, likely Stripe degradation\n  Health endpoint: GET /health → {"status":"ok","uptime":N}\n\n[Step 5 — commands]\n/review — 0 issues\n  [main 3c8a1d9] ops: add structured logging, metrics, and runbook to payments service\n   11 files changed, 287 insertions(+), 14 deletions(-)\nPushed to origin/main.'
           }
         ]
       },
