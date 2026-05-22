@@ -1113,14 +1113,7 @@ h1 {
       <div class="pills-rows" id="category-pills">
         <div class="pills-row" data-row="1"></div>
         <div class="pills-row" data-row="2"></div>
-      </div>
-    </div>
-    <div>
-      <div class="row-label">Difficulty</div>
-      <div class="pills" id="difficulty-pills">
-        <button class="pill active-diff-all" data-diff="all">All</button>
-        <button class="pill" data-diff="essential">Essential</button>
-        <button class="pill" data-diff="advanced">Advanced</button>
+        <div class="pills-row" data-row="3"></div>
       </div>
     </div>
     <div class="search-bar">
@@ -5331,6 +5324,1418 @@ Write specific tests that would catch each mutation. Be minimal — one test per
         ]
       },
 
+
+      webdev: {
+        icon: '🌐',
+        title: 'Web Dev',
+        description: 'Build web applications from a blank page to a deployed full-stack app. Each example is a complete workflow — scaffold, implement, test, and commit. Start with a landing page, end with a 3-day autonomous build loop.',
+        examples: [
+          {
+            title: 'Scaffold a landing page',
+            difficulty: 'essential',
+            why: 'Start every project with a working baseline. Claude generates semantic HTML, responsive CSS, and accessible markup fast.',
+            prompt: '"Create a landing page for a SaaS product called Shipfast: hero with CTA, 3 feature cards, pricing table (Free/Pro/Enterprise), footer. Semantic HTML5, CSS custom properties, mobile-first. Save to index.html."',
+            lang: 'bash',
+            code: `"Create a landing page for a SaaS called Shipfast:
+- Hero: headline, subheading, 'Get Started' CTA
+- 3 feature cards (Fast, Reliable, Affordable)
+- Pricing table: Free / Pro ($29/mo) / Enterprise
+- Footer with links
+
+Requirements:
+- Semantic HTML5 (header, main, section, footer)
+- CSS custom properties for colors and spacing
+- Mobile-first responsive design
+- Zero external dependencies
+
+Save as index.html"`,
+            output: `Created index.html (148 lines)
+✓ Hero with gradient background
+✓ Feature cards in CSS Grid
+✓ Responsive pricing table
+✓ Mobile breakpoints at 768px
+
+Preview: python3 -m http.server 8080`
+          },
+          {
+            title: 'Add a contact form with validation',
+            difficulty: 'essential',
+            why: 'Forms need client-side and server-side validation. Claude writes both in one pass — no back-and-forth needed.',
+            prompt: '"Read index.html. Add a Contact section before the footer: Name, Email, Message fields. Inline validation (required, email format, 10-500 char message). On submit, POST to /api/contact as JSON and show a success/error toast."',
+            lang: 'bash',
+            code: `"Read index.html. Add a Contact section before the footer:
+
+Fields: Name (required), Email (required, format check), Message (required, 10-500 chars)
+- Show inline error as user types
+- On submit: POST {name, email, message} to /api/contact
+- Show success toast on 200, error toast otherwise
+- No frameworks — vanilla JS only
+- Style to match existing CSS custom properties"`,
+            output: `Updated index.html
++ Contact section (42 lines HTML)
++ Validation logic (28 lines JS)
++ Toast component with CSS animation
++ fetch() with error handling`
+          },
+          {
+            title: 'Full-stack Todo app: Node + SQLite + tests',
+            difficulty: 'advanced',
+            why: 'A complete CRUD app is the most educational project. Claude builds backend, frontend, and tests in one instruction.',
+            prompt: '"Build a full-stack Todo app. Backend: Node.js + Express + SQLite (better-sqlite3). Frontend: vanilla JS SPA. Features: create/complete/delete, filter by status. Include npm run dev and Jest API tests."',
+            lang: 'bash',
+            code: `"Build a full-stack Todo app:
+
+Backend (server.js):
+- Express + better-sqlite3
+- Routes: GET /api/todos, POST /api/todos,
+          PATCH /api/todos/:id, DELETE /api/todos/:id
+- Schema: id, text, completed (0/1), created_at
+- CORS enabled for localhost
+
+Frontend (public/index.html):
+- Vanilla JS, no frameworks
+- Add todo form, checkbox to complete, delete button
+- Filter tabs: All / Active / Completed
+
+Tests (tests/api.test.js):
+- Jest + supertest, test all 4 routes + edge cases
+
+package.json scripts:
+  npm run dev  → nodemon server.js
+  npm test     → jest --coverage"`,
+            output: `Created:
+├── server.js          (89 lines)
+├── public/index.html  (124 lines)
+├── tests/api.test.js  (67 lines)
+└── package.json
+
+npm run dev → http://localhost:3000
+npm test    → 12/12 passing ✓`
+          },
+          {
+            title: 'React SPA with API integration and TypeScript',
+            difficulty: 'advanced',
+            why: 'Most real web apps need React, TypeScript, and a REST API. Claude sets up the full stack including types, hooks, and error boundaries.',
+            prompt: '"Create a React + TypeScript SPA that fetches and displays a list of GitHub repositories for a username. Use React Query for data fetching, Tailwind for styling. Include a search input, loading skeleton, and error state."',
+            lang: 'bash',
+            code: `"Create a React + TypeScript + Vite project:
+
+Features:
+- Search input: user types a GitHub username, hits Enter
+- Fetch https://api.github.com/users/{username}/repos
+- Display: repo name, description, stars, language, updated date
+- States: loading skeleton (3 placeholder cards), error message, empty state
+
+Tech stack:
+- React 18 + TypeScript
+- React Query (TanStack) for data fetching + caching
+- Tailwind CSS for styling
+- Zod for API response validation
+
+Also add: npm run dev, npm run build, npm test (Vitest)
+Create the project from scratch with npm create vite."`,
+            output: `Scaffolded React+TS+Vite project
++ src/hooks/useRepos.ts   (React Query hook)
++ src/types/github.ts     (Zod schema + types)
++ src/components/RepoCard, SearchBar, Skeleton
+
+npm run dev → http://localhost:5173
+npm test    → 8/8 passing`
+          },
+          {
+            title: '3-day autonomous web app build with checkpoints',
+            difficulty: 'advanced',
+            why: 'For large builds, use checkpoints, auto-commits, and a self-healing test loop. Claude works through phases autonomously, resuming where it left off.',
+            prompt: '"Build a project management web app over 3 sessions. Checkpoint after each phase. Auto-commit. Run tests before continuing to the next phase. Resume from CHECKPOINT.json if it exists."',
+            lang: 'bash',
+            code: `"Build a project management web app over multiple sessions.
+Always check for CHECKPOINT.json first and resume from the last step.
+
+PHASE 1 (Session 1):
+[ ] Scaffold Express + SQLite backend
+[ ] Users table + bcrypt auth (register/login/logout)
+[ ] JWT middleware protecting /api/* routes
+[ ] Write 8 auth tests with supertest; all must pass
+[ ] git commit -m 'phase1: auth complete'
+[ ] Update CHECKPOINT.json: { phase: 2, lastStep: 'auth' }
+
+PHASE 2 (Session 2):
+[ ] Read CHECKPOINT.json; load phase 2
+[ ] Projects CRUD: create, list, update, delete
+[ ] Tasks CRUD nested under projects
+[ ] Write 12 CRUD tests; all must pass before continuing
+[ ] git commit -m 'phase2: projects + tasks'
+
+PHASE 3 (Session 3):
+[ ] Read CHECKPOINT.json; load phase 3
+[ ] Dashboard with project stats (task counts, completion %)
+[ ] Export to CSV endpoint
+[ ] npm test -- --coverage (must be >70% coverage)
+[ ] git commit -m 'phase3: COMPLETE'
+
+Rule: if any test fails, fix it before the next checkbox."`,
+            output: `[Session 1] Reading CHECKPOINT.json... not found.
+Starting Phase 1.
+✓ Express + SQLite scaffolded
+✓ Auth routes: /register, /login, /logout
+✓ JWT middleware active
+✓ Tests: 8/8 passing
+✓ git commit: 'phase1: auth complete'
+CHECKPOINT.json written → { phase: 2 }`
+          },
+        ]
+      },
+
+      gamedev: {
+        icon: '🎮',
+        title: 'Game Dev',
+        description: 'Build games with Claude — ASCII terminal games to browser-based 2D/3D with physics, scoring, and WebSocket multiplayer. Multi-step workflows from a playable prototype to a 3-day autonomous build.',
+        examples: [
+          {
+            title: 'ASCII Snake game in Python',
+            difficulty: 'essential',
+            why: 'Terminal games teach game loops, input handling, and collision detection in 80 lines. No browser, no framework.',
+            prompt: '"Build a playable Snake game in Python using curses. Arrow keys to move, * symbols are food, walls and self-collision end the game. Show score in the header. Save as snake.py."',
+            lang: 'python',
+            code: `# Ask Claude: "Build snake.py — a terminal Snake game:
+# - curses library for rendering
+# - Arrow keys to move
+# - '*' symbols are food; eating grows the snake
+# - Hitting a wall or yourself ends the game
+# - Score displayed in top bar
+# - Press 'q' to quit
+# ~80 lines, no external dependencies"
+
+# Claude generates:
+import curses, random
+
+def main(stdscr):
+    curses.curs_set(0)
+    sh, sw = stdscr.getmaxyx()
+    snake = [[sh//2, sw//4+1], [sh//2, sw//4]]
+    direction = curses.KEY_RIGHT
+    score = 0
+    # ... full game loop with collision detection
+
+# Run: python3 snake.py`,
+            output: `snake.py created (78 lines)
+
+Run: python3 snake.py
+
+Controls: ← ↑ → ↓  |  q to quit
+Score shown in header bar`
+          },
+          {
+            title: 'Browser platformer with Phaser 3',
+            difficulty: 'advanced',
+            why: 'Phaser is the most popular 2D browser game framework. Claude scaffolds a working scene with physics, movement, and collectibles in a single HTML file.',
+            prompt: '"Create a Phaser 3 platformer in a single HTML file (CDN). Player: colored rectangle, WASD controls, gravity. 5 platforms, 10 coins to collect, score HUD. Restart on R key."',
+            lang: 'javascript',
+            code: `// Ask Claude: "Build game.html — a Phaser 3 platformer:
+// - Load Phaser 3 from CDN (no npm)
+// - Player: 32x48 blue rectangle, WASD / arrow keys
+// - Gravity: 800, jump: velocity -500 (space or up)
+// - 5 static platforms (green rectangles)
+// - 10 coin collectibles (yellow circles)
+// - Score HUD: top-left text, updates on collect
+// - Fall off screen → game over text + R to restart
+// Single index.html file"
+
+class GameScene extends Phaser.Scene {
+  create() {
+    this.platforms = this.physics.add.staticGroup();
+    this.player = this.physics.add.rectangle(100, 200, 32, 48, 0x4488ff);
+    this.coins = this.physics.add.group();
+    this.cursors = this.input.keyboard.createCursorKeys();
+    // ... collision, scoring, restart
+  }
+}`,
+            output: `game.html created (147 lines)
+
+Open: python3 -m http.server 8080
+→ http://localhost:8080/game.html
+
+Controls: WASD / arrow keys + space to jump
+Collect all 10 coins for bonus points`
+          },
+          {
+            title: 'Multiplayer game: WebSockets + 3-day build',
+            difficulty: 'advanced',
+            why: 'Multiplayer games require server authority, client interpolation, and careful state sync. A 3-session checkpoint workflow lets Claude build this incrementally.',
+            prompt: '"Build a real-time multiplayer top-down game over 3 sessions. Checkpoint after each session. Run integration tests before each commit. Resume from GAME_CHECKPOINT.json."',
+            lang: 'bash',
+            code: `"Build a multiplayer top-down game over 3 sessions.
+Read GAME_CHECKPOINT.json first and resume from last completed step.
+
+SESSION 1 — Server:
+[ ] Node.js + ws WebSocket server
+[ ] Lobby: players join with name, server assigns ID + color
+[ ] 60fps game loop: broadcast all player positions
+[ ] WASD movement: client sends direction, server computes position
+[ ] Server-side bounds checking (never trust client)
+[ ] Integration tests with ws mock client (6 tests, all pass)
+[ ] git commit -m 'game: server + movement'
+[ ] GAME_CHECKPOINT.json → { session: 2 }
+
+SESSION 2 — Frontend:
+[ ] Read GAME_CHECKPOINT.json
+[ ] Canvas renderer: draw each player as colored circle + name tag
+[ ] Smooth interpolation between server ticks
+[ ] keydown/keyup state map for input
+[ ] Connection status UI (Connected / Reconnecting)
+[ ] git commit -m 'game: client renderer'
+
+SESSION 3 — Mechanics:
+[ ] Read GAME_CHECKPOINT.json
+[ ] Spacebar fires bullet; server validates hits
+[ ] Health: 3 hits = eliminated, respawn countdown
+[ ] Leaderboard: kills/deaths, synced every 5s
+[ ] Full test run: npm test -- --coverage
+[ ] git commit -m 'game: mechanics COMPLETE'"`,
+            output: `[Session 1] GAME_CHECKPOINT.json not found — starting fresh.
+✓ WebSocket server on :8080
+✓ Lobby + ID assignment
+✓ 60fps broadcast loop
+✓ Integration tests: 6/6 passing
+✓ git commit: 'game: server + movement'
+GAME_CHECKPOINT.json → { session: 2 }`
+          },
+          {
+            title: 'Procedural map generation with tests',
+            difficulty: 'advanced',
+            why: 'Procedural generation makes games replayable. Claude implements a maze generator with unit tests for connectivity and coverage.',
+            prompt: '"Write a procedural maze generator in Python using recursive backtracking. Generate a 21x21 maze, print it to terminal, and write 5 unit tests: no isolated cells, all cells reachable, start/end always open, walls always even rows."',
+            lang: 'python',
+            code: `# Ask Claude: "Build maze_gen.py:
+# Algorithm: recursive backtracking (DFS)
+# Grid: 21x21 (odd dimensions so walls are even cells)
+# Output: print maze to terminal with '#' walls, ' ' paths
+# Mark 'S' at top-left, 'E' at bottom-right
+# 
+# Also write tests/test_maze.py with pytest:
+# 1. All path cells are reachable from S (BFS check)
+# 2. S and E cells are always open
+# 3. Wall cells are always at even row/col indices
+# 4. Maze dimensions are exactly 21x21
+# 5. Two different seeds produce different mazes
+#
+# Run: python3 maze_gen.py --seed 42"
+
+import random, sys
+from collections import deque
+
+def generate_maze(rows=21, cols=21, seed=None):
+    if seed: random.seed(seed)
+    maze = [['#'] * cols for _ in range(rows)]
+    # ... recursive backtracking implementation`,
+            output: `maze_gen.py created (67 lines)
+tests/test_maze.py created (45 lines)
+
+Sample output (seed=42):
+#S###############
+#   #       #   #
+# # # ##### # # #
+# #   #   # # # #
+# ##### # # # ###
+#       #   #  E#
+#################
+
+pytest: 5/5 passing ✓`
+          },
+        ]
+      },
+
+      ghpages: {
+        icon: '📄',
+        title: 'GitHub Pages',
+        description: 'Deploy to GitHub Pages — from a static site to a Jekyll blog with custom domain, CI/CD via GitHub Actions, and automated deployments on every push to main.',
+        examples: [
+          {
+            title: 'Set up GitHub Pages deployment',
+            difficulty: 'essential',
+            why: 'GitHub Pages is the fastest way to publish a site. Claude writes the correct workflow file and explains configuration in one step.',
+            prompt: '"Set up GitHub Pages for this repo. Create .github/workflows/deploy.yml that deploys the public/ folder on every push to main. Use the standard actions/deploy-pages workflow."',
+            lang: 'bash',
+            code: `# Ask Claude: "Set up GitHub Pages deployment:
+# 1. Create .github/workflows/deploy.yml
+# 2. Deploy contents of public/ to GitHub Pages
+# 3. Trigger on push to main
+# 4. Use actions/deploy-pages (current recommended approach)
+# 5. Commit and tell me the URL format"
+
+mkdir -p .github/workflows
+
+# Claude creates deploy.yml:
+# name: Deploy to GitHub Pages
+# on: push to main
+# permissions: pages: write, id-token: write
+# jobs: checkout → configure-pages → upload-artifact → deploy-pages
+
+git add .github/workflows/deploy.yml
+git commit -m "ci: add GitHub Pages deployment"
+git push`,
+            output: `Created .github/workflows/deploy.yml
+Committed + pushed to main
+
+Your site will be live at:
+https://<username>.github.io/<repo-name>/
+
+Enable in: Settings → Pages → Source: GitHub Actions
+(Takes ~2 min for first deployment to complete)`
+          },
+          {
+            title: 'Jekyll blog with posts and RSS feed',
+            difficulty: 'advanced',
+            why: 'Jekyll is natively supported by GitHub Pages. Claude scaffolds a full blog with posts, tags, dark theme, and RSS feed in one session.',
+            prompt: '"Scaffold a Jekyll blog for GitHub Pages: _config.yml, default layout, post layout, index page, 2 sample posts, tag system, RSS feed (jekyll-feed), dark CSS theme. Then run jekyll serve to verify."',
+            lang: 'bash',
+            code: `"Create a Jekyll blog for GitHub Pages:
+
+Files to create:
+- _config.yml: title, email, baseurl: /<repo-name>, plugins: [jekyll-feed, jekyll-sitemap]
+- _layouts/default.html: nav + main + footer, CSS vars for dark theme
+- _layouts/post.html: extends default, shows date + tag pills
+- index.html: list of posts with excerpts + pagination
+- _posts/2024-01-15-hello-world.md: first post with tags
+- _posts/2024-01-20-second-post.md: second post
+- Gemfile: gem 'github-pages'
+
+After creating all files:
+bundle install
+bundle exec jekyll serve --livereload"`,
+            output: `Jekyll blog created:
+├── _config.yml
+├── _layouts/default.html + post.html
+├── _posts/ (2 posts)
+├── index.html
+└── Gemfile
+
+bundle install... done (47 gems)
+→ http://localhost:4000  ✓ Live
+
+Push to main → auto-deploys to GitHub Pages`
+          },
+          {
+            title: 'Custom domain + HTTPS + privacy analytics',
+            difficulty: 'advanced',
+            why: 'Production GitHub Pages sites need a custom domain, forced HTTPS, and usage analytics. Claude handles all three configurations in sequence.',
+            prompt: '"Configure GitHub Pages for custom domain www.mysite.com. Create the CNAME file, add a Content Security Policy header, integrate Plausible analytics script, and create DNS_SETUP.md with the 4 required DNS records."',
+            lang: 'bash',
+            code: `"Configure GitHub Pages for custom domain:
+
+1. Create CNAME file (root of repo):
+   www.mysite.com
+
+2. In _layouts/default.html <head>, add CSP meta tag:
+   <meta http-equiv='Content-Security-Policy'
+     content='default-src self; script-src self plausible.io; img-src * data:;'>
+
+3. Add Plausible analytics (privacy-friendly, no cookies):
+   <script defer data-domain='mysite.com'
+     src='https://plausible.io/js/script.js'><\/script>
+
+4. Create docs/DNS_SETUP.md with instructions for 4 DNS records:
+   A records → 185.199.108.153 (+ .109, .110, .111)
+   CNAME www → <username>.github.io
+
+5. git commit -m 'feat: custom domain + analytics'"`,
+            output: `Created CNAME
+Updated _layouts/default.html (CSP + Plausible)
+Created docs/DNS_SETUP.md
+Committed: 'feat: custom domain + analytics'
+Pushed to main
+
+DNS: add the 4 records from docs/DNS_SETUP.md
+HTTPS: auto-enabled 24-48h after DNS propagates`
+          },
+          {
+            title: 'Full CI/CD pipeline: lint, test, build, deploy',
+            difficulty: 'advanced',
+            why: 'A production Pages site should only deploy after passing tests and linting. Claude writes a multi-job workflow with proper dependency gates.',
+            prompt: '"Create a GitHub Actions workflow that: (1) lints HTML with HTMLHint, (2) runs npm test, (3) builds with jekyll, (4) only deploys to Pages if all previous jobs pass. Add branch protection rules instructions."',
+            lang: 'bash',
+            code: `"Create .github/workflows/ci-deploy.yml:
+
+Jobs (run in sequence, each waits for previous to pass):
+
+1. lint:
+   - npm install -g htmlhint
+   - htmlhint public/**/*.html
+
+2. test:
+   - needs: [lint]
+   - npm ci && npm test
+
+3. build:
+   - needs: [test]
+   - bundle exec jekyll build --destination ./_site
+
+4. deploy:
+   - needs: [build]
+   - uses: actions/deploy-pages
+   - Only runs on push to main
+   - Upload _site/ as the pages artifact
+
+Also create docs/BRANCH_PROTECTION.md explaining:
+- Require CI to pass before merge
+- Require 1 review on PRs
+- Protect main branch from direct push"`,
+            output: `Created .github/workflows/ci-deploy.yml
+  jobs: lint → test → build → deploy
+  deploy only runs if all 3 prior jobs pass
+
+Created docs/BRANCH_PROTECTION.md
+
+First pipeline run:
+  lint  ✓ (0 errors)
+  test  ✓ (12/12 passing)
+  build ✓ (jekyll build)
+  deploy → github-pages environment`
+          },
+        ]
+      },
+
+      jupyter: {
+        icon: '📓',
+        title: 'Jupyter',
+        description: 'Write data science notebooks with Claude — from EDA to full ML pipelines. Complete, reproducible notebooks with visualizations, cross-validated models, and git-tracked outputs.',
+        examples: [
+          {
+            title: 'EDA notebook from a CSV file',
+            difficulty: 'essential',
+            why: 'Exploratory data analysis is step 1 of every data project. Claude writes the full notebook — missing value checks, distributions, correlation heatmap — faster than doing it manually.',
+            prompt: '"Read data/sales.csv and create analysis.ipynb: load data, show shape and dtypes, missing value heatmap, distribution plots for numeric columns, correlation heatmap. End with a 5-insight markdown summary."',
+            lang: 'python',
+            code: `# Ask Claude: "Create analysis.ipynb for data/sales.csv:
+#
+# Cell 1 — Imports: pandas, matplotlib, seaborn, numpy
+# Cell 2 — Load: df = pd.read_csv('data/sales.csv')
+#            show df.head(), df.info(), df.describe()
+# Cell 3 — Missing values: sns.heatmap(df.isnull())
+# Cell 4 — Distributions: histogram for each numeric column
+# Cell 5 — Correlation: sns.heatmap(df.corr(), annot=True)
+# Cell 6 — Markdown: '## Key Findings' with 5 bullet insights
+#
+# Use tight_layout(); save figures to figures/ dir
+# Include plt.savefig() for each plot"`,
+            output: `Created analysis.ipynb (6 cells)
+Created figures/ (3 PNG files)
+
+Findings:
+- 3 columns have >10% missing values
+- 'revenue' is right-skewed (log transform recommended)
+- price ↔ revenue correlation: r = 0.87 (strong)
+
+jupyter lab analysis.ipynb`
+          },
+          {
+            title: 'ML pipeline: train, cross-validate, save model',
+            difficulty: 'advanced',
+            why: 'A full ML notebook — preprocessing, feature engineering, training, evaluation — takes an hour manually. Claude produces a clean, reproducible pipeline in minutes.',
+            prompt: '"Create ml_pipeline.ipynb for data/churn.csv: preprocessing pipeline (impute, encode, scale), train RandomForest and XGBoost, 5-fold cross-validate, plot ROC curves, save best model to models/best_model.pkl."',
+            lang: 'python',
+            code: `# Ask Claude: "Create ml_pipeline.ipynb for churn prediction:
+#
+# 1. Load data/churn.csv, show target distribution
+# 2. Preprocessing Pipeline (sklearn.pipeline.Pipeline):
+#    - Numeric: SimpleImputer(median) + StandardScaler
+#    - Categorical: SimpleImputer(most_frequent) + OneHotEncoder
+# 3. Train two models:
+#    - RandomForestClassifier(n_estimators=100)
+#    - XGBClassifier(n_estimators=100)
+# 4. StratifiedKFold(5) cross-validation for both
+#    Report: mean AUC ± std
+# 5. Plot ROC curves side-by-side with AUC in legend
+# 6. Feature importance bar chart (top 20 features)
+# 7. joblib.dump(best_model, 'models/best_model.pkl')
+# 8. Markdown summary cell with 3-line results"`,
+            output: `Created ml_pipeline.ipynb (12 cells)
+Created models/best_model.pkl
+
+Results:
+  RandomForest: AUC 0.847 ± 0.023
+  XGBoost:      AUC 0.891 ± 0.018 ← best
+
+Saved figures/roc_curves.png
+Saved figures/feature_importance.png`
+          },
+          {
+            title: '3-session research notebook: collect → analyze → publish',
+            difficulty: 'advanced',
+            why: 'Research notebooks need reproducibility, checkpoints, and clean exports. A 3-session workflow with RANDOM_SEED=42 and nbconvert ensures repeatable results.',
+            prompt: '"Run a 3-session data science research project on public salary data. Session 1: collect and clean. Session 2: analysis and modeling. Session 3: write up and export to HTML. Use RESEARCH_CHECKPOINT.json to resume."',
+            lang: 'bash',
+            code: `"Run a reproducible 3-session research project.
+Always read RESEARCH_CHECKPOINT.json first and resume.
+Use RANDOM_SEED=42 in every notebook cell.
+
+SESSION 1 — Data Collection & Cleaning:
+[ ] Download DS salary CSV to data/raw/salaries.csv
+[ ] Create notebooks/01_cleaning.ipynb:
+    - Load and profile raw data (shape, dtypes, missing %)
+    - Drop rows missing >3 fields
+    - Standardize job titles (map variants to canonical names)
+    - Save to data/processed/salaries_clean.csv
+[ ] Run all cells — zero errors allowed
+[ ] git commit -m 'research: data cleaning'
+[ ] RESEARCH_CHECKPOINT.json → { session: 2 }
+
+SESSION 2 — Analysis & Modeling:
+[ ] Read RESEARCH_CHECKPOINT.json
+[ ] notebooks/02_analysis.ipynb:
+    - Salary by role, experience, company size (grouped bars)
+    - Remote vs on-site comparison (box plots)
+    - Linear regression: predict salary; report R² + RMSE
+    - Save all figures to figures/
+[ ] Run all cells — zero errors
+[ ] git commit -m 'research: analysis + modeling'
+
+SESSION 3 — Write-up & Export:
+[ ] Read RESEARCH_CHECKPOINT.json
+[ ] notebooks/03_results.ipynb:
+    - Executive summary (markdown)
+    - Embed key figures with captions
+    - Limitations section
+[ ] Export all 3 notebooks:
+    jupyter nbconvert --to html notebooks/*.ipynb
+[ ] git commit -m 'research: COMPLETE'"`,
+            output: `[Session 1] RESEARCH_CHECKPOINT.json not found.
+✓ Downloaded salaries.csv (78,342 rows)
+✓ 01_cleaning.ipynb: all cells ran ✓
+✓ 74,891 rows clean, 0 missing values
+✓ git commit: 'research: data cleaning'
+RESEARCH_CHECKPOINT.json → { session: 2 }`
+          },
+        ]
+      },
+
+      paper: {
+        icon: '📑',
+        title: 'Research Paper',
+        description: 'Outline, draft, cite, and revise research papers with Claude. From a topic to a full manuscript — with literature reviews, reproducible data analysis, and PDF export via pandoc.',
+        examples: [
+          {
+            title: 'Outline a research paper from a topic',
+            difficulty: 'essential',
+            why: 'A strong outline is 80% of a good paper. Claude produces a structured outline with section headings, key arguments, and suggested real citations.',
+            prompt: '"Write a detailed research paper outline on: impact of LLMs on software developer productivity. Include abstract, intro, related work, methodology, results, discussion, conclusion. Suggest 3 real citations per section. Save to paper/outline.md."',
+            lang: 'bash',
+            code: `"Write a research paper outline on:
+'Impact of Large Language Models on Software Developer Productivity'
+
+Structure (save to paper/outline.md):
+1. Abstract (150 words): research question, method, key finding
+2. Introduction: motivation, research gap, contribution claims (3 bullets)
+3. Related Work: prior LLM + productivity studies, IDE AI tools, surveys
+4. Methodology: study design, participants, metrics (time, quality, LOC)
+5. Results: quantitative findings, tables, statistical tests
+6. Discussion: interpretation, threats to validity, limitations
+7. Conclusion: summary, future work
+
+For each section:
+- 3-4 bullet points of key content to cover
+- 2-3 suggested real citations (author, year, venue, title)"`,
+            output: `Created paper/outline.md (87 lines)
+
+Suggested citations (real papers found):
+- Chen et al. 2021 — Evaluating Large Language Models (arXiv)
+- Ziegler et al. 2022 — Productivity Assessment of Neural Code Completion (ESEC/FSE)
+- Vaithilingam et al. 2022 — Expectation vs Experience (CHI)
+
+paper/outline.md ready to share for feedback`
+          },
+          {
+            title: 'Write a literature review section',
+            difficulty: 'advanced',
+            why: 'Literature reviews require synthesis, not just summarization. Claude groups papers by theme, notes disagreements, and identifies the research gap.',
+            prompt: '"Read paper/references.bib and paper/outline.md. Write the Related Work section (800-1200 words). 3 subsections: LLM coding tools, developer productivity measurement, AI pair programming. End with the research gap. Append to paper/draft.md."',
+            lang: 'bash',
+            code: `"Read paper/references.bib and paper/outline.md.
+Write the Related Work section and append to paper/draft.md:
+
+Requirements:
+- 800-1200 words total
+- Academic prose (past tense, synthesize — don't just list)
+- 3 subsections:
+  2.1 LLM-Based Code Generation Tools
+  2.2 Measuring Developer Productivity
+  2.3 Studies on AI-Assisted Programming
+- In each subsection: group papers by finding, note where they disagree
+- Final paragraph: identify the specific gap this paper fills
+- Use \\cite{key} format matching keys in references.bib"`,
+            output: `Appended Related Work to paper/draft.md
+1,047 words | 14 citations used
+3 inter-paper conflicts identified and noted
+Research gap paragraph: final paragraph of section 2`
+          },
+          {
+            title: '3-session paper: outline → draft → export PDF',
+            difficulty: 'advanced',
+            why: 'Writing a full paper in one session is unreliable. A 3-session workflow with PAPER_CHECKPOINT.json produces a coherent manuscript with correct citations and a PDF output.',
+            prompt: '"Write a complete research paper over 3 sessions. Track in PAPER_CHECKPOINT.json. Session 1: abstract + intro + lit review. Session 2: methods + results. Session 3: discussion + conclusion + pandoc PDF export."',
+            lang: 'bash',
+            code: `"Write a complete research paper across 3 sessions.
+Always read PAPER_CHECKPOINT.json first and resume.
+
+SESSION 1 — Foundation:
+[ ] Create paper/ directory: draft.md, references.bib, figures/
+[ ] Write Abstract (150 words)
+[ ] Write Introduction (500 words, end with 3 explicit contribution claims)
+[ ] Write Related Work (900 words, 3 themed subsections, cite bib keys)
+[ ] git commit -m 'paper: intro + lit review'
+[ ] PAPER_CHECKPOINT.json → { session: 2 }
+
+SESSION 2 — Core Content:
+[ ] Read PAPER_CHECKPOINT.json
+[ ] Write Methodology (600 words: design, participants, metrics)
+[ ] Create results tables in Markdown (mean ± std per condition)
+[ ] Write Results (700 words, reference every table and figure)
+[ ] Run any analysis scripts; save plots to paper/figures/
+[ ] git commit -m 'paper: methods + results'
+
+SESSION 3 — Polish + Export:
+[ ] Read PAPER_CHECKPOINT.json
+[ ] Write Discussion (500 words: interpret, threats to validity)
+[ ] Write Conclusion (300 words: summary + future work)
+[ ] Verify all \\cite{} keys exist in references.bib
+[ ] Export PDF:
+    pandoc paper/draft.md --bibliography=paper/references.bib \\
+      --citeproc --pdf-engine=xelatex -o paper/final.pdf
+[ ] git commit -m 'paper: COMPLETE manuscript + PDF'"`,
+            output: `[Session 1] PAPER_CHECKPOINT.json not found.
+✓ paper/ directory created
+✓ Abstract: 149 words
+✓ Introduction: 512 words, 3 contribution claims
+✓ Related Work: 894 words, 12 citations
+✓ git commit: 'paper: intro + lit review'
+PAPER_CHECKPOINT.json → { session: 2 }`
+          },
+        ]
+      },
+
+      webscan: {
+        icon: '🔍',
+        title: 'Scan Website',
+        description: 'Crawl, audit, and monitor websites with Claude. From link checking and content scraping to accessibility audits and 3-day continuous change detection.',
+        examples: [
+          {
+            title: 'Check all links on a website',
+            difficulty: 'essential',
+            why: 'Broken links hurt SEO and UX. Claude writes a crawler that checks every link and produces a prioritized broken-link report.',
+            prompt: '"Write broken_link_checker.py. Start from a given URL (CLI arg), follow all same-domain links, check each with requests.head(), report non-200 status codes with the page they were found on. Save to broken_links.csv. Respect robots.txt. 0.5s delay."',
+            lang: 'python',
+            code: `# Ask Claude: "Write broken_link_checker.py:
+# - Start URL passed as CLI arg: python3 broken_link_checker.py https://mysite.com
+# - BFS crawl, same domain only
+# - Skip: mailto:, tel:, #anchor-only, already-visited
+# - Check each URL with requests.head(timeout=5)
+# - Track: url, status_code, found_on_page
+# - Print progress: one dot per page checked
+# - Save non-200 results to broken_links.csv
+# - Obey robots.txt (use urllib.robotparser)
+# - Sleep 0.5s between requests"
+
+from urllib.parse import urljoin, urlparse
+from urllib.robotparser import RobotFileParser
+from collections import deque
+import requests, csv, time
+
+def crawl(start_url):
+    domain = urlparse(start_url).netloc
+    visited, broken = set(), []
+    queue = deque([(start_url, 'direct')])
+    # ... BFS with robots.txt check`,
+            output: `python3 broken_link_checker.py https://mysite.com
+
+Checking... ......................
+Pages checked: 47 | Links checked: 312
+
+Broken links: 4
+Written to broken_links.csv
+
+url                         status  found_on
+/products/legacy-widget     404     /products
+/docs/api-v1                410     /docs`
+          },
+          {
+            title: 'Scrape and structure website content',
+            difficulty: 'advanced',
+            why: 'Extracting structured data from a site is a common research and competitive analysis task. Claude handles pagination, rate limiting, and outputs clean JSON + CSV.',
+            prompt: '"Write jobs_scraper.py to scrape a job board. Extract: title, company, location, salary, posted date, URL. Handle pagination (up to 10 pages). Rate limit 1 req/sec. Save to jobs.json and jobs.csv."',
+            lang: 'python',
+            code: `# Ask Claude: "Write jobs_scraper.py:
+# Target site: job cards in .job-card divs (adjust selectors as needed)
+# Extract per job:
+#   - title: h2.job-title text
+#   - company: span.company-name text
+#   - location: span.location text
+#   - salary: span.salary (may be absent — use None)
+#   - posted_date: parse <time> datetime attr to ISO 8601
+#   - url: make absolute from a.job-link href
+#
+# Pagination: follow 'Next' link, stop at page 10 or no Next
+# Rate limit: time.sleep(1) between requests
+# User-Agent: set a real browser string
+# Output:
+#   jobs.json (list of dicts)
+#   jobs.csv (same data, flat)
+#
+# Run: python3 jobs_scraper.py https://jobs.example.com"`,
+            output: `Scraping https://jobs.example.com...
+Page 1/10: 25 jobs
+Page 2/10: 25 jobs
+Page 3/10: 23 jobs (no Next link — done)
+
+73 jobs extracted
+Saved: jobs.json + jobs.csv
+
+Top locations: Remote (31), London (18), Berlin (12)`
+          },
+          {
+            title: '72-hour website monitor: uptime + change detection',
+            difficulty: 'advanced',
+            why: 'Websites change without notice. A 3-day monitor checks uptime every 5 minutes, detects content changes, and writes daily summary reports automatically.',
+            prompt: '"Build monitor.py that runs for 72 hours. Check target URLs every 5 minutes, detect content changes via hash, log to SQLite, write a daily markdown report. Exit with code 1 if any downtime detected."',
+            lang: 'bash',
+            code: `"Build monitor.py — 72-hour website monitor.
+
+Config file (monitor_config.json):
+{
+  "targets": [
+    {"url": "https://mysite.com", "check_content": true, "selector": "h1"},
+    {"url": "https://mysite.com/api/health", "expected_status": 200}
+  ],
+  "interval_seconds": 300
+}
+
+SQLite schema (monitor.db):
+  checks: id, url, timestamp, status_code, response_ms, content_hash, changed
+  alerts: id, url, type, message, timestamp
+
+Every 5 minutes:
+1. GET each URL, measure response time
+2. If status != expected: log alert, print WARNING
+3. If content hash changed: log change alert, print CHANGE DETECTED
+
+At midnight each day → write reports/daily_YYYY-MM-DD.md:
+  - Uptime % per URL
+  - Avg + P95 response time
+  - List of detected changes
+
+After 72 hours: exit 0 if no downtime, exit 1 if any outage"`,
+            output: `monitor.py created (134 lines)
+Running 72-hour monitor...
+
+[09:00] ✓ mysite.com 200 (124ms)
+[09:05] ✓ mysite.com 200 (118ms)
+[09:10] ⚠ CHANGE: mysite.com h1 content changed
+[09:15] ✓ mysite.com 200 (131ms)
+
+Daily report: reports/daily_2024-01-15.md
+Uptime: 100% | Avg: 121ms | Changes: 1`
+          },
+        ]
+      },
+
+      reposcan: {
+        icon: '🔬',
+        title: 'Scan Git Repo',
+        description: 'Audit git repositories for quality, dead code, dependency health, and architecture. From a quick code quality report to a comprehensive 3-session repo health assessment.',
+        examples: [
+          {
+            title: 'Generate a code quality audit report',
+            difficulty: 'essential',
+            why: 'Before refactoring or onboarding a new team member, audit the repo. Claude runs shell commands and writes a structured report with prioritized action items.',
+            prompt: '"Audit this repo for: files >500 lines, TODO/FIXME comments, source files with no test counterpart, outdated dependencies. Write findings to AUDIT.md with a summary table and top 5 action items."',
+            lang: 'bash',
+            code: `"Audit this git repository and write AUDIT.md.
+
+Run these checks and collect results:
+
+1. Large files (flag >500 lines):
+   find . -name '*.js' -o -name '*.ts' -o -name '*.py' \\
+     | xargs wc -l 2>/dev/null | sort -rn | head -20
+
+2. TODO/FIXME/HACK comments:
+   grep -rn 'TODO\\|FIXME\\|HACK\\|XXX' src/ --include='*.ts'
+
+3. Untested modules (src files with no matching test):
+   Compare filenames in src/ vs tests/ (ignore path prefix)
+
+4. Outdated npm packages:
+   npm outdated 2>/dev/null
+
+Write AUDIT.md with:
+- Summary table: metric | count | severity (High/Medium/Low)
+- Full list per category
+- Top 5 recommended actions, ordered by impact"`,
+            output: `Running audit checks...
+✓ Large files: 12 (>500 lines)
+✓ TODO comments: 47 (8 FIXME)
+✓ Untested modules: 23
+✓ Outdated packages: 8 (2 with known CVEs)
+
+AUDIT.md written
+
+Top 5 actions:
+1. [HIGH] Fix 2 deps with CVEs immediately
+2. [HIGH] Add tests for 23 untested modules
+3. [MED] Refactor 12 oversized files
+4. [MED] Resolve 8 FIXMEs
+5. [LOW] Update remaining 6 outdated deps`
+          },
+          {
+            title: 'Find dead code and unused exports',
+            difficulty: 'advanced',
+            why: 'Dead code increases maintenance burden. Claude traces all exports and imports across the project to find what is truly unused.',
+            prompt: '"Find all exported functions and classes in src/ that are never imported anywhere in the project. List each with file and line number. Mark safe-to-delete vs requires manual check. Write to DEAD_CODE.md. Do NOT delete anything yet."',
+            lang: 'bash',
+            code: `"Find dead code in this TypeScript project. Do NOT delete anything.
+
+Step 1 — Build export map:
+  grep -rn 'export (function|class|const|default)' src/
+  → collect: symbol, file, line
+
+Step 2 — Build import map:
+  grep -rn 'import.*from' src/ tests/
+  → collect: what is imported, from where
+
+Step 3 — Compute dead exports:
+  exports not found in any import statement
+
+Step 4 — Check dynamic access patterns:
+  grep -rn 'require(\\|\\[.*\\]' src/
+  Flag any dead symbol that could be dynamically accessed
+
+Step 5 — Write DEAD_CODE.md table:
+  symbol | file | line | safe_to_delete (Yes/Needs Check)
+
+Mark 'Needs Check' if: used in a dynamic require, exported as part of public API (index.ts), or only used in migration scripts."`,
+            output: `Dead code analysis complete.
+Checked 312 files, 847 exports.
+
+Found 31 dead exports:
+Symbol            File                  Line  Safe?
+─────────────────────────────────────────────────────
+formatLegacyDate  src/utils/dates.ts    89    Yes
+OldAuthMiddleware src/middleware/auth   234   Needs Check
+convertV1Schema   src/migrations/v1    12    Yes
+... (28 more in DEAD_CODE.md)`
+          },
+          {
+            title: '3-session full repo health assessment',
+            difficulty: 'advanced',
+            why: 'A thorough audit takes multiple passes. This 3-session workflow covers structure, tests, security, and produces a graded health report with a prioritized action plan.',
+            prompt: '"Run a 3-session repo health audit. Track in AUDIT_CHECKPOINT.json. Session 1: structure + deps. Session 2: tests + complexity. Session 3: security + final REPO_HEALTH.md with letter grade."',
+            lang: 'bash',
+            code: `"3-session repository health audit.
+Read AUDIT_CHECKPOINT.json first and resume.
+
+SESSION 1 — Structure & Dependencies:
+[ ] tree -I node_modules -L 3 > reports/structure.txt
+[ ] npm audit --json > reports/security.json
+[ ] npm outdated > reports/outdated.txt
+[ ] Identify: monorepo vs single, test framework, CI config
+[ ] Write reports/session1.md
+[ ] git commit -m 'audit: session 1'
+[ ] AUDIT_CHECKPOINT.json → { session: 2 }
+
+SESSION 2 — Tests & Code Quality:
+[ ] Read AUDIT_CHECKPOINT.json
+[ ] npm test -- --coverage 2>&1 | tee reports/coverage.txt
+[ ] Find files >300 lines (flag for refactor)
+[ ] Compute test-to-source file ratio
+[ ] Write reports/session2.md
+[ ] git commit -m 'audit: session 2'
+
+SESSION 3 — Security & Final Report:
+[ ] Read AUDIT_CHECKPOINT.json
+[ ] grep -rn 'password =\\|API_KEY\\|SECRET' src/ (exclude test files)
+[ ] Check .gitignore covers: .env, *.key, *.pem, *.p12
+[ ] Write REPO_HEALTH.md:
+    - Letter grade (A-F) based on all findings
+    - Metrics table (coverage %, CVE count, debt ratio)
+    - Top 10 prioritized action items
+[ ] git commit -m 'audit: COMPLETE — REPO_HEALTH.md'"`,
+            output: `[Session 1] AUDIT_CHECKPOINT.json not found.
+✓ Structure mapped: 47 dirs, 312 files
+✓ npm audit: 3 vulnerabilities (1 high)
+✓ 8 packages outdated
+✓ reports/session1.md written
+✓ git commit: 'audit: session 1'
+AUDIT_CHECKPOINT.json → { session: 2 }`
+          },
+        ]
+      },
+
+      vulnscan: {
+        icon: '🛡️',
+        title: 'Vuln Scan',
+        description: 'Security scanning for your code and dependencies. Triage CVEs in npm audit output, do OWASP Top 10 code reviews, and run 72-hour continuous vulnerability monitoring.',
+        examples: [
+          {
+            title: 'Triage npm audit CVEs',
+            difficulty: 'essential',
+            why: 'npm audit output is noisy. Claude runs the audit, parses the JSON, and gives you a prioritized fix list — critical CVEs first with the exact fix command.',
+            prompt: '"Run npm audit --json. Parse the output and give me a prioritized list: critical first, then high, then moderate. For each: package, CVE ID, one-sentence description, exact npm fix command. Save to SECURITY_AUDIT.md."',
+            lang: 'bash',
+            code: `# Ask Claude: "Run npm audit and triage results:
+# 1. npm audit --json > audit_results.json
+# 2. Parse the JSON
+# 3. Group by severity: critical → high → moderate → low
+# 4. For each vulnerability:
+#    - Package name + version
+#    - CVE ID (or advisory ID)
+#    - Description: one sentence
+#    - Fix command: exact npm install <pkg>@<safe-version>
+# 5. Show total count per severity at top
+# 6. Write to SECURITY_AUDIT.md"
+
+npm audit --json > audit_results.json
+# Claude parses and writes SECURITY_AUDIT.md`,
+            output: `npm audit --json > audit_results.json
+Parsing 847 lines...
+
+SECURITY_AUDIT.md written
+
+Summary:
+  Critical: 2  High: 5  Moderate: 8  Low: 12
+
+Fix critical first:
+  npm install lodash@4.17.21    # CVE-2021-23337
+  npm install axios@1.6.0       # CVE-2021-3749`
+          },
+          {
+            title: 'OWASP Top 10 code review',
+            difficulty: 'advanced',
+            why: 'Automated scanners miss logic flaws. Claude reads your actual code and checks for SQL injection, broken auth, insecure config, and 7 other OWASP Top 10 categories.',
+            prompt: '"Review src/routes/ and src/middleware/ for OWASP Top 10 vulnerabilities. For each finding: file, line number, vulnerable code, and the fix. Write to OWASP_REVIEW.md."',
+            lang: 'bash',
+            code: `"You are a security engineer. Review src/ for OWASP Top 10.
+
+A01 — Broken Access Control:
+  src/routes/*.ts: check routes missing auth middleware
+  Look for direct object references without ownership checks
+
+A02 — Cryptographic Failures:
+  Search for: MD5, SHA1, 'http://' hardcoded, base64 used as encryption
+
+A03 — Injection:
+  src/db/*, src/routes/*: string interpolation in SQL queries
+  eval() calls, unsanitized input passed to shell commands
+
+A05 — Security Misconfiguration:
+  CORS config: must not use wildcard '*' in production
+  Express: check for helmet.js usage
+
+A07 — Identification & Auth Failures:
+  bcrypt rounds < 10?
+  JWT secret < 32 characters or hardcoded?
+  Session expiry configured?
+
+For each finding write to OWASP_REVIEW.md:
+  File: path/to/file.ts:LINE
+  Category: A0N — Name
+  Vulnerable: (code snippet)
+  Fix: (corrected code)"`,
+            output: `OWASP review complete → OWASP_REVIEW.md
+
+CRITICAL (2):
+  src/routes/users.ts:47 A03 — SQL Injection
+  src/db/query.ts:12    A03 — SQL Injection
+
+HIGH (3):
+  src/middleware/auth.ts:23 A07 — JWT secret too short
+  src/config/cors.ts:8  A05 — Wildcard CORS in production
+  src/routes/admin.ts:89 A01 — Missing auth on /admin/export
+
+MEDIUM: 2 findings | LOW: 1 finding`
+          },
+          {
+            title: '72-hour continuous CVE monitoring',
+            difficulty: 'advanced',
+            why: 'New CVEs are published daily. A 72-hour monitor checks your dependencies against npm audit and the NVD feed, alerting you to new vulnerabilities as they are disclosed.',
+            prompt: '"Build security_monitor.py that runs for 72 hours. Check npm audit every 6 hours, query NVD API for our package list, log findings to SQLite, write a daily security report. Exit 1 if any critical CVE found."',
+            lang: 'bash',
+            code: `"Build security_monitor.py — 72-hour CVE monitor.
+
+Setup:
+- Read package.json → extract all dependency names + versions
+- Create security.db (SQLite):
+  scans: id, timestamp, source, severity, package, version, cve_id, description
+  reports: id, date, new_findings, critical_count
+
+Every 6 hours:
+1. Run npm audit --json
+   Parse and insert new findings (deduplicate by cve_id)
+
+2. Query NVD API for each dependency (free, no key):
+   GET https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=PACKAGE
+   Rate limit: 1 request per 6 seconds (NVD enforced)
+   Insert any CVEs published since last scan
+
+3. Print: '[TIME] Scan: N new findings'
+
+At midnight → write reports/security_YYYY-MM-DD.md:
+  New CVEs, severity breakdown, recommended fixes
+
+After 72 hours:
+  Exit 0 if no critical/high found
+  Exit 1 if any critical or high severity CVE found"`,
+            output: `security_monitor.py created (134 lines)
+Loaded 47 packages from package.json
+
+[09:00] npm audit: 0 new findings
+[09:00] NVD: 47 packages checked, 0 new CVEs
+[15:00] npm audit: 0 new findings
+[15:00] NVD: ⚠ NEW CVE for express@4.18.1 (HIGH)
+         CVE-2024-XXXX: path traversal in static middleware
+         Fix: npm install express@4.19.0
+
+Daily report: reports/security_2024-01-15.md
+Exit code will be 1 (HIGH CVE found)`
+          },
+        ]
+      },
+
+      schools: {
+        icon: '🎓',
+        title: 'Research Schools',
+        description: 'Research schools and programs with Claude — from initial shortlisting to a weighted decision matrix, deadline tracker, essay prompt analysis, and complete application kit.',
+        examples: [
+          {
+            title: 'Build a program shortlist from criteria',
+            difficulty: 'essential',
+            why: 'Researching programs manually across 20 schools takes hours. Claude cross-references your criteria and produces a ranked shortlist with sources.',
+            prompt: '"Research online MBA programs for me: AACSB accredited, under $35k total, no GMAT required, strong finance track. List 10 matches with: URL, total cost, GMAT policy, duration, one standout feature. Save to schools/shortlist.md."',
+            lang: 'bash',
+            code: `"Research online MBA programs matching my criteria.
+Save results to schools/shortlist.md.
+
+My requirements:
+- AACSB or AMBA accredited
+- Total program cost under $35,000
+- No GMAT required (or easy waiver)
+- Fully online or hybrid
+- Finance specialization available
+
+For each match provide:
+1. School + program name
+2. Program URL
+3. Total estimated cost
+4. GMAT: Required / Optional / Waived
+5. Typical completion time
+6. One standout feature
+
+Find at least 10 programs.
+Also flag any I should avoid and why (accreditation issues, hidden fees, etc.)"`,
+            output: `Researching online MBA programs...
+Created schools/shortlist.md
+
+Top 10 matches:
+1. Indiana Kelley Online MBA — $30,600, No GMAT, #1 ranked online
+2. UNC Kenan-Flagler — $32,500, GMAT optional
+3. Arizona State W.P. Carey — $26,000, No GMAT
+... (7 more)
+
+Avoid: 2 programs with accreditation concerns
+       1 program with hidden fees (true cost: $52k)`
+          },
+          {
+            title: 'Weighted decision matrix with scoring',
+            difficulty: 'advanced',
+            why: 'A decision matrix removes emotion from school selection. Claude scores each program against your weighted criteria and explains the trade-offs.',
+            prompt: '"Read schools/shortlist.md. Build a weighted decision matrix (schools/matrix.md): cost 30%, reputation 25%, flexibility 20%, alumni network 15%, time-to-complete 10%. Score each school 1-5 per criterion, compute totals, rank them. Explain the top 3."',
+            lang: 'bash',
+            code: `"Read schools/shortlist.md.
+Build a weighted decision matrix in schools/matrix.md.
+
+Scoring rubric:
+- Cost (30%): 5=$25k, 4=$25-30k, 3=$30-35k, 2=$35-40k, 1=$40k+
+- Reputation (25%): 1-5 based on US News / FT / Bloomberg Businessweek rank
+- Flexibility (20%): 5=fully async, 4=mostly async, 3=some sync, 2=hybrid
+- Alumni Network (15%): 1-5 based on LinkedIn alumni density in finance
+- Time to Complete (10%): 5=18mo, 4=18-24mo, 3=24-30mo, 2=30-36mo
+
+Format as a Markdown table with weighted totals.
+Sort by TOTAL score descending.
+
+Add a paragraph explaining:
+- Why #1 is the recommendation
+- Key trade-off vs #2 and #3
+- Any non-obvious deal-breakers"`,
+            output: `Created schools/matrix.md
+
+Rankings:
+1. Indiana Kelley    — 4.35 (cost:5 rep:4 flex:4 net:4 time:5)
+2. UNC Kenan-Flagler — 4.10 (cost:3 rep:5 flex:4 net:5 time:3)
+3. AZ State Carey    — 4.05 (cost:5 rep:3 flex:5 net:3 time:4)
+
+Recommendation: Kelley leads on cost + flexibility balance.
+Trade-off vs UNC: Kelley costs $2k less; UNC has stronger alumni network.`
+          },
+          {
+            title: '3-session application research kit',
+            difficulty: 'advanced',
+            why: 'A complete application involves deadlines, essay prompts, recommendation letters, and outreach templates. A 3-session workflow builds the full kit.',
+            prompt: '"Run a 3-session application research project. Session 1: school research + requirements. Session 2: essay prompts + timeline. Session 3: application tracker + outreach email templates. Track in APP_CHECKPOINT.json."',
+            lang: 'bash',
+            code: `"3-session application research project.
+Read APP_CHECKPOINT.json first and resume.
+
+SESSION 1 — Research & Requirements:
+[ ] Create schools/ directory
+[ ] Research 8 target schools from schools/criteria.md
+[ ] For each school, create schools/SCHOOL_NAME.md with:
+    - Application deadlines (early + regular decision)
+    - Required: transcripts, LOR count, test scores
+    - Admitted student averages (GPA, GMAT/GRE)
+    - Application fee + fee waiver availability
+    - Scholarships / financial aid info
+[ ] Build schools/deadlines.md — sorted by earliest deadline
+[ ] git commit -m 'schools: research complete'
+[ ] APP_CHECKPOINT.json → { session: 2 }
+
+SESSION 2 — Essays & Timeline:
+[ ] Read APP_CHECKPOINT.json
+[ ] For each school: extract essay prompts + word limits
+    Save to schools/SCHOOL_NAME_essays.md
+[ ] Build schools/timeline.md:
+    - 12-week countdown from earliest deadline
+    - Week-by-week action items
+    - Milestones: essays drafted, reviewed, submitted
+[ ] git commit -m 'schools: essays + timeline'
+
+SESSION 3 — Tracker + Outreach:
+[ ] Read APP_CHECKPOINT.json
+[ ] Build schools/APPLICATION_TRACKER.md (checklist per school):
+    [ ] Request transcripts
+    [ ] Ask LOR writers (name + ask date)
+    [ ] Draft essays
+    [ ] Final review
+    [ ] Submit + pay fee
+[ ] Create schools/templates/:
+    - lor_request.md (email to recommender)
+    - admissions_question.md (email to admissions)
+    - alumni_coffee.md (LinkedIn message to alumni)
+[ ] git commit -m 'schools: complete application kit'"`,
+            output: `[Session 1] APP_CHECKPOINT.json not found.
+Researching 8 schools from schools/criteria.md...
+✓ Stanford GSB — saved (deadline: Jan 10)
+✓ Wharton — saved (deadline: Jan 3)
+✓ Harvard HBS — saved (deadline: Jan 3)
+... (5 more)
+✓ schools/deadlines.md created
+✓ git commit: 'schools: research complete'
+APP_CHECKPOINT.json → { session: 2 }`
+          },
+        ]
+      },
+
+      tokensave: {
+        icon: '💰',
+        title: 'Token Saving',
+        description: 'Every token you send costs money and fills context. These patterns cut prompt size, avoid redundant context, and stretch your token budget further — without sacrificing quality.',
+        examples: [
+          {
+            title: 'Speak like a caveman to cut system prompt length',
+            difficulty: 'essential',
+            why: 'Verbose system prompts waste tokens on every single call. Ultra-compressed instructions work just as well for simple tasks.',
+            prompt: '"Rewrite this system prompt to be as short as possible while keeping the intent. Drop pleasantries, verbose descriptions, and any instruction Claude follows by default anyway."',
+            lang: 'bash',
+            code: `# Instead of:
+"You are a helpful, friendly assistant. Please respond in a clear,
+professional manner. Always be polite and considerate. When answering
+questions, make sure to be thorough and accurate..."
+
+# Write:
+"Answer directly. No fluff."
+
+# Or for a coding assistant:
+"Code only. No explanations unless asked."
+
+# Claude follows reasonable defaults — only state exceptions.`,
+            output: `Before: 847 tokens in system prompt
+After:   12 tokens
+
+Savings per call: 835 tokens
+At 1000 calls/day: 835,000 tokens saved daily`
+          },
+          {
+            title: 'Ask for diffs instead of full file rewrites',
+            difficulty: 'essential',
+            why: 'When Claude rewrites a 500-line file to change 3 lines, you pay for 500 lines of output. Ask for a diff and pay for 3.',
+            prompt: '"Show me only the diff/patch for this change, not the full file. Use unified diff format."',
+            lang: 'bash',
+            code: `# Bad — Claude rewrites the entire file:
+"Update the validateEmail function in src/utils.ts to also reject
+plus-sign aliases"
+
+# Good — Claude returns only what changed:
+"Show me a unified diff for src/utils.ts that makes validateEmail
+reject plus-sign aliases. Do not show the full file."
+
+# Even better — explicit constraint:
+"Respond with only the changed lines in diff format.
+File: src/utils.ts  Function: validateEmail"`,
+            output: `--- a/src/utils.ts
++++ b/src/utils.ts
+@@ -14,7 +14,7 @@
+ export function validateEmail(email: string): boolean {
+-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
++  return /^[^+\s@][^\s@]*@[^\s@]+\.[^\s@]+$/.test(email);
+ }
+
+Output: 8 lines instead of 312 lines`
+          },
+          {
+            title: 'Tell Claude: "respond with only changed code"',
+            difficulty: 'essential',
+            why: 'Without this instruction Claude often restates the whole function, adds explanation, and summarizes what it did. One sentence eliminates all of that.',
+            prompt: 'Add "Respond with only the changed code, no explanation." to any edit request.',
+            lang: 'bash',
+            code: `# Append to any code edit request:
+"Respond with only the changed code, no explanation."
+
+# Example:
+"Add input sanitization to the createUser handler in
+src/routes/users.ts. Respond with only the changed code,
+no explanation."
+
+# For multiple small edits:
+"Fix these 3 issues in src/auth.ts:
+1. bcrypt rounds should be 12 not 8
+2. JWT expiry should be 15m not 1h
+3. Remove the console.log on line 47
+Respond with only the changed lines, no explanation."`,
+            output: `// Line 23:
+const hash = await bcrypt.hash(password, 12);
+// Line 31:
+const token = jwt.sign(payload, secret, { expiresIn: '15m' });
+
+(2 lines returned instead of 89-line full function)`
+          },
+          {
+            title: 'Limit files added to context',
+            difficulty: 'essential',
+            why: 'Reading 20 files "just in case" is the fastest way to fill context. Reference only the files Claude actually needs for the current task.',
+            prompt: '"Before reading any file, tell me which specific files you need and why. Only read those."',
+            lang: 'bash',
+            code: `# Bad — loads everything:
+"Read all files in src/ and tell me how auth works"
+
+# Good — targeted:
+"Auth is in src/middleware/auth.ts and src/routes/login.ts.
+Read only those two files and explain how JWT validation works."
+
+# For Claude Code sessions, add to CLAUDE.md:
+# "Do not read files speculatively. Only read a file when
+#  you need its specific contents to complete the current task."
+
+# When spawning subagents, scope their reads:
+Agent({
+  prompt: "Read ONLY src/db/schema.ts and answer: what tables exist?"
+})`,
+            output: `Files read: 2 (instead of 47)
+Tokens used: ~1,200 (instead of ~18,000)
+
+Tip: Use the Explore subagent for discovery — it reads
+excerpts rather than full files, keeping context lean.`
+          },
+          {
+            title: 'Feed a summary back instead of the full chat history',
+            difficulty: 'essential',
+            why: 'Long conversations accumulate context fast. Periodically summarize progress and start a fresh session with just the summary — same results, a fraction of the tokens.',
+            prompt: '"Summarize everything we\'ve accomplished in this session: decisions made, files changed, and what still needs to be done. I\'ll use this to start a fresh session."',
+            lang: 'bash',
+            code: `# At a natural break point, ask:
+"Summarize this session for handoff:
+1. What was the goal?
+2. What did we complete? (list files changed)
+3. What decisions were made and why?
+4. What still needs to be done?
+5. Any blockers or open questions?
+Keep it under 400 words."
+
+# Then start a new session with:
+"Context from previous session:
+[paste summary]
+
+Continue from where we left off. Next task: [next item]"`,
+            output: `Summary generated (287 words):
+Goal: Add payment processing to checkout flow
+Completed: src/payments/stripe.ts, src/routes/checkout.ts
+Decisions: Use Stripe webhooks (not polling)
+Remaining: refund flow, webhook signature validation
+Blockers: none
+
+New session token cost: ~400 vs ~12,000`
+          },
+          {
+            title: 'Use /compact to summarize conversation context',
+            difficulty: 'essential',
+            why: '/compact summarizes older messages in-place so you can keep working without starting over. Use it before context fills up, not after.',
+            prompt: '/compact',
+            lang: 'bash',
+            code: `# Run before context gets full:
+/compact
+
+# Or enable auto-compaction in settings so Claude does it automatically:
+# Settings → Auto-compact context: On
+
+# To compact with a focus hint:
+/compact "Focus the summary on the auth refactor — discard the
+debugging tangents from earlier."
+
+# Check your context usage before compacting:
+/status  # shows token usage if available
+
+# Rule of thumb: compact at 60-70% context used,
+# not at 95% when it's too late to be selective.`,
+            output: `/compact
+
+Compacting conversation...
+Previous: 48,000 tokens
+After compact: 6,200 tokens
+Preserved: all decisions, file changes, current task
+Discarded: exploratory tangents, repeated context
+
+Continue working — context state is preserved.`
+          },
+          {
+            title: 'Keep logs and stack traces out of context',
+            difficulty: 'essential',
+            why: 'A 2,000-line stack trace burns context for one error. Paste only the relevant error lines, not the full log dump.',
+            prompt: '"Here is the relevant part of the error: [paste 5-10 lines]. Full log is in logs/app.log if you need more context."',
+            lang: 'bash',
+            code: `# Bad — pastes 2,000 lines of logs:
+"Here are the logs: [massive dump]"
+
+# Good — paste only what matters:
+"Getting this error when I POST to /api/checkout:
+  TypeError: Cannot read properties of undefined (reading 'id')
+    at processPayment (src/payments/stripe.ts:47:23)
+    at async POST /api/checkout (src/routes/checkout.ts:89:5)
+
+Full logs at logs/app.log line 4,892 if you need more."
+
+# For generated files (build output, test reports):
+# Don't paste them — reference the file path:
+"Test run failed. Results in test-results/junit.xml. What failed?"
+
+# Add to CLAUDE.md:
+# "Never read logs/, dist/, or coverage/ unless explicitly asked."`,
+            output: `Error identified from 4 lines:
+  stripe.ts:47 — payment object is undefined when user
+  has no saved payment method (new user checkout)
+
+Fix: add null check before accessing payment.id
+
+Context used: 180 tokens (vs 8,000 for full log dump)`
+          }
+        ]
+      },
+
       // ===================================================
       // 14. CHAINS — multi-step prompt sequences
       // ===================================================
@@ -5440,7 +6845,6 @@ Write specific tests that would catch each mutation. Be minimal — one test per
 
 // ── State ──────────────────────────────────────────────────────────────────
 let activeCategory  = 'loops';
-let activeDifficulty = 'all';
 let searchQuery     = '';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -5512,22 +6916,17 @@ function renderChainCard(ex, idx) {
 
 // ── Render category pills ──────────────────────────────────────────────────
 const ROW_1 = ['commands','loops','agents','skills','hooks','monitoring','prompting'];
+const ROW_2 = ['chains','limits','run24','tokensave','patterns','halloffame','markdown','security','testing'];
+const ROW_3 = ['webdev','gamedev','ghpages','jupyter','paper','webscan','reposcan','vulnscan','schools'];
 
 function renderCategoryPills() {
   const row1 = document.querySelector('#category-pills [data-row="1"]');
   const row2 = document.querySelector('#category-pills [data-row="2"]');
+  const row3 = document.querySelector('#category-pills [data-row="3"]');
   const pill = (id, c) => `<button class="pill${activeCategory === id ? ' active-cat' : ''}" data-cat="${id}">${c.icon} ${c.title} <span class="pill-count">${c.examples.length}</span></button>`;
   row1.innerHTML = ROW_1.filter(id => CATEGORIES[id]).map(id => pill(id, CATEGORIES[id])).join('');
-  const row2Keys = ['chains', ...Object.keys(CATEGORIES).filter(id => !ROW_1.includes(id) && id !== 'chains')];
-  row2.innerHTML = row2Keys.filter(id => CATEGORIES[id]).map(id => pill(id, CATEGORIES[id])).join('');
-}
-
-// ── Render difficulty pills ────────────────────────────────────────────────
-function renderDiffPills() {
-  document.querySelectorAll('#difficulty-pills .pill').forEach(btn => {
-    const d = btn.dataset.diff;
-    btn.className = 'pill' + (activeDifficulty === d ? ' ' + DIFF_ACTIVE[d] : '');
-  });
+  row2.innerHTML = ROW_2.filter(id => CATEGORIES[id]).map(id => pill(id, CATEGORIES[id])).join('');
+  row3.innerHTML = ROW_3.filter(id => CATEGORIES[id]).map(id => pill(id, CATEGORIES[id])).join('');
 }
 
 // ── Render main content ────────────────────────────────────────────────────
@@ -5537,7 +6936,7 @@ function renderContent() {
   if (!cat) { main.innerHTML = ''; return; }
 
   let examples = cat.examples;
-  if (activeDifficulty !== 'all') examples = examples.filter(e => e.difficulty === activeDifficulty);
+
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
     examples = examples.filter(e => {
@@ -5587,7 +6986,7 @@ function renderContent() {
         <div class="prompt-block">
           <span class="prompt-block-label">💬 What you'd type to Claude</span>
           <div class="prompt-text">${escText(getPrompt(ex))}</div>
-          <button class="copy-btn prompt-copy-btn" data-code="${escAttr(getPrompt(ex))}">COPY PROMPT</button>
+          <button class="copy-btn prompt-copy-btn" data-code="${escAttr(getPrompt(ex))}">COPY</button>
         </div>
         <div class="why-block"><strong>Why this matters</strong><span>${ex.why}</span></div>
         <div class="code-block" style="position:relative">
@@ -5621,15 +7020,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderContent();
   });
 
-  // Difficulty pills — clicking the active pill deselects back to "all"
-  document.getElementById('difficulty-pills').addEventListener('click', e => {
-    const btn = e.target.closest('[data-diff]');
-    if (!btn) return;
-    const d = btn.dataset.diff;
-    activeDifficulty = (activeDifficulty === d && d !== 'all') ? 'all' : d;
-    renderDiffPills();
-    renderContent();
-  });
 
   // Search
   document.getElementById('search-input').addEventListener('input', e => {
